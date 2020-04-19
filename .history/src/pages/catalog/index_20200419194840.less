@@ -23,9 +23,9 @@ page {
 }
 
 .catalog .nav {
-  flex-basis: 196px;
+  width: 196px;
   background:#f7f7f7;
-  flex-grow:0;
+  height: 100%;
 }
 
 .catalog .nav .item {
@@ -46,6 +46,7 @@ page {
   border-left: 1px solid #fafafa;
   flex: 1;
   height: 100%;
+  padding: 0 30px 0 30px;
 }
 
 .banner {
@@ -79,12 +80,7 @@ page {
 
 .cate{
    .hd{
-    // position: fixed;
     display:flex;
-    padding-left:46px;
-    // z-index:2;
-    // top:0;
-    background:#fff;
     flex-wrap: wrap;
     justify-content: space-between;
     .second_type{
@@ -99,67 +95,39 @@ page {
         color:#333;
         font-size:25px;
       }
-      .active{
-        background:rgba(214,212,255,1);
-        border:1px solid rgba(132,115,220,1);
-        color:#8473DC;
-        box-sizing:border-box;
-      }
   }
 }
 
 
 
 .catalog .bd {
+  height: auto;
   width: 100%;
-  display:flex;
-  padding:0 30px;
-  align-items:center;
-  flex-wrap:wrap;
-  justify-content:space-between;
+  overflow: hidden;
 }
 
 .catalog .bd .item {
-  height: 284px;
-  position: relative;
-  flex-basis:49%;
-  display: flex;
-  flex-direction:column;
-  align-items:center;
-  margin-top:10px;
+  display: block;
+  float: left;
+  height: 216px;
+  width: 144px;
+  margin-right: 34px;
 }
 
-.bd{
-  .num{
-    position:absolute;
-    left:-10px;
-    top:0;
-    width:52px;
-    height:28px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:rgba(232,47,139,1);
-    border-radius:14px;
-    font-size:16px;
-    color:#fff;
-  }
-  .money{
-    margin-top:5px;
-    color:rgb(247, 18, 121);
-    font-size:24px;
-  }
-  .symbol{
-    font-size:20px;
-  }
+.catalog .bd .item.last {
+  margin-right: 0;
 }
+
 .catalog .bd .item .icon {
-  height: 205px;
-  width: 219px;
+  height: 144px;
+  width: 144px;
 }
 
 .catalog .bd .item .txt {
+  display: block;
   text-align: center;
-  font-size: 26px;
+  font-size: 24px;
   color: #333;
+  height: 72px;
+  width: 144px;
 }

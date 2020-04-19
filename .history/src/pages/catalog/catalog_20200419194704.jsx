@@ -15,7 +15,6 @@ class Index extends Component {
   }
 
   state = {
-    currentActve: 0,
     secondList: [
       {
         title: "苹果"
@@ -36,11 +35,6 @@ class Index extends Component {
     this.getData();
   }
 
-  handleSetSecond(item, index) {
-    this.setState({
-      currentActve: index
-    })
-  }
 
 
   getData = (cbk) => {
@@ -62,7 +56,7 @@ class Index extends Component {
   }
 
   render() {
-    const { categoryList, currentCategory, currentSubCategory } = this.props;
+    const { categoryList, currentCategory, currentSubCategory, goodsCount } = this.props;
     return (
       <View className='container'>
         <View className='catalog'>
@@ -82,19 +76,17 @@ class Index extends Component {
           <ScrollView scrollY className="cate">
             <View className='hd'>
               {
-                this.state.secondList.map((item, index) => {
-                  return <View onClick={this.handleSetSecond.bind(this, item, index)} className={`second_type ${this.state.currentActve === index ? 'active' : ''}`}>{item.title}</View>
-                })
+                this.state.secondList.map((item => {
+                  return <View className="second_type">{item.ttile}</View>
+                }))
               }
             </View>
             <View className='bd'>
               {
                 Array.isArray(currentSubCategory) && currentSubCategory.map((item, index) => {
-                  return <Navigator url={`/pages/category/category?id=${item.id}`} key={item.id} class="item">
-                    <Text className="num">95新</Text>
+                  return <Navigator url={`/pages/category/category?id=${item.id}`} className={`item ${(index + 1) % 3 == 0 ? 'last' : ''}`} key={item.id}>
                     <Image className='icon' src={item.picUrl}></Image>
                     <Text className='txt'>{item.name}</Text>
-                    <Text class="money">￥8/<Text className="symbol">天</Text></Text>
                   </Navigator>
                 })
               }

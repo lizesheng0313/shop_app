@@ -40,6 +40,7 @@ class Index extends PureComponent {
   }
   config = {
     navigationBarTitleText: '首页',
+    enablePullDownRefresh: true,
   }
 
   componentDidMount() {

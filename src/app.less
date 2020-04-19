@@ -34,3 +34,49 @@ div, span {
 }
 /*  #endif  */
 
+.flex-box {
+  display: flex;
+}
+
+.flex-space_center {
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+}
+
+.flex-around_center {
+  justify-content: space-around;
+  align-items: center;
+  display: flex;
+}
+
+.flex-start_center {
+  display: flex;
+  align-items: center;
+}
+
+.flex_dir_end {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+}
+
+.flex_all_center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex_dir_center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.flex1 {
+  -webkit-flex: 1; /* Chrome */
+  -moz-box-flex: 1; /* Firefox 19- */
+  -ms-flex: 1; /* IE 10 */
+  flex: 1; /* NEW,  Opera 12.1, Firefox 20+ */
+}

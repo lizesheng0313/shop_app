@@ -14,33 +14,12 @@ class Index extends Component {
     navigationBarTitleText: '分类',
   }
 
-  state = {
-    currentActve: 0,
-    secondList: [
-      {
-        title: "苹果"
-      },
-      {
-        title: "华为"
-      },
-      {
-        title: "OPPO"
-      },
-      {
-        title: "三星"
-      }
-    ]
-  }
+  state = {}
 
   componentDidMount() {
     this.getData();
   }
 
-  handleSetSecond(item, index) {
-    this.setState({
-      currentActve: index
-    })
-  }
 
 
   getData = (cbk) => {
@@ -62,7 +41,7 @@ class Index extends Component {
   }
 
   render() {
-    const { categoryList, currentCategory, currentSubCategory } = this.props;
+    const { categoryList, currentCategory, currentSubCategory, goodsCount } = this.props;
     return (
       <View className='container'>
         <View className='catalog'>
@@ -81,20 +60,16 @@ class Index extends Component {
           </View>
           <ScrollView scrollY className="cate">
             <View className='hd'>
-              {
-                this.state.secondList.map((item, index) => {
-                  return <View onClick={this.handleSetSecond.bind(this, item, index)} className={`second_type ${this.state.currentActve === index ? 'active' : ''}`}>{item.title}</View>
-                })
-              }
+              <Text className='line'></Text>
+              <Text className='txt'>{currentCategory.name}分类</Text>
+              <Text className='line'></Text>
             </View>
             <View className='bd'>
               {
                 Array.isArray(currentSubCategory) && currentSubCategory.map((item, index) => {
-                  return <Navigator url={`/pages/category/category?id=${item.id}`} key={item.id} class="item">
-                    <Text className="num">95新</Text>
+                  return <Navigator url={`/pages/category/category?id=${item.id}`} className={`item ${(index + 1) % 3 == 0 ? 'last' : ''}`} key={item.id}>
                     <Image className='icon' src={item.picUrl}></Image>
                     <Text className='txt'>{item.name}</Text>
-                    <Text class="money">￥8/<Text className="symbol">天</Text></Text>
                   </Navigator>
                 })
               }

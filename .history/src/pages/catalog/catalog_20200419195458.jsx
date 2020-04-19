@@ -37,9 +37,7 @@ class Index extends Component {
   }
 
   handleSetSecond(item, index) {
-    this.setState({
-      currentActve: index
-    })
+    console.log(item, index)
   }
 
 
@@ -63,6 +61,7 @@ class Index extends Component {
 
   render() {
     const { categoryList, currentCategory, currentSubCategory } = this.props;
+    const { currentActve } = this.state
     return (
       <View className='container'>
         <View className='catalog'>
@@ -82,19 +81,18 @@ class Index extends Component {
           <ScrollView scrollY className="cate">
             <View className='hd'>
               {
-                this.state.secondList.map((item, index) => {
-                  return <View onClick={this.handleSetSecond.bind(this, item, index)} className={`second_type ${this.state.currentActve === index ? 'active' : ''}`}>{item.title}</View>
-                })
+                this.state.secondList.map((item, index => {
+                  return <View className="second_type" >{item.title}</View>
+                }))
+                // onClick={this.handleSetSecond.bind(this,item,index)}
               }
             </View>
             <View className='bd'>
               {
                 Array.isArray(currentSubCategory) && currentSubCategory.map((item, index) => {
-                  return <Navigator url={`/pages/category/category?id=${item.id}`} key={item.id} class="item">
-                    <Text className="num">95新</Text>
+                  return <Navigator url={`/pages/category/category?id=${item.id}`} className={`item ${(index + 1) % 3 == 0 ? 'last' : ''}`} key={item.id}>
                     <Image className='icon' src={item.picUrl}></Image>
                     <Text className='txt'>{item.name}</Text>
-                    <Text class="money">￥8/<Text className="symbol">天</Text></Text>
                   </Navigator>
                 })
               }

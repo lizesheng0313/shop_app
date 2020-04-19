@@ -87,7 +87,7 @@ class Index extends Component {
                 })
               }
             </View>
-            <View className='bd'>
+            <View className='bd' style={{marginTop:this.state.secondList.length % 3 * 55 + 'px'}}>
               {
                 Array.isArray(currentSubCategory) && currentSubCategory.map((item, index) => {
                   return <Navigator url={`/pages/category/category?id=${item.id}`} key={item.id} class="item">

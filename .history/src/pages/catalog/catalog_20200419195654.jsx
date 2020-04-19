@@ -37,9 +37,7 @@ class Index extends Component {
   }
 
   handleSetSecond(item, index) {
-    this.setState({
-      currentActve: index
-    })
+    console.log(item, index)
   }
 
 
@@ -83,18 +81,16 @@ class Index extends Component {
             <View className='hd'>
               {
                 this.state.secondList.map((item, index) => {
-                  return <View onClick={this.handleSetSecond.bind(this, item, index)} className={`second_type ${this.state.currentActve === index ? 'active' : ''}`}>{item.title}</View>
+                  return <View  onClick={this.handleSetSecond.bind(this, item, index)} className={['second_type' this.state.currentActve === index ? 'active' : '']}>{item.title}</View>
                 })
               }
             </View>
             <View className='bd'>
               {
                 Array.isArray(currentSubCategory) && currentSubCategory.map((item, index) => {
-                  return <Navigator url={`/pages/category/category?id=${item.id}`} key={item.id} class="item">
-                    <Text className="num">95新</Text>
+                  return <Navigator url={`/pages/category/category?id=${item.id}`} className={`item ${(index + 1) % 3 == 0 ? 'last' : ''}`} key={item.id}>
                     <Image className='icon' src={item.picUrl}></Image>
                     <Text className='txt'>{item.name}</Text>
-                    <Text class="money">￥8/<Text className="symbol">天</Text></Text>
                   </Navigator>
                 })
               }
