@@ -4,8 +4,7 @@ import { View, Image } from '@tarojs/components';
 import icon from "../../../assets/images/coupons/icon.png"
 import first from "../../../assets/images/coupons/first.png"
 import second from "../../../assets/images/coupons/second.png"
-import nothing from "../../../assets/images/nothing.jpg"
-
+// import nothing from "../../../assets/images/nothing.jpg"
 import './index.less';
 
 class Index extends Component {
@@ -54,7 +53,8 @@ class Index extends Component {
                 </View>
               </View>
             })
-              : <Image src={nothing} className="nothing"></Image>
+              // : <Image src={nothing} className="nothing"></Image>
+              : ""
           }
         </View>
         <View className="btn_submit">兑换优惠券</View>
