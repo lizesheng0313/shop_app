@@ -1,14 +1,14 @@
 import Taro, { PureComponent } from '@tarojs/taro'
-import { View, Text, Navigator, Swiper, SwiperItem, Image, ScrollView, Block,Input } from '@tarojs/components'
+import { View, Text, Navigator, Swiper, SwiperItem, Image, ScrollView, Block, Input } from '@tarojs/components'
 import { connect } from '@tarojs/redux';
-import { AtIcon, AtTag } from 'taro-ui';
 import { get as getGlobalData } from '../../global_data';
-import { couponReceive } from '../../services/coupon';
+import { apiFindList } from '../../services/home';
 
 //图片
 import category from "../../assets/images/home/category.png"
 import adv from "../../assets/images/home/adv.png"
-import phone from "../../assets/images/home/phone.png"
+import phone from "../../assets/images/home/sb.png"
+import coupons from "../../assets/images/home/coupons.png"
 
 import './index.less'
 
@@ -38,6 +38,7 @@ class Index extends PureComponent {
       ]
     }
   }
+
   config = {
     navigationBarTitleText: '首页',
   }
@@ -47,13 +48,18 @@ class Index extends PureComponent {
   }
 
   getData = () => {
-    const { dispatch } = this.props;
-    dispatch({ type: 'home/getIndex' })
-    dispatch({ type: 'goods/getGoodsCount' })
+    apiFindList({ type: 2 }).then(res => {
+    })
   }
 
   componentWillMount() {
 
+  }
+
+  async onGetAuthorize(res) {
+    let userInfo = await Taro.getOpenUserInfo()
+    userInfo = JSON.parse(userInfo.response).response
+    console.log(userInfo)
   }
 
   onShareAppMessage() {
@@ -85,6 +91,15 @@ class Index extends PureComponent {
     const { data } = this.props;
     return (
       <View className='container'>
+        {/* <Button
+          openType="getAuthorize"
+          scope="userInfo"
+          onClick={this.onGetAuthorize.bind(this)}
+          type="primary"
+          className="login-button"
+        >
+          支付宝登录
+      </Button> */}
         <View class="header">
           <View className="search_box">
             <View className='search'>
@@ -109,7 +124,7 @@ class Index extends PureComponent {
           </View>
         </View>
         <View className="nav_box">
-          <Image src={adv} className="adv" />
+          <Image src={adv} className="adv" mode="widthFix" />
         </View>
 
         <View className="process">
@@ -128,6 +143,10 @@ class Index extends PureComponent {
               </Navigator>
             })
           }
+        </View>
+
+        <View>
+          <Image src={coupons} class="coupons" />
         </View>
 
         <View className="like">

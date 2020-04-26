@@ -9,8 +9,7 @@ page {
   background: #f9f9f9;
   height: 100%;
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  position: relative;
 }
 
 
@@ -23,9 +22,14 @@ page {
 }
 
 .catalog .nav {
-  flex-basis: 196px;
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  width:196px;
   background:#f7f7f7;
   flex-grow:0;
+  z-index:2;
 }
 
 .catalog .nav .item {
@@ -79,16 +83,18 @@ page {
 
 .cate{
    .hd{
-    // position: fixed;
+    position: fixed;
     display:flex;
-    padding-left:46px;
-    // z-index:2;
-    // top:0;
+    padding-left:20px;
+    z-index:2;
+    top:0;
+    left:197px;
+    right:30px;
     background:#fff;
     flex-wrap: wrap;
-    justify-content: space-between;
     .second_type{
         margin-top:13px;
+        margin-right:23px;
         display:flex;
         align-items:center;
         justify-content:center;
@@ -98,6 +104,9 @@ page {
         border-radius:20px;
         color:#333;
         font-size:25px;
+      }
+      .second_type:nth-of-type(3n){
+        margin-right:0;
       }
       .active{
         background:rgba(214,212,255,1);
@@ -111,9 +120,12 @@ page {
 
 
 .catalog .bd {
-  width: 100%;
+  position: relative;
+  left:197px;
   display:flex;
-  padding:0 30px;
+  width: calc(100% - 197px);
+  padding:60px 10px 0 30px;
+  box-sizing:border-box;
   align-items:center;
   flex-wrap:wrap;
   justify-content:space-between;

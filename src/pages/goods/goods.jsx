@@ -1,22 +1,26 @@
-import Taro , { Component } from '@tarojs/taro';
-import { View, Swiper, SwiperItem, Button, Navigator, Text, Block, Input, Image, RichText} from '@tarojs/components';
-import { AtIcon } from 'taro-ui';
-import {getGoodsDetail, getGoodsRelated, goodsCollectAddOrDelete} from '../../services/goods';
-import { groupOnJoin } from '../../services/group';
-import { addCart, cartFastAdd, getCartGoodsCount} from '../../services/cart';
+import Taro, { Component } from '@tarojs/taro';
+import { View, Swiper, SwiperItem, Button, Navigator, Text, Block, Input, Image, RichText } from '@tarojs/components';
+import { AtSegmentedControl } from 'taro-ui';
+import { getGoodsDetail, getGoodsRelated } from '../../services/goods';
+import { getCartGoodsCount } from '../../services/cart';
 
-import { showErrorToast } from '../../utils/util';
-import {ImgWeChat, ImgFriend} from '../../static/images';
+
+import home from "../../assets/images/goods/home.png"
+import shape from "../../assets/images/goods/shape.png"
+import customer from "../../assets/images/goods/customer.png"
+import zm from "../../assets/images/goods/zm.png"
+
+
 
 import './index.less';
 
 class Goods extends Component {
 
-   config = {
-      navigationBarTitleText: '商品详情'
+  config = {
+    navigationBarTitleText: '商品详情'
   }
 
-  state={
+  state = {
     canShare: false,
     id: 0,
     goods: {},
@@ -32,7 +36,6 @@ class Goods extends Component {
     cartGoodsCount: 0,
     userHasCollect: 0,
     number: 1,
-    checkedSpecText: '规格数量选择',
     tmpSpecText: '请选择规格数量',
     checkedSpecPrice: 0,
     openAttr: false,
@@ -42,15 +45,54 @@ class Goods extends Component {
     isGroupon: false, //标识是否是一个参团购买
     soldout: false,
     canWrite: false, //用户是否获取了保存相册的权限
+
+
+    goodsInfo: {
+      price: '25/天',
+      title: "【全新国行】ThinkPad X1c 极速版14英寸笔记本电脑",
+      xiao: "3061",
+      kd: "包邮",
+      info: [
+        "免押金",
+        "分期月付",
+        "可续租",
+        "可买断"
+      ],
+      tag: [
+        "大连发货",
+        '全新',
+        '好用'
+      ]
+    },
+    orderObj: {
+      checkedSpecText: '',
+      coupons: ""
+    },
+    current: 0,
+    likeList: [
+      { id: 123, picUrl: "", name: 'Iphone8PLUS 95新' },
+      { id: 123, picUrl: "", name: 'Iphone8PLUS 95新' },
+      { id: 123, picUrl: "", name: 'Iphone8PLUS 95新' },
+      { id: 123, picUrl: "", name: 'Iphone8PLUS 95新' },
+      { id: 123, picUrl: "", name: 'Iphone8PLUS 95新' },
+      { id: 123, picUrl: "", name: 'Iphone8PLUS 95新' }
+    ],
+    specifInfo: {
+      tag: "全新",
+      price: "21.5/天",
+      total_rent: "￥11800",
+      month_rent: "￥700",
+      money: "￥800",
+      color: ["黑色", '白色'],
+      package: ["套餐一", "套餐二"]
+    }
   }
 
-  componentWillMount () {
+  componentWillMount() {
 
   }
-  componentDidMount () {
-    const { id, grouponId } = this.$router.params;
-    // const id = 1181000;
-    // console.log('id', id);
+  componentDidMount() {
+    const id = 1181000;
     if (id) {
       this.setState({
         id: parseInt(id),
@@ -58,66 +100,18 @@ class Goods extends Component {
         this.getGoodsInfo();
       })
     }
-
-    // 记得打开
-    if (grouponId) {
-      this.setState({
-        isGroupon: true,
-      }, () => {
-        this.getGrouponInfo(grouponId);
-      });
-    }
-
-    let that = this;
-    Taro.getSetting({
-        success: function (res) {
-            console.log(res)
-            //不存在相册授权
-            if (!res.authSetting['scope.writePhotosAlbum']) {
-                Taro.authorize({
-                    scope: 'scope.writePhotosAlbum',
-                    success: function () {
-                        that.setState({
-                            canWrite: true
-                        })
-                    },
-                    fail: function (err) {
-                        that.setState({
-                            canWrite: false
-                        })
-                    }
-                })
-            } else {
-                that.setState({
-                    canWrite: true
-                });
-            }
-        }
-    })
   }
 
-  componentDidShow () {
-    // 页面显示
-    getCartGoodsCount().then(res => {
-      this.setState({
-        cartGoodsCount: res || 0
-      });
-    })
+  componentDidShow() {
+    // // 页面显示
+    // getCartGoodsCount().then(res => {
+    //   this.setState({
+    //     cartGoodsCount: res || 0
+    //   });
+    // })
   }
 
-  getGrouponInfo = (grouponId) => {
-    let that = this;
-    groupOnJoin({
-      grouponId: grouponId
-    }).then(res => {
-      that.setState({
-        grouponLink: res.groupon,
-        id: res.goods.id
-      });
-      //获取商品详情
-      that.getGoodsInfo();
-    })
-  }
+
 
   getGoodsInfo = () => {
     const { id } = this.state;
@@ -192,7 +186,7 @@ class Goods extends Component {
   }
 
   getGoodsRelated = () => {
-    const {id} = this.state;
+    const { id } = this.state;
 
     getGoodsRelated(id).then(res => {
       this.setState({
@@ -202,78 +196,8 @@ class Goods extends Component {
 
   }
 
-  componentDidShow () {}
+  componentDidShow() { }
 
-  shareFriendOrCircle = () => {
-    if (this.state.openShare === false) {
-      this.setState({
-        openShare: !this.state.openShare
-      });
-    } else {
-      return false;
-    }
-  }
-
-  closeShare = () => {
-    this.setState({
-      openShare: false,
-    });
-  }
-
-  handleSetting = (e) => {
-    console.log('---', e);
-    console.log(e)
-    // TODO 需测试
-    if (!e.detail.authSetting['scope.writePhotosAlbum']) {
-        Taro.showModal({
-            title: '警告',
-            content: '不授权无法保存',
-            showCancel: false
-        })
-        this.setState({
-          canWrite: false
-        })
-    } else {
-        Taro.showToast({
-            title: '保存成功'
-        })
-        this.setState({
-          canWrite: true
-        })
-    }
-  }
-
-  saveShare = () => {
-    Taro.downloadFile({
-      url: this.state.shareImage,
-      success: function(res) {
-        console.log(res)
-        Taro.saveImageToPhotosAlbum({
-          filePath: res.tempFilePath,
-          success: function() {
-            Taro.showModal({
-              title: '存图成功',
-              content: '图片成功保存到相册了，可以分享到朋友圈了',
-              showCancel: false,
-              confirmText: '好的',
-              confirmColor: '#a78845',
-              success: function(res1) {
-                if (res1.confirm) {
-                  console.log('用户点击确定');
-                }
-              }
-            })
-          },
-          fail: function() {
-            console.log('fail')
-          }
-        })
-      },
-      fail: function() {
-        console.log('fail')
-      }
-    })
-  }
 
   switchAttrPop = () => {
     if (this.state.openAttr == false) {
@@ -287,6 +211,12 @@ class Goods extends Component {
     this.setState({
       openAttr: false,
     });
+  }
+
+  handleClick(value) {
+    this.setState({
+      current: value
+    })
   }
 
   //获取选中的规格信息
@@ -312,7 +242,7 @@ class Goods extends Component {
   }
 
   isCheckedAllSpec = () => {
-    return !this.getCheckedSpecValue().some(function(v) {
+    return !this.getCheckedSpecValue().some(function (v) {
       if (v.valueId == 0) {
         return true;
       }
@@ -320,7 +250,7 @@ class Goods extends Component {
   }
 
   getCheckedProductItem = (key) => {
-    return this.state.productList.filter(function(v) {
+    return this.state.productList.filter(function (v) {
       if (v.specifications.toString() == key.toString()) {
         return true;
       } else {
@@ -330,135 +260,18 @@ class Goods extends Component {
   }
 
   getCheckedSpecKey = () => {
-    let checkedValue = this.getCheckedSpecValue().map(function(v) {
+    let checkedValue = this.getCheckedSpecValue().map(function (v) {
       return v.valueText;
     });
     return checkedValue;
   }
 
-  changeSpecInfo = () => {
-    let checkedNameValue = this.getCheckedSpecValue();
 
-    //设置选择的信息
-    let checkedValue = checkedNameValue.filter(function(v) {
-      if (v.valueId != 0) {
-        return true;
-      } else {
-        return false;
-      }
-    }).map(function(v) {
-      return v.valueText;
-    });
-    if (checkedValue.length > 0) {
-      this.setState({
-        tmpSpecText: checkedValue.join('　')
-      });
-    } else {
-      this.setState({
-        tmpSpecText: '请选择规格数量'
-      });
-    }
-
-    if (this.isCheckedAllSpec()) {
-      this.setState({
-        checkedSpecText: this.state.tmpSpecText
-      });
-
-      // 规格所对应的货品选择以后
-      let checkedProductArray = this.getCheckedProductItem(this.getCheckedSpecKey());
-      if (!checkedProductArray || checkedProductArray.length <= 0) {
-        this.setState({
-          soldout: true
-        });
-        console.error('规格所对应货品不存在');
-        return;
-      }
-
-      let checkedProduct = checkedProductArray[0];
-      if (checkedProduct.number > 0) {
-        this.setState({
-          checkedSpecPrice: checkedProduct.price,
-          soldout: false
-        });
-      } else {
-        this.setState({
-          checkedSpecPrice: this.state.goods.retailPrice,
-          soldout: true
-        });
-      }
-
-    } else {
-      this.setState({
-        checkedSpecText: '规格数量选择',
-        checkedSpecPrice: this.state.goods.retailPrice,
-        soldout: false
-      });
-    }
-  }
 
   clickSkuValue = (data) => {
-    let specName = data.specification;
-    let specValueId = data.id;
-
-    //判断是否可以点击
-
-    //TODO 性能优化，可在wx:for中添加index，可以直接获取点击的属性名和属性值，不用循环
-    let _specificationList = this.state.specificationList;
-    for (let i = 0; i < _specificationList.length; i++) {
-      if (_specificationList[i].name === specName) {
-        for (let j = 0; j < _specificationList[i].valueList.length; j++) {
-          if (_specificationList[i].valueList[j].id == specValueId) {
-            //如果已经选中，则反选
-            if (_specificationList[i].valueList[j].checked) {
-              _specificationList[i].valueList[j].checked = false;
-            } else {
-              _specificationList[i].valueList[j].checked = true;
-            }
-          } else {
-            _specificationList[i].valueList[j].checked = false;
-          }
-        }
-      }
-    }
-    this.setState({
-      specificationList: _specificationList,
-    }, () =>{
-      //重新计算spec改变后的信息
-      this.changeSpecInfo();
-    });
-
-
-    //重新计算哪些值不可以点击
+    console.log(data)
   }
 
-  // 团购选择
-  clickGroupon = (data) => {
-
-    //参与团购，不可更改选择
-    if (this.state.isGroupon) {
-      return;
-    }
-
-    // let specName = data.specification;
-    let specValueId = data.id;
-
-    let _grouponList = this.state.groupon;
-    for (let i = 0; i < _grouponList.length; i++) {
-      if (_grouponList[i].id == specValueId) {
-        if (_grouponList[i].checked) {
-          _grouponList[i].checked = false;
-        } else {
-          _grouponList[i].checked = true;
-        }
-      } else {
-        _grouponList[i].checked = false;
-      }
-    }
-
-    this.setState({
-      groupon: _grouponList,
-    });
-  }
 
   cutNumber = () => {
     this.setState({
@@ -472,421 +285,184 @@ class Goods extends Component {
     });
   }
 
-  //添加或是取消收藏
-  addCollectOrNot = () => {
 
-    goodsCollectAddOrDelete({
-      type: 0,
-      valueId: this.state.id
-    }).then((res) => {
-      if (this.state.userHasCollect == 1) {
-        this.setState({
-          collect: false,
-          userHasCollect: 0
-        });
-      } else {
-        this.setState({
-          collect: true,
-          userHasCollect: 1
-        });
-      }
-    })
-  }
 
-  openCartPage = () => {
+  handleSwitchIndex = () => {
     Taro.switchTab({
-      url: '/pages/cart/cart'
+      url: '/pages/index/index'
     });
   }
 
-  addToCart = () => {
-    if (this.state.openAttr == false) {
-      //打开规格选择窗口
-      this.setState({
-        openAttr: !this.state.openAttr
-      });
-    } else {
-
-      //提示选择完整规格
-      if (!this.isCheckedAllSpec()) {
-        showErrorToast('请选择完整规格');
-        return false;
-      }
-
-      //根据选中的规格，判断是否有对应的sku信息
-      let checkedProductArray = this.getCheckedProductItem(this.getCheckedSpecKey());
-      if (!checkedProductArray || checkedProductArray.length <= 0) {
-        //找不到对应的product信息，提示没有库存
-        showErrorToast('没有库存');
-        return false;
-      }
-
-      let checkedProduct = checkedProductArray[0];
-      //验证库存
-      if (checkedProduct.number <= 0) {
-        showErrorToast('没有库存');
-        return false;
-      }
-
-      // 添加购物车
-      addCart({
-        goodsId: this.state.goods.id,
-        number: this.state.number,
-        productId: checkedProduct.id
-      }).then(res => {
-        Taro.showToast({
-          title: '添加成功'
-        });
-        this.setState({
-          openAttr: !this.state.openAttr,
-          cartGoodsCount: res
-        });
-        if (this.state.userHasCollect == 1) {
-          this.setState({
-            collect: true
-          });
-        } else {
-          this.setState({
-            collect: false
-          });
-        }
-      })
-
-    }
-  }
-
-    //获取选中的团购信息
-  getCheckedGrouponValue = () => {
-    let checkedValues = {};
-    let _grouponList = this.state.groupon;
-    for (let i = 0; i < _grouponList.length; i++) {
-      if (_grouponList[i].checked) {
-        checkedValues = _grouponList[i];
-      }
-    }
-
-    return checkedValues;
-  }
-
   addFast = () => {
-    if (this.state.openAttr == false) {
-      //打开规格选择窗口
-      this.setState({
-        openAttr: !this.state.openAttr
-      });
-    } else {
 
-      //提示选择完整规格
-      if (!this.isCheckedAllSpec()) {
-        showErrorToast('请选择完整规格');
-        return false;
-      }
-
-      //根据选中的规格，判断是否有对应的sku信息
-      let checkedProductArray = this.getCheckedProductItem(this.getCheckedSpecKey());
-      if (!checkedProductArray || checkedProductArray.length <= 0) {
-        //找不到对应的product信息，提示没有库存
-        showErrorToast('没有库存');
-        return false;
-      }
-
-      let checkedProduct = checkedProductArray[0];
-      //验证库存
-      if (checkedProduct.number <= 0) {
-        showErrorToast('没有库存');
-        return false;
-      }
-
-      //验证团购是否有效
-      let checkedGroupon = this.getCheckedGrouponValue();
-
-      //立即购买
-      cartFastAdd({
-        goodsId: this.state.goods.id,
-        number: this.state.number,
-        productId: checkedProduct.id
-      }).then(res => {
-        Taro.setStorageSync('cartId', res);
-        Taro.setStorageSync('grouponRulesId', checkedGroupon.id);
-        Taro.setStorageSync('grouponLinkId', this.state.grouponLink.id);
-        Taro.navigateTo({
-          url: '/pages/checkout/checkout'
-        })
-      })
-    }
   }
 
   render() {
-    const {canShare, collect, cartGoodsCount, soldout, groupon, number, specificationList, tmpSpecText, openAttr, canWrite, goods, isGroupon, brand, comment, attribute, issueList, relatedGoods, openShare, checkedSpecText, checkedSpecPrice} = this.state;
+    const { goodsInfo, specifInfo, soldout, openAttr, goods, orderObj } = this.state;
     return (
       <Block>
-      <View className='container'>
-        <Swiper className='goodsimgs' indicator-dots='true' autoplay='true' interval='3000' duration='1000'>
-          { Array.isArray(goods.gallery) && goods.gallery.map(item => {
-            return <SwiperItem key={item}>
-              <Image className='img' src={item} background-size='cover'></Image>
-            </SwiperItem>
-          })}
+        <View className='container'>
 
-        </Swiper>
-        {/* <!-- 分享 --> */}
-        <View class='goods_name'>
-          <View class='goods_name_left'>{goods.name}</View>
-          {
-            !canShare && <View className='goods_name_right' onClick={this.shareFriendOrCircle}>分享</View>
-          }
-        </View>
-        <View className='share-pop-box' style={{display: !openShare ? 'none' : 'block'}}>
-          <View className='share-pop'>
-            <View className='close' onClick={this.closeShare}>
-              <AtIcon className='icon' size='14' color='#666' value='close' />
-            </View>
-            <View className='share-info'>
-              {
-                !isGroupon && <Button className='sharebtn' openType='share'>
-                  <Image class='sharebtn_image' src={ImgWeChat}></Image>
-                  <View class='sharebtn_text'>分享给好友</View>
-                </Button>
-              }
+          <Swiper className='goodsimgs' indicator-dots='true' autoplay='true' interval='3000' duration='1000'>
+            {Array.isArray(goods.gallery) && goods.gallery.map(item => {
+              return <SwiperItem key={item}>
+                <Image className='img' src={item} background-size='cover'></Image>
+              </SwiperItem>
+            })}
+          </Swiper>
 
-              {
-                !isGroupon && !canWrite && <Button  className='savesharebtn' openType='openSetting' onOpenSetting={this.handleSetting} >
-                  <Image class='sharebtn_image' src={ImgFriend}></Image>
-                  <View class='sharebtn_text'>发朋友圈</View>
-                </Button>
-              }
-              {
-                !isGroupon && canWrite && <Button className='savesharebtn' onClick={this.saveShare}>
-                  <Image class='sharebtn_image' src={ImgFriend}></Image>
-                  <View class='sharebtn_text'>发朋友圈</View>
-                </Button>
-              }
-            </View>
+          <View>
+            <Image src={zm} className="zm_icon"></Image>
           </View>
-        </View>
 
-        <View className='goods-info'>
-          <View className='c'>
-            <Text className='desc'>{goods.brief}</Text>
-            <View className='price'>
-              <View className='counterPrice'>原价：￥{goods.counterPrice}</View>
-              <View className='retailPrice'>现价：￥{checkedSpecPrice}</View>
-            </View>
-            {
-              brand.name && <View className='brand'>
-                {/* TODO url 替换 */}
-                <Navigator url='../brandDetail/brandDetail?id={brand.id}'>
-                  <Text>{brand.name}</Text>
-                </Navigator>
-              </View>
-            }
-
-          </View>
-        </View>
-        <View className='section-nav section-attr' onClick={this.switchAttrPop}>
-          <View className='t'>{checkedSpecText}</View>
-          <AtIcon className='i' value='chevron-right' size='18' color='#666' />
-        </View>
-        {
-          comment && comment.count > 0 && <View className='comments'>
-            <View className='h'>
-              <Navigator url={`/pages/comment/comment?valueId=${goods.id}&type=0`}>
-                <Text className='t'>评价({comment.count > 999 ? '999+' : comment.count})</Text>
-                <View className='i'>
-                  查看全部
-                  <van-icon name='arrow' />
-                </View>
-              </Navigator>
-            </View>
-            <View className='b'>
+          <View className='goods-info'>
+            <View className='price'>￥{goodsInfo.price}</View>
+            <View className="tag">
               {
-                Array.isArray(comment.data) && comment.data.map(item => {
-                  return <View className='item' key={item.id}>
-                    <View className='info'>
-                      <View className='user'>
-                        <Image src={item.avatar}></Image>
-                        <Text>{item.nickname}</Text>
-                      </View>
-                      <View className='time'>{item.addTime}</View>
-                    </View>
-                    <View className='content'>
-                      {item.content}
-                    </View>
-                    {
-                      item.picList.length > 0 && <View className='imgs'>
-                        {
-                          item.picList.map(pic => {
-                            return <Image className='img' key={item.pic} src={pic}></Image>
-                          })
-                        }
-                      </View>
-                    }
-                    {
-                      item.adminContent && <View className='customer-service'>
-                        <Text className='u'>商家回复：</Text>
-                        <Text className='c'>{item.adminContent}</Text>
-                      </View>
-                    }
+                goodsInfo.tag.map((item => {
+                  return <Text>{item}</Text>
+                }))
+              }
+            </View>
+            <View className='title'>{goodsInfo.title}</View>
+            <View className="courier flex-space_center">
+              <View>销量:{goodsInfo.xiao}件</View>
+              <View>{goodsInfo.kd}</View>
+            </View>
+            <View className="other_info">
+              {
+                goodsInfo.info.map((item => {
+                  return <View className="item">
+                    <View className='at-icon at-icon-check-circle'></View>
+                    <Text className="name">{item}</Text>
                   </View>
-                })
+                }))
               }
             </View>
           </View>
-        }
 
-        <View className='goods-attr'>
-          <View className='t'>商品参数</View>
-          <View className='l'>
-            {
-              Array.isArray(attribute) && attribute.map(item => {
-                return <View className='item' key={item.name}>
-                  <Text className='left'>{item.attribute}</Text>
-                  <Text className='right'>{item.value}</Text>
-                </View>
-              })
-            }
 
-          </View>
-        </View>
-
-        <View className='detail'>
-          { goods.detail && <RichText style={{fontSize: 0}} nodes={goods.detail2} />}
-        </View>
-
-        <View className='common-problem'>
-          <View className='h'>
-            <View className='line'></View>
-            <Text className='title'>常见问题</Text>
-          </View>
-          <View className='b'>
-            {
-              Array.isArray(issueList) && issueList.map(item => {
-                return <View className='item' key={item.id}>
-                  <View className='question-box'>
-                    <Text className='spot'></Text>
-                    <Text className='question'>{item.question}</Text>
-                  </View>
-                  <View className='answer'>
-                    {item.answer}
-                  </View>
-                </View>
-              })
-            }
-          </View>
-        </View>
-
-        {/* <!-- 大家都在看 --> */}
-        {
-          Array.isArray(relatedGoods) && relatedGoods.length > 0 && <View className='related-goods'>
-            <View className='h'>
-              <View className='line'></View>
-              <Text className='title'>大家都在看</Text>
-            </View>
-            <View className='b'>
+          <View className='section-nav section-attr' onClick={this.switchAttrPop}>
+            <View className='t'>
               {
-                relatedGoods.map(item => {
-                  return <View className='item' key={item.id}>
-                  <Navigator url='/pages/goods/goods?id={item.id}'>
-                    <Image className='img' src={item.picUrl} background-size='cover'></Image>
-                    <Text className='name'>{item.name}</Text>
-                    <Text className='price'>￥{item.retailPrice}</Text>
+                orderObj.checkedSpecText ? orderObj.checkedSpecText : <Text className="tips">请选择规格</Text>
+              }
+            </View>
+            <Text className='at-icon at-icon-chevron-right'></Text>
+          </View>
+
+
+
+          <View className='section-nav section-attr'>
+            <View className='t'>
+              {
+                orderObj.coupons ? <View className="coupons">{orderObj.coupons}</View> : <Text className="tips">请选择优惠券</Text>
+              }
+            </View>
+            <Text className='at-icon at-icon-chevron-right'></Text>
+          </View>
+
+
+          <View className="recommend_list">
+            <View className="header">
+              <Text className="title">为您推荐</Text>
+              <Text className="check_all">查看全部<Text className='at-icon at-icon-chevron-right'></Text></Text>
+            </View>
+            <ScrollView scrollX scrollWithAnimation className="scroll_view">
+              {
+                this.state.likeList.map(item => {
+                  return <Navigator url={`/pages/category/category?id=${item.id}`} key={item.id} className="item" >
+                    <Text className="num">95新</Text>
+                    <Image className='icon' src={item.picUrl}></Image>
+                    <Text className='txt'>{item.name}</Text>
+                    <Text className="money">￥8/<Text className="symbol">天</Text></Text>
                   </Navigator>
-                </View>
                 })
               }
-            </View>
-          </View>
-        }
-      </View>
-
-      {/* <!-- 规格选择界面 --> */}
-
-      <View className='attr-pop-box' style={{display: !openAttr ? 'none' : 'block'}}>
-        <View className='attr-pop'>
-          <View className='close' onClick={this.closeAttr}>
-            <AtIcon className='icon' size='14' color='#666' value='close' />
-          </View>
-          <View className='img-info'>
-            <Image className='img' src={goods.picUrl}></Image>
-            <View className='info'>
-              <View className='c'>
-                <View className='p'>价格：￥{checkedSpecPrice}</View>
-                <View className='a'>{tmpSpecText}</View>
-              </View>
-            </View>
+            </ScrollView>
           </View>
 
-          {/* <!-- 规格列表 --> */}
-          <View className='spec-con'>
+          {/* <View className='detail'>
+            {goods.detail && <RichText style={{ fontSize: 0 }} nodes={goods.detail2} />}
+          </View> */}
+          <View className="goods_detils">
+            <AtSegmentedControl
+              values={['商品详情', '租赁说明', '租赁规则']}
+              onClick={this.handleClick.bind(this)}
+              current={this.state.current}
+            />
             {
-              Array.isArray(specificationList) && specificationList.map(item => {
-                return <View className='spec-item' key={item.name}>
-                <View className='name'>{item.name}</View>
-                <View className='values'>
-                  {
-                    item.valueList.map(vitem => {
-                      return  <View className={`value ${vitem.checked ? 'selected' : ''}`} onClick={() => this.clickSkuValue(vitem)} key={vitem.id}>{vitem.value}</View>
-                    })
-                  }
-                </View>
-              </View>
-              })
+              this.state.current === 0
+                ? <View className='tab-content'>标签1的内容</View>
+                : null
             }
             {
-              groupon.length > 0 && <View className='spec-item'>
-                <View className='name'>团购立减</View>
-                <View className='values'>
-                  {
-                    groupon.map(vitem1 => {
-                      return  <View className={`value ${vitem1.checked ? 'selected' : ''}`} onClick={ () => this.clickGroupon(vitem1) } key={vitem1.id}>￥{vitem1.discount} ({vitem1.discountMember}人)</View>
-                    })
-                  }
-
-                </View>
-              </View>
+              this.state.current === 1
+                ? <View className='tab-content'>标签2的内容</View>
+                : null
             }
-
-
-            {/* <!-- 数量 --> */}
-            <View className='number-item'>
-              <View className='name'>数量</View>
-              <View className='selnum'>
-                <View className='cut' onClick={this.cutNumber}>-</View>
-                <Input value={number} className='number' disabled type='number' />
-                <View className='add' onClick={this.addNumber}>+</View>
-              </View>
-            </View>
+            {
+              this.state.current === 2
+                ? <View className='tab-content'>标签3的内容</View>
+                : null
+            }
           </View>
+
         </View>
-      </View>
 
-      {/* <!-- 联系客服 TODO 禁用了 --> */}
-      <View className='contact'>
-        <contact-button style='opacity:0;position:absolute;' type='default-dark' session-from='weapp' size='27'>
-        </contact-button>
-      </View>
-
-      {/* <!-- 底部按钮 --> */}
-      <View className='bottom-btn'>
         {
-          !isGroupon && <View className='l l-collect' onClick={this.addCollectOrNot}>
-            {
-              collect ? <AtIcon className='icon' value='star-2' color='#ab956d' size={20} /> : <AtIcon className='icon' value='star' size={20} />
-            }
-          </View>
-        }
-        {
-          !isGroupon && <View className='l l-cart'>
-            <View className='box'>
-              <Text className='cart-count'>{cartGoodsCount}</Text>
-              <AtIcon onClick={this.openCartPage} className='icon' value='shopping-cart' size={22} />
+          <View className='attr-pop-box' style={{ display: !openAttr ? 'none' : 'block' }}>
+            <View className='attr-pop'>
+              <View className='close' onClick={this.closeAttr}>
+                <View className='at-icon at-icon-close'></View>
+              </View>
+              <View className='img-info'>
+                <View className="tag-box">
+                  <Image className='img' src={goods.picUrl}>
+                  </Image>
+                  <Text className="tag">{specifInfo.tag}</Text>
+                </View>
+                <View className='info'>
+                  <View className='c'>
+                    <View className='p'>￥{specifInfo.price}</View>
+                    <View className='total'>总租金：￥{specifInfo.total_rent}</View>
+                    <View className='month'>月租金：￥{specifInfo.month_rent}</View>
+                    <View className='buy'>买断金：￥{specifInfo.money}</View>
+                  </View>
+                </View>
+              </View>
+              <View className='spec-con'>
+                <View className='spec-item'>
+                  <View className='name'>套餐</View>
+                  <View className="package">
+                    {
+                      Array.isArray(specifInfo.package) && specifInfo.package.map(item => {
+                        return <View className={`value ${item.checked ? 'selected' : ''}`} onClick={() => this.clickSkuValue(item)}>{item}</View>
+                      })
+                    }
+                  </View>
+                </View>
+              </View>
+              <View className="btn_rent">立即租用</View>
             </View>
           </View>
         }
-        { !soldout && !isGroupon && <View className='r' onClick={this.addToCart}>加入购物车</View>}
-        { !soldout && <View className='c' onClick={this.addFast}>{isGroupon?'参加团购':'立即购买'}</View>}
-        { soldout && <View className='n'>商品已售空</View>}
-      </View>
+
+        <View className='bottom-btn'>
+          <View className='l l-cart' onClick={this.handleSwitchIndex}>
+            <Image src={home}></Image>
+            首页
+          </View>
+          <View className='l l-cart'>
+            <Image src={shape}></Image>
+            店铺
+          </View>
+          <View className='l l-cart'>
+            <Image src={customer}></Image>
+            客服
+          </View>
+          {!soldout && <View className='c' onClick={this.addFast}>免押租赁</View>}
+        </View>
       </Block>
     );
   }
