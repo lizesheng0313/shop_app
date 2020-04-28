@@ -1,5 +1,5 @@
 import Taro, { Component } from '@tarojs/taro';
-import { View, Image } from '@tarojs/components';
+import { View, Image, Text } from '@tarojs/components';
 
 import icon from "../../../assets/images/coupons/icon.png"
 import first from "../../../assets/images/coupons/first.png"
@@ -15,15 +15,7 @@ class Index extends Component {
   }
 
   state = {
-    couponList: [{
-      title: '123'
-    }, {
-      title: '123'
-    }, {
-      title: '123'
-    }, {
-      title: '123'
-    }],
+    couponList: [],
   }
 
   componentDidMount() {
@@ -54,10 +46,15 @@ class Index extends Component {
                 </View>
               </View>
             })
-              : <Image src={nothing} className="nothing"></Image>
+              : <View className="nothing">
+                <Image src={nothing} className="img"></Image>
+                <Text className="tips">暂无优惠券</Text>
+              </View>
           }
         </View>
-        <View className="btn_submit">兑换优惠券</View>
+        {
+          this.state.couponList.length > 0 ? <View className="btn_submit">兑换优惠券</View> : ""
+        }
       </View>
     );
   }

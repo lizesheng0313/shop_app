@@ -100,7 +100,7 @@ class Index extends PureComponent {
         >
           支付宝登录
       </Button> */}
-        <View class="header">
+        <View className="header">
           <View className="search_box">
             <View className='search'>
               <Input type='text' placeholder='请输入商品关键词' placeholderStyle='color:rgba(255,255,255,1);' />
@@ -137,8 +137,8 @@ class Index extends PureComponent {
         <View className="menu_list">
           {
             this.state.menuList.map(item => {
-              return <Navigator class="menu_item" url={`/pages/category/category?id=${item.id}`}>
-                <Image src={item.src} />
+              return <Navigator className="menu_item" url={`/pages/category/category?id=${item.id}`}>
+                <Image className="img" src={item.src} />
                 <Text>{item.title}</Text>
               </Navigator>
             })
@@ -146,7 +146,7 @@ class Index extends PureComponent {
         </View>
 
         <View>
-          <Image src={coupons} class="coupons" />
+          <Image src={coupons} className="coupons" />
         </View>
 
         <View className="like">
@@ -174,13 +174,13 @@ class Index extends PureComponent {
               return <View className='item' key={item.id}>
                 <Navigator url={`../goods/goods?id=${item.id}`}>
                   <Image className='img' src={item.picUrl}></Image>
-                  <View class="tag">
+                  <View className="tag">
                     <Text>全新</Text>
                     <Text>大连发货</Text>
                   </View>
                   <Text className='name'>{item.name}</Text>
                   <View className="flex-space_center">
-                    <Text className="price"><Text class="icon">￥</Text>{item.retailPrice}<Text class="start">起</Text></Text>
+                    <Text className="price"><Text className="icon">￥</Text>{item.retailPrice}<Text className="start">起</Text></Text>
                     <Text className="time">90天起租</Text>
                   </View>
                 </Navigator>

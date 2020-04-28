@@ -1,11 +1,9 @@
 import Taro, { Component, clearStorage } from '@tarojs/taro';
 import { View, Text, Button, Image } from '@tarojs/components';
-import { AtIcon } from 'taro-ui';
 import { connect } from '@tarojs/redux';
-import { bindPhone, logOut } from '../../../services/auth';
 import { getUserIndex } from '../../../services/user';
 import { set as setGlobalData, get as getGlobalData } from '../../../global_data';
-import * as images from '../../../static/images/index';
+
 import './index.less';
 import d1 from "../../../assets/images/mine/d1.png"
 import d2 from "../../../assets/images/mine/d2.png"
@@ -69,6 +67,12 @@ class Index extends Component {
     }
   }
 
+  handleToOrder = (index) => {
+    Taro.navigateTo({
+      url: "/pages/ucenter/order/index?index=" + index
+    });
+  }
+
   handleToUrl = (url) => {
     Taro.navigateTo({
       url
@@ -90,14 +94,14 @@ class Index extends Component {
         <View className='user_area'>
           <View className='user_row' onClick={this.goOrder}>
             <View className='user_row_left'>我的订单</View>
-            <View className='user_row_right flex-space_center'>全部订单
+            <View className='user_row_right flex-space_center' onClick={this.handleToOrder.bind(this, 0)}>全部订单
                <Text className='at-icon at-icon-chevron-right'></Text>
             </View>
           </View>
           <View className='user_column'>
             {
-              this.state.orderTypeList.map(item => {
-                return <View className='user_column_item' onClick={this.goAfterSale}>
+              this.state.orderTypeList.map((item, index) => {
+                return <View className='user_column_item' onClick={this.handleToOrder.bind(this, index+1)}>
                   <Image className='user_column_item_image' src={item.src}></Image>
                   <View className='user_column_item_text'>{item.title}</View>
                 </View>

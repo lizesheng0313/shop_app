@@ -35,7 +35,7 @@ class App extends Component {
   config = {
     pages: [
       'pages/index/index',
-      'pages/ucenter/order/order',
+      'pages/ucenter/order/index',
       'pages/ucenter/coupons/index',
       'pages/ucenter/feedback/index',
       'pages/goods/goods',
