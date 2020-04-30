@@ -38,10 +38,10 @@ class Index extends Component {
     ],
     otherTypeList: [
       { title: "我的优惠券", src: l1, url: "/pages/ucenter/coupons/index" },
-      { title: "我的地址", src: l2, url: "/pages/ucenter/coupons/index" },
+      { title: "我的地址", src: l2, url: "/pages/ucenter/address/index" },
       { title: "申诉反馈", src: l4, url: "/pages/ucenter/feedback/index" },
-      { title: "实名认证", src: l5, url: "/pages/ucenter/coupons/index" },
-      { title: "身份信息", src: l6, url: "/pages/ucenter/coupons/index" },
+      { title: "实名认证", src: l5, url: "/pages/ucenter/realnameAuth/index" },
+      { title: "身份信息", src: l6, url: "/pages/ucenter/auth/index" },
       { title: "在线客服", src: l3, url: "", type: 'weapp' },
     ]
   }

@@ -34,33 +34,18 @@ class App extends Component {
 
   config = {
     pages: [
+      'pages/ucenter/address/index',
+      'pages/store/index',
+      'pages/ucenter/index/index',
       'pages/index/index',
+      'pages/goods/goods',
+      'pages/catalog/catalog',
+
+      'pages/ucenter/realnameAuth/index',
+      'pages/ucenter/auth/index',
       'pages/ucenter/order/index',
       'pages/ucenter/coupons/index',
-      'pages/ucenter/feedback/index',
-      'pages/goods/goods',
-      'pages/ucenter/index/index',
-      'pages/catalog/catalog',
-      // 'pages/ucenter/address/address',
-      // 'pages/ucenter/addressAdd/addressAdd',
-      // 'pages/auth/login/login',
-      // 'pages/checkout/checkout',
-
-      // 'pages/auth/accountLogin/accountLogin',
-      // 'pages/search/search',
-      // 'pages/cart/cart',
-
-      // 'pages/auth/register/register',
-      // 'pages/ucenter/orderDetail/orderDetail',
-      // 'pages/ucenter/aftersaleList/aftersaleList',
-      // 'pages/groupon/myGroupon/myGroupon',
-      // 'pages/ucenter/collect/collect',
-      // 'pages/ucenter/footprint/footprint',
-      // 'pages/ucenter/couponSelect/couponSelect',
-      // 'pages/payResult/payResult',
-      // 'pages/category/category',
-      // 'pages/auth/reset/reset'
-
+      'pages/ucenter/feedback/index'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -90,13 +75,6 @@ class App extends Component {
         "text": "我的"
       }]
     },
-    subpackages: [{
-      root: "packages",
-      name: "pack2",
-      pages: [
-        'pages/demo/index'
-      ],
-    }],
     "networkTimeout": {
       "request": 10000,
       "downloadFile": 10000

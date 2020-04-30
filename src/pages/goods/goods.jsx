@@ -293,6 +293,12 @@ class Goods extends Component {
     });
   }
 
+  handleToStore = () =>{
+    Taro.navigateTo({
+      url: '/pages/store/index'
+    });
+  }
+
   addFast = () => {
 
   }
@@ -453,7 +459,7 @@ class Goods extends Component {
             <Image src={home}></Image>
             首页
           </View>
-          <View className='l l-cart'>
+          <View className='l l-cart' onClick={this.handleToStore}>
             <Image src={shape}></Image>
             店铺
           </View>
