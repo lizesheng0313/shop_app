@@ -1,10 +1,10 @@
 import Taro, { Component } from '@tarojs/taro';
 import { View, Text, Button } from '@tarojs/components';
-import { AtModal, AtModalHeader, AtModalContent, AtModalAction } from "taro-ui"
+import { AtModal, AtModalHeader, AtModalContent, AtModalAction} from "taro-ui"
 
 import edit from "../../../assets/images/address/edit.png"
 import del from "../../../assets/images/address/del.png"
-import nothing from "../../../assets/images/nothing.jpg"
+import nothing from "../../../assets/images/nothing1.jpg"
 
 import './index.less';
 
@@ -27,8 +27,24 @@ class Index extends Component {
     total: 0
   }
 
-  componentWillMount() { }
+  componentWillMount() {}
 
+  handleToDelete()  {
+    this.setState({
+      isOpened:true
+    })
+  }
+
+  handleToCancle() {
+   this.setState({
+     isOpened:false
+   })
+  }
+  handleToSubmit() {
+    this.setState({
+     isOpened:true
+   })
+  }
 
   componentDidShow() {
     // my.getAddress({
@@ -38,6 +54,12 @@ class Index extends Component {
     //     });
     //   }
     // });
+  }
+
+  addressAddOrUpdate() {
+     Taro.navigateTo({
+      url: "/pages/ucenter/addressAdd/index"
+    });
   }
 
   render() {
@@ -65,7 +87,7 @@ class Index extends Component {
                     <Image src={edit} class="icon"></Image>
                     <Text class="text">编辑</Text>
                   </View>
-                  <View className="flex-start_center">
+                  <View className="flex-start_center" onClick={this.handleToDelete.bind(this,item)}>
                     <Image src={del} class="icon"></Image>
                     <Text class="text">删除</Text>
                   </View>
@@ -74,16 +96,17 @@ class Index extends Component {
             </View>
           })
             :  <View className="nothing">
+               <Image src={nothing} className="img"></Image>
                 <Text className="tips">暂无地址</Text>
               </View>
         }
         <View className='btn_submit' onClick={this.addressAddOrUpdate} >新建地址</View>
-        <AtModal isOpened>
+        <AtModal isOpened={isOpened}>
           <AtModalHeader>确定提示</AtModalHeader>
           <AtModalContent>
               确定删除这个地址吗？
           </AtModalContent>
-          <AtModalAction> <Button>取消</Button> <Button>确定</Button> </AtModalAction>
+          <AtModalAction> <Button onClick={this.handleToCancle.bind(this)}>取消</Button> <Button onClick={this.handleToSubmit}>确定</Button> </AtModalAction>
         </AtModal>
       </View>
     );

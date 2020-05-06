@@ -34,13 +34,14 @@ class App extends Component {
 
   config = {
     pages: [
-      'pages/ucenter/address/index',
       'pages/store/index',
-      'pages/ucenter/index/index',
       'pages/index/index',
+      'pages/ucenter/index/index',
       'pages/goods/goods',
       'pages/catalog/catalog',
 
+      'pages/ucenter/addressAdd/index',
+      'pages/ucenter/address/index',
       'pages/ucenter/realnameAuth/index',
       'pages/ucenter/auth/index',
       'pages/ucenter/order/index',

@@ -2,7 +2,7 @@
 	"name": "xiaochengxu-shop",
 	"version": "1.0.0",
 	"private": true,
-	"description": "严选案例",
+	"description": "租",
 	"templateInfo": {
 		"name": "redux",
 		"typescript": false,
@@ -26,7 +26,8 @@
 		"dev:qq": "npm run build:qq -- --watch",
 		"dev:quickapp": "npm run build:quickapp -- --watch"
 	},
-	"author": "",
+  "author": "xiaoze",
+  "email":"905317626@qq.com",
 	"license": "MIT",
 	"dependencies": {
 		"@tarojs/components": "2.1.4",
