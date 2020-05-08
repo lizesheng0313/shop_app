@@ -17,6 +17,7 @@ class Index extends Component {
     orderType: [
       "全部",
       "待付款",
+      "待发货",
       "待收货",
       "租用中",
       "已逾期",
@@ -29,7 +30,7 @@ class Index extends Component {
         img: "",
         title: "全新国行 iphone 6s plus",
         color: "规格灰色 16GB",
-        total: "总租金: ￥1496.5"
+        total: "￥1496.5"
       },
       {
         time: "2020-03-03 10:14:57",
@@ -37,7 +38,7 @@ class Index extends Component {
         img: "",
         title: "全新国行 iphone 6s plus",
         color: "规格灰色 16GB",
-        total: "总租金: ￥1496.5"
+        total: "￥1496.5"
       }
     ]
   }
@@ -113,10 +114,15 @@ class Index extends Component {
                   <View>
                     <Text className="title">{item.title}</Text>
                     <View className="color">{item.color}</View>
-                    <View className="total">{item.total}</View>
+                    <View className="total">总租金：<Text class="t">{item.total}</Text></View>
                   </View>
                 </View>
                 <Text className='at-icon at-icon-chevron-right'></Text>
+              </View>
+              <View className="button_group">
+                <View className="btn">联系商家</View>
+                <View className="btn">联系商家</View>
+                <View className="btn_pay btn">联系商家</View>
               </View>
             </View>
           })

@@ -53,8 +53,9 @@ class Index extends PureComponent {
     return (
       <View className='container'>
         <View className="header">
-          <Image src={back} className="back"/>
+          <Image src={back} className="back" />
         </View>
+        <Image src={service} className="service"></Image>
         <View className="like">
           <View className="like_title like_type">
             <Text className="top">猜你喜欢</Text>

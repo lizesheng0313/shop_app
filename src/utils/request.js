@@ -1,24 +1,21 @@
 import Taro from '@tarojs/taro';
-import {showErrorToast} from '../utils/util';
+import { showErrorToast } from '../utils/util';
 
-
-/**
- * 封封微信的的request
- */
 function request(url, data = {}) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     Taro.request({
-      url: "https://app.zuyuanzhang01.com/core_api/"+url,
+      url: "https://app.zuyuanzhang01.com/" + url,
       data: data,
       method: 'POST',
       header: {
         'Content-Type': 'application/x-www-form-urlencoded',
         // 'X-Litemall-Token': Taro.getStorageSync('token')
       },
-      success: function(res) {
+      success: function (res) {
         console.log(res)
         if (res.statusCode == 200) {
-          if (res.data.errno == 501) {
+          if (res.data.code === 200) {
+            resolve(res.data.data);
             // 清除登录相关内容
             // try {
             //   Taro.removeStorageSync('userInfo');
@@ -30,17 +27,17 @@ function request(url, data = {}) {
             // Taro.navigateTo({
             //   url: '/pages/auth/login/login'
             // });
-          } else if(res.data.errno == 0) {
-            resolve(res.data.data);
+          } else if (res.data.data !== 200) {
+            showErrorToast(res.data.msg);
+            reject(res.data.msg);
           }
         } else {
-          showErrorToast(res.data.errmsg);
-          reject(res.data.errmsg);
-          reject(res.errMsg);
+          showErrorToast(res.data.msg);
+          reject(res.data.msg);
         }
 
       },
-      fail: function(err) {
+      fail: function (err) {
         reject(err)
       }
     })

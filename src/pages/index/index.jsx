@@ -2,7 +2,7 @@ import Taro, { PureComponent } from '@tarojs/taro'
 import { View, Text, Navigator, Swiper, SwiperItem, Image, ScrollView, Block, Input } from '@tarojs/components'
 import { connect } from '@tarojs/redux';
 import { get as getGlobalData } from '../../global_data';
-import { apiFindList } from '../../services/home';
+import { apiFindList, apiuserOauthToken,apiIndexList } from '../../services/home';
 
 //图片
 import category from "../../assets/images/home/category.png"
@@ -44,10 +44,21 @@ class Index extends PureComponent {
   }
 
   componentDidMount() {
+    my.getAuthCode({
+      scopes: 'auth_base',
+      success: (res) => {
+        apiuserOauthToken({
+          authCode: res.authCode
+        })
+      },
+    });
     this.getData();
   }
 
   getData = () => {
+    apiIndexList().then(res=>{
+      
+    })
     apiFindList({ type: 2 }).then(res => {
     })
   }
@@ -124,7 +135,7 @@ class Index extends PureComponent {
           </View>
         </View>
         <View className="nav_box">
-          <Image src={adv} className="adv" mode="widthFix" />
+          <Image src="http://app.zuyuanzhang01.com/shop_app/home/adv.png" className="adv" mode="widthFix" />
         </View>
 
         <View className="process">

@@ -35,7 +35,7 @@ class Index extends Component {
 
   onGetRegion(region) {
     // 参数region为选择的省市区
-    console.log(region);
+    // console.log(region);
   }
 
   handleChange(e, value) {

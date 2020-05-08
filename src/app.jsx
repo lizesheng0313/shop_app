@@ -1,6 +1,7 @@
 import Taro, { Component } from '@tarojs/taro'
 import { Provider } from '@tarojs/redux'
 import 'taro-ui/dist/style/index.scss';
+import "./assets/font/iconfont.css"
 import dva from './dva';
 import models from './models';
 import * as user from './utils/user';
@@ -34,11 +35,14 @@ class App extends Component {
 
   config = {
     pages: [
-      'pages/store/index',
       'pages/index/index',
+      'pages/productList/index',
+      'pages/store/index',
       'pages/ucenter/index/index',
       'pages/goods/goods',
       'pages/catalog/catalog',
+      'pages/activeList/index',
+
 
       'pages/ucenter/addressAdd/index',
       'pages/ucenter/address/index',

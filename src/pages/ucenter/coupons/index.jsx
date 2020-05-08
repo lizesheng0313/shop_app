@@ -15,7 +15,7 @@ class Index extends Component {
   }
 
   state = {
-    couponList: [],
+    couponList: [,,,,],
   }
 
   componentDidMount() {

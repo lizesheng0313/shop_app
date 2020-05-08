@@ -1,0 +1,23 @@
+{
+  "id": "1803542",
+  "name": "alipay",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "6308124",
+      "name": "筛选",
+      "font_class": "shaixuan",
+      "unicode": "e692",
+      "unicode_decimal": 59026
+    },
+    {
+      "icon_id": "13516480",
+      "name": "上下箭头",
+      "font_class": "shangxiajiantouheise",
+      "unicode": "e8f0",
+      "unicode_decimal": 59632
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import {getIndex} from '../services/index';
+import { apiIndexList } from '../services/index';
 
 export default {
   namespace: 'home',
@@ -6,15 +6,15 @@ export default {
     data: {},
   },
   reducers: {
-    save: (state, {payload}) => {
+    save: (state, { payload }) => {
       state.data = payload;
     },
   },
   effects: {
-    *getIndex(_, {call, put}) {
-      const res = yield call(getIndex);
+    *apiIndexList(_, { call, put }) {
+      const res = yield call(apiIndexList);
       console.log('--home--', res);
-      yield put({type: 'save', payload: res});
+      yield put({ type: 'save', payload: res });
     }
   }
 };
