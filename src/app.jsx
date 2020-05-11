@@ -36,6 +36,8 @@ class App extends Component {
   config = {
     pages: [
       'pages/index/index',
+      'pages/billDetails/index',
+      'pages/payDetails/index',
       'pages/productList/index',
       'pages/store/index',
       'pages/ucenter/index/index',
@@ -43,7 +45,7 @@ class App extends Component {
       'pages/catalog/catalog',
       'pages/activeList/index',
 
-
+      'pages/ucenter/orderDetail/index',  
       'pages/ucenter/addressAdd/index',
       'pages/ucenter/address/index',
       'pages/ucenter/realnameAuth/index',

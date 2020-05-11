@@ -1,0 +1,200 @@
+@import '../../assets/less/variables.less';
+page {
+  height: 100%;
+  width: 100%;
+  background: #f4f4f4;
+}
+
+.address_box{
+  height:160px;
+  background:rgba(255,255,255,1);
+  border-radius:20px;
+  margin:0 17px;
+  margin-bottom:19px;
+  padding:41px 48px 49px 33px;
+  box-sizing:border-box;
+  font-size:26px;
+  .name{
+    color:#333;
+  }
+  .txt{
+    margin-left:20px;
+    display: inline-block;
+  }
+  .address{
+    color:#9F9F9F;
+    margin-top:19px;
+  }
+  .modify{
+    padding-left: 28px;
+    border-left:1px solid #9F9F9F;
+    font-size:#898989;
+    display:flex;
+    align-items:center;
+    font-size:24px;
+    height:60px;
+  }
+  .add_res{
+    color:#666666;
+    font-size:26px;
+    display:flex;
+    align-items:center;
+    height:100%;
+  }
+}
+
+.order-details{
+  background:#f5f4f9;
+  padding-top:19px;
+  // padding-bottom:134px;
+  box-sizing:border-box;
+  min-height:100vh;
+  .goods_details{
+    position: relative;
+    margin:0 17px;
+    padding:37px 42px 24px 15px;
+    background:#fff;  
+    border-radius:20px;
+    .image{
+      width:149px;
+      height:98px;
+    }
+    .title{
+      font-size:28px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      color:#333;
+    }
+    .sp{
+      color:#7E7E7E;
+      font-size:24px; 
+      margin:25px 0;
+    }
+    .total{
+      color:#000;
+      font-size:26px;
+    }
+    &_right{
+      margin-left:17px;
+    }
+    .number{
+      position:absolute;
+      right:46px;
+      bottom:45px;
+      display: flex;
+      align-items:center;
+      justify-content:center;
+      .sym{
+        background:#EBEBEB;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        width:36px;
+        height:36px;
+        color:#333;
+        font-size:24px;
+      }
+      .sym1{
+        margin-right:24px;
+      }
+      .sym2{
+        margin-left:24px;
+      }
+      .num{
+        font-weight:bold;
+        font-size:24px;
+      }
+    }
+  }
+  .coupons{
+    background:#fff;
+    margin:19px 17px 20px 17px;
+    padding:15px 39px 15px 31px;
+    color:#333;
+    font-size:26px; 
+    border-radius:25px;
+    .flex-space_center{
+      height:53px;
+    }
+    .select_con{
+      color:@mainPrice;
+    }
+    .title{
+      margin-bottom:18px;
+      border-bottom:2px solid rgba(51,51,51,0.16);
+      height:83px;
+      line-height:83px;
+    }
+    .bold{
+      font-weight:bold;
+    }
+    .c9{
+      color:#999;
+    }
+    .freight{
+      border-top:2px solid  rgba(51,51,51,0.16);
+      margin-top:20px;
+      padding-top:20px;
+    }
+    .deposit{
+      margin-top:50px;
+    }
+  }
+  .message{
+    margin-top:25px;
+    background:#fff;
+    height:69px;
+    display:flex;
+    align-items:center;
+    margin:0 17px;
+    font-size:26px;
+    border-radius:20px;
+    padding-left:32px;
+    .input{
+      flex-grow:2;
+      font-size:26px;
+    }
+    .plcss{
+      color:#999;
+      font-size:26px;
+    }
+  }
+ 
+  .footer_btn{
+    display:flex;
+    justify-content:space-between;
+    background:#fff;
+    height:114px; 
+    font-size:24px;
+    align-items:center;
+    position: fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    padding:0 32px;
+    .total_box{
+      color:#3F3F3F;
+      font-size:24px;
+    }
+    .symbol{
+      color:@mainPrice;
+      font-size:24px;
+    }
+    .total{
+      font-size:28px;
+      color:@mainPrice;
+    }
+    .btn{
+      width:149px;
+      height:60px;
+      background:@mainPrice;
+      border-radius:30px;
+      color:#fff;
+      font-size:26px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+  }
+}

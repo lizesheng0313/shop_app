@@ -5,9 +5,6 @@ import { AtDrawer } from 'taro-ui'
 import { get as getGlobalData } from '../../global_data';
 
 //图片
-import active1 from "../../assets/images/activeList/active1.png"
-import icon from "../../assets/images/activeList/icon.png"
-import active2 from "../../assets/images/activeList/active2.jpg"
 
 import './index.less'
 
@@ -51,9 +48,9 @@ class Index extends PureComponent {
     const { data } = this.props;
     return (
       <View className='container'>
-        <Image src={active1} className="header_image"></Image>
+        <Image src="http://app.zuyuanzhang01.com/shop_app/activeList/active1.png" className="header_image"></Image>
         <View className="back">
-          <Image src={icon} className="icon"></Image>
+          <Image src="http://app.zuyuanzhang01.com/shop_app/activeList/icon.png" className="icon"></Image>
           <Text className="txt">爆款电脑</Text>
           <View className="recommended_list">
             {

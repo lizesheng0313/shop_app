@@ -59,6 +59,12 @@ class Index extends Component {
     })
   }
 
+  handleToDetails() {
+    Taro.navigateTo({
+      url:"/pages/ucenter/orderDetail/index"
+    })
+  }
+
   getOrderList = () => {
     getOrderListApi({
       showType: this.state.showType,
@@ -103,7 +109,7 @@ class Index extends Component {
         </ScrollView>
         {
           this.state.list.length > 0 ? this.state.list.map((item, index) => {
-            return <View className="order_list">
+            return <View className="order_list" onClick={this.handleToDetails.bind(this)}>
               <View className="flex-space_center top">
                 <Text>{item.time}</Text>
                 <Text>{item.type}</Text>
