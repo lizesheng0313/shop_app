@@ -1,13 +1,14 @@
 import Taro, { Component, closeBLEConnection } from '@tarojs/taro';
 import { View, Text, Navigator, ScrollView, Image } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
+import { apiCatalogList, apiFindTypeList } from '../../services/catalog';
 
 import './index.less';
 
-@connect(({ catalog, goods }) => ({
-  ...catalog,
-  goodsCount: goods.goodsCount,
-}))
+// @connect(({ catalog, goods }) => ({
+//   ...catalog,
+//   goodsCount: goods.goodsCount,
+// }))
 class Index extends Component {
 
   config = {
@@ -15,64 +16,104 @@ class Index extends Component {
   }
 
   state = {
+    currentFirst: 0,
     currentActve: 0,
-    secondList: [
-      {
-        title: "苹果"
-      },
-      {
-        title: "华为"
-      },
-      {
-        title: "OPPO"
-      },
-      {
-        title: "三星"
-      }
-    ]
+    categoryList: [],
+    secondList: [],
+    currentSecondId: ""
   }
 
   componentDidMount() {
-    this.getData();
+    this.fetchCategoryList();
   }
 
   handleSetSecond(item, index) {
     this.setState({
       currentActve: index
     })
+    this.fetchGoodsList(item.id)
   }
 
-
-  getData = (cbk) => {
-    const { dispatch } = this.props;
-    dispatch({ type: 'catalog/getCatalogList' }).then(() => {
-      cbk && cbk()
+  //一级分类 
+  fetchCategoryList = () => {
+    Taro.showLoading({
+      title: '加载中'
     })
-    dispatch({ type: 'goods/getGoodsCount' })
+    apiCatalogList().then(res => {
+      this.setState({
+        categoryList: res.data
+      })
+      if (this.$router.params.id) {
+        res.data.forEach((item, index) => {
+          if (item.id == this.$router.params.id) {
+            this.setState({
+              currentFirst: index
+            })
+          }
+        })
+      }
+      let id = this.$router.params.id || res.data[0].id
+      console.log(id)
+      this.fetchSecondCategory(id)
+    })
   }
 
-  switchCate = (data) => {
-    const { currentCategory, dispatch } = this.props;
-    if (currentCategory.id == data.id) {
+  //二级分类 
+  fetchSecondCategory(id) {
+    this.setState({
+      currentActve: 0
+    })
+    Taro.showLoading({
+      title: '加载中'
+    })
+    apiCatalogList({
+      id
+    }).then(res => {
+      this.fetchGoodsList(res.data[0].id)
+      Taro.hideLoading();
+      this.setState({
+        secondList: res.data
+      })
+    })
+  }
+
+  //获取商品
+  fetchGoodsList(typeId) {
+    Taro.showLoading({
+      title: '加载中'
+    })
+    apiFindTypeList({
+      typeId
+    }).then(res => {
+      Taro.hideLoading();
+      this.setState({
+        list: res.data
+      })
+    })
+  }
+  //切换一级分类
+  switchCate = (id, index) => {
+    if (this.state.currentFirst === index) {
       return false;
     }
-    dispatch({ type: 'catalog/getCurrentCategory', payload: data.id })
-
-    // this.getCurrentCategory(event.currentTarget.dataset.id);
+    this.setState({
+      currentFirst: index
+    })
+    this.fetchSecondCategory(id)
   }
 
   render() {
-    const { categoryList, currentCategory, currentSubCategory } = this.props;
+    const { categoryList, currentFirst, secondList, list } = this.state;
     return (
       <View className='container'>
         <View className='catalog'>
           <View className='nav'>
             {
-              Array.isArray(categoryList) && categoryList.map(item => {
+              categoryList.map((item, index) => {
                 return <View
-                  className={`item ${currentCategory.id == item.id ? 'active' : ''}`}
+                  className={`item ${currentFirst === index ? 'active' : ''}`}
                   key='id'
-                  onClick={() => this.switchCate(item)}
+                  onClick={() => this.switchCate(item.id, index)}
                 >
                   {item.name}
                 </View>
@@ -82,19 +123,19 @@ class Index extends Component {
           <ScrollView scrollY className="cate">
             <View className='hd'>
               {
-                this.state.secondList.map((item, index) => {
-                  return <View onClick={this.handleSetSecond.bind(this, item, index)} className={`second_type ${this.state.currentActve === index ? 'active' : ''}`}>{item.title}</View>
+                secondList.map((item, index) => {
+                  return <View onClick={this.handleSetSecond.bind(this, item, index)} className={`second_type ${this.state.currentActve === index ? 'active' : ''}`}>{item.name}</View>
                 })
               }
             </View>
-            <View className='bd' style={{ marginTop: this.state.secondList.length % 3 * 30 + 'px' }}>
+            <View className='bd' style={{ marginTop: secondList.length % 3 * 30 + 'px' }}>
               {
-                Array.isArray(currentSubCategory) && currentSubCategory.map((item, index) => {
-                  return <Navigator url={`/pages/category/category?id=${item.id}`} key={item.id} className="item" >
-                    <Text className="num">95新</Text>
-                    <Image className='icon' src={item.picUrl}></Image>
+                list.map((item, index) => {
+                  return <Navigator url={`/pages/goods/goods?id=${item.id}`} key={item.id} className="item" >
+                    <Text className="num">{item.tag}</Text>
+                    <Image className='icon' src={'http://app.zuyuanzhang01.com/' + item.title_pic}></Image>
                     <Text className='txt'>{item.name}</Text>
-                    <Text class="money">￥8/<Text className="symbol">天</Text></Text>
+                    <Text class="money">￥{item.price}/<Text className="symbol">天</Text></Text>
                   </Navigator>
                 })
               }

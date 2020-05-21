@@ -1,4 +1,4 @@
-import { apiIndexList } from '../services/index';
+import { apiIndexList } from '../services/home';
 
 export default {
   namespace: 'home',
@@ -11,7 +11,7 @@ export default {
     },
   },
   effects: {
-    *apiIndexList(_, { call, put }) {
+    *actionIndexList(_, { call, put }) {
       const res = yield call(apiIndexList);
       console.log('--home--', res);
       yield put({ type: 'save', payload: res });

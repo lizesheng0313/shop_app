@@ -12,10 +12,9 @@ function request(url, data = {}) {
         // 'X-Litemall-Token': Taro.getStorageSync('token')
       },
       success: function (res) {
-        console.log(res)
         if (res.statusCode == 200) {
           if (res.data.code === 200) {
-            resolve(res.data.data);
+            resolve(res.data);
             // 清除登录相关内容
             // try {
             //   Taro.removeStorageSync('userInfo');
@@ -29,7 +28,7 @@ function request(url, data = {}) {
             // });
           } else if (res.data.data !== 200) {
             showErrorToast(res.data.msg);
-            reject(res.data.msg);
+            reject(res.data);
           }
         } else {
           showErrorToast(res.data.msg);

@@ -1,18 +1,17 @@
-import Taro, { PureComponent } from '@tarojs/taro'
+import Taro, { PureComponent, connectSocket } from '@tarojs/taro'
 import { View, Text, Navigator, Swiper, SwiperItem, Image, ScrollView, Block, Input } from '@tarojs/components'
 import { connect } from '@tarojs/redux';
 import { AtDrawer } from 'taro-ui'
 import { get as getGlobalData } from '../../global_data';
-import { apiFindList } from '../../services/home';
+import { apiSeachList } from '../../services/catalog';
 
 //图片
 import phone from "../../assets/images/home/sb.png"
 
 import './index.less'
 
-@connect(({ home, goods }) => ({
+@connect(({ home }) => ({
   data: home.data,
-  goodsCount: goods.goodsCount,
 }))
 
 class Index extends PureComponent {
@@ -21,6 +20,15 @@ class Index extends PureComponent {
     this.state = {
       current: 0,
       show: false,
+      queryObj: {
+        txt: "",
+        order: "",
+        day: "",
+        brandId: "",
+        type_id: "",
+        tag: "",
+      },
+      list: [],
       likeList: [
         { title: "iPhone", src: phone },
         { title: "华为", src: phone },
@@ -36,15 +44,18 @@ class Index extends PureComponent {
       tab: [
         {
           title: "综合",
-          icon: ""
+          icon: "",
+          order: 1
         },
         {
           title: "价格",
-          icon: "icon-shangxiajiantouheise"
+          desc: true,
+          icon: "icon-shangxiajiantouheise",
+          order: 2
         },
         {
           title: "筛选",
-          icon: "icon-shaixuan"
+          icon: "icon-shaixuan",
         }
       ]
     }
@@ -55,46 +66,50 @@ class Index extends PureComponent {
   }
 
   componentDidMount() {
-    // this.getData();
+    // this.setState((state) => {
+    //   state.queryObj.txt = this.$router.params.txt
+    // })
+    // this.getData(this.state.queryObj);
   }
 
-  getData = () => {
-    apiFindList({ type: 2 }).then(res => {
-    })
-  }
+  // getData = (queryObj) => {
+  //   // console.log(this.state.queryObj)
+  //   console.log(queryObj)
+  //   apiSeachList(queryObj).then(res => {
+  //     this.setState({
+  //       list: res.data
+  //     })
+  //   })
+  // }
 
-  componentWillMount() {
-
-  }
-  
   onClose() {
     this.setState({
       show: false
     })
   }
 
-  handleToggleTab(index) {
-    console.log(index)
+  handleToggleTab(index, item) {
     if (index === 2) {
       this.setState({
         show: true
       })
     }
-    console.log(this.state.show)
+    let data = Object.assign({}, this.state.queryObj, { order: item.order })
     this.setState({
-      current: index
+      current: index,
+      queryObj: data
     })
+    this.getData()
   }
 
   render() {
-    const { data } = this.props;
     const { tab, current, likeList, quickList } = this.state;
     return (
       <View className='container'>
         <View className="header flex-around_center">
           {
             tab.map((item, index) => {
-              return <View onClick={this.handleToggleTab.bind(this, index)} className={`item ${current === index ? 'active' : ""}`}>
+              return <View onClick={this.handleToggleTab.bind(this, index, item)} className={`item ${current === index ? 'active' : ""}`}>
                 {item.title}
                 <Text className={`iconfont ${item.icon}`}></Text>
               </View>
@@ -103,8 +118,7 @@ class Index extends PureComponent {
         </View>
         <View className="recommended_list">
           {
-            data.newGoodsList && data.newGoodsList.length > 0 &&
-            data.newGoodsList.map(item => {
+            list.map(item => {
               return <View className='item' key={item.id}>
                 <Navigator url={`../goods/goods?id=${item.id}`}>
                   <Image className='img' src={item.picUrl}></Image>
@@ -125,7 +139,7 @@ class Index extends PureComponent {
         <AtDrawer
           show={this.state.show}
           right
-          onClose={this.onClose.bind(this)} 
+          onClose={this.onClose.bind(this)}
           width="300px"
           mask
         >

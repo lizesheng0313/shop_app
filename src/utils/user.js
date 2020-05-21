@@ -1,5 +1,4 @@
 import Taro from '@tarojs/taro';
-import { loginByWeXin } from '../services/auth';
 
 /**
  * Promise封装wx.checkSession

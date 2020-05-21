@@ -1,16 +1,14 @@
 import Taro, { PureComponent } from '@tarojs/taro'
 import { View, Text, Navigator, Image } from '@tarojs/components'
 import { connect } from '@tarojs/redux';
-import { AtDrawer } from 'taro-ui'
-import { get as getGlobalData } from '../../global_data';
+import { apiFindActiveList } from '../../services/catalog';
 
 //图片
 
 import './index.less'
 
-@connect(({ home, goods }) => ({
+@connect(({ home }) => ({
   data: home.data,
-  goodsCount: goods.goodsCount,
 }))
 
 class Index extends PureComponent {
@@ -19,19 +17,26 @@ class Index extends PureComponent {
     this.state = {
       current: 0,
       show: false,
+      list: []
     }
   }
 
   config = {
-    navigationBarTitleText: '产品列表',
+    navigationBarTitleText: '活动列表',
   }
 
   componentDidMount() {
-    // this.getData();
+    this.fetActiveList();
   }
 
-  getData = () => {
-
+  fetActiveList = () => {
+    apiFindActiveList({
+      acId: this.$router.params.id
+    }).then(res => {
+      this.setState({
+        list: res.data
+      })
+    })
   }
 
   componentWillMount() {
@@ -50,23 +55,22 @@ class Index extends PureComponent {
       <View className='container'>
         <Image src="http://app.zuyuanzhang01.com/shop_app/activeList/active1.png" className="header_image"></Image>
         <View className="back">
-          <Image src="http://app.zuyuanzhang01.com/shop_app/activeList/icon.png" className="icon"></Image>
+          <Image src="http://app.zuyuanzhang01.com/shop_app/activeList/icon.png" className="header_icon"></Image>
           <Text className="txt">爆款电脑</Text>
           <View className="recommended_list">
             {
-              data.newGoodsList && data.newGoodsList.length > 0 &&
-              data.newGoodsList.map(item => {
+              list.map(item => {
                 return <View className='item' key={item.id}>
                   <Navigator url={`../goods/goods?id=${item.id}`}>
-                    <Image className='img' src={item.picUrl}></Image>
+                    <Image className='img' src={'http://app.zuyuanzhang01.com/' + item.title_pic}></Image>
                     <View className="tag">
-                      <Text>全新</Text>
-                      <Text>大连发货</Text>
+                      {item.tag ? <Text>{item.tag}</Text> : ""}
+                      {item.address ? <Text>{item.address}</Text> : ""}
                     </View>
                     <Text className='name'>{item.name}</Text>
                     <View className="flex-space_center">
-                      <Text className="price"><Text className="icon">￥</Text>{item.retailPrice}<Text className="start">起</Text></Text>
-                      <Text className="time">90天起租</Text>
+                      <Text className="price"><Text className="icon">￥</Text>{item.price}<Text className="start">起</Text></Text>
+                      <Text className="time">{item.day}天起租</Text>
                     </View>
                   </Navigator>
                 </View>

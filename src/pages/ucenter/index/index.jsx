@@ -1,8 +1,8 @@
 import Taro, { Component, clearStorage } from '@tarojs/taro';
 import { View, Text, Button, Image } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
-import { getUserIndex } from '../../../services/user';
-import { set as setGlobalData, get as getGlobalData } from '../../../global_data';
+import { apiFindList } from '../../../services/home';
+import { apiFindActiveList } from '../../../services/catalog';
 
 import './index.less';
 import d1 from "../../../assets/images/mine/d1.png"
@@ -29,6 +29,7 @@ class Index extends Component {
       nickName: '',
       avatarUrl: '/static/images/my.png'
     },
+    list: [],
     orderTypeList: [
       { title: "待付款", src: d1, url: "" },
       { title: "待收货", src: d2, url: "" },
@@ -51,20 +52,36 @@ class Index extends Component {
   }
 
   componentDidMount() {
+    this.getData();
     //获取用户的登录信息
-    if (getGlobalData('hasLogin')) {
-      let userInfo = Taro.getStorageSync('userInfo');
-      this.setState({
-        userInfo: userInfo,
-        hasLogin: true
-      });
+    // if (getGlobalData('hasLogin')) {
+    //   let userInfo = Taro.getStorageSync('userInfo');
+    //   this.setState({
+    //     userInfo: userInfo,
+    //     hasLogin: true
+    //   });
 
-      getUserIndex().then(res => {
-        this.setState({
-          order: res.order
-        });
-      });
-    }
+    //   getUserIndex().then(res => {
+    //     this.setState({
+    //       order: res.order
+    //     });
+    //   });
+    // }
+
+  }
+
+  async getData() {
+    let id
+    await apiFindList({ type: 4 }).then(res => {
+      id = res.data[0].id;
+    })
+    await apiFindActiveList({
+      acId: id
+    }).then(res => {
+      this.setState({
+        list: res.data
+      })
+    })
   }
 
   handleToOrder = (index) => {
@@ -101,7 +118,7 @@ class Index extends Component {
           <View className='user_column'>
             {
               this.state.orderTypeList.map((item, index) => {
-                return <View className='user_column_item' onClick={this.handleToOrder.bind(this, index+1)}>
+                return <View className='user_column_item' onClick={this.handleToOrder.bind(this, index + 1)}>
                   <Image className='user_column_item_image' src={item.src}></Image>
                   <View className='user_column_item_text'>{item.title}</View>
                 </View>
@@ -134,19 +151,19 @@ class Index extends Component {
 
         <View className="recommended_list">
           {
-            data.newGoodsList && data.newGoodsList.length > 0 &&
-            data.newGoodsList.map(item => {
+            list.length > 0 &&
+            list.map(item => {
               return <View className='item' key={item.id}>
-                <Navigator url={`../goods/goods?id=${item.id}`}>
-                  <Image className='img' src={item.picUrl}></Image>
+                <Navigator url={`/pages/goods/goods?id=${item.id}`}>
+                  <Image className='img' src={'http://app.zuyuanzhang01.com/' + item.title_pic}></Image>
                   <View class="tag">
-                    <Text>全新</Text>
-                    <Text>大连发货</Text>
+                    {item.tag ? <Text>{item.tag}</Text> : ""}
+                    {item.address ? <Text>{item.address}</Text> : ""}
                   </View>
                   <Text className='name'>{item.name}</Text>
                   <View className="flex-space_center">
-                    <Text className="price"><Text class="icon">￥</Text>{item.retailPrice}<Text class="start">起</Text></Text>
-                    <Text className="time">90天起租</Text>
+                    <Text className="price"><Text class="icon">￥</Text>{item.price}<Text className="start">起</Text></Text>
+                    <Text className="time">{item.day}天起租</Text>
                   </View>
                 </Navigator>
               </View>

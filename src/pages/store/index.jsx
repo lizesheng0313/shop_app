@@ -2,7 +2,9 @@ import Taro, { PureComponent } from '@tarojs/taro'
 import { View, Text, Navigator, Swiper, SwiperItem, Image, ScrollView, Block, Input } from '@tarojs/components'
 import { connect } from '@tarojs/redux';
 import { get as getGlobalData } from '../../global_data';
-import { apiFindList } from '../../services/home';
+import { apiGetType, apiGetShop } from '../../services/catalog';
+
+
 
 //图片
 import back from "../../assets/images/store/back.png"
@@ -11,23 +13,16 @@ import service from "../../assets/images/store/service.png"
 
 import './index.less'
 
-@connect(({ home, goods }) => ({
-  data: home.data,
-  goodsCount: goods.goodsCount,
-}))
+// @connect(({ home }) => ({
+//   data: home.data
+// }))
 
 class Index extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      likeList: [
-        { title: "iPhone", src: phone },
-        { title: "华为", src: phone },
-        { title: "左从", src: phone },
-        { title: "THink", src: phone },
-        { title: "iPhone", src: phone },
-        { title: "iPhone", src: phone }
-      ]
+      likeList: [],
+      list: []
     }
   }
 
@@ -36,20 +31,27 @@ class Index extends PureComponent {
   }
 
   componentDidMount() {
-    // this.getData();
+    this.getData();
   }
 
   getData = () => {
-    apiFindList({ type: 2 }).then(res => {
+    apiGetType({ id: this.$router.params.id }).then(res => {
+      this.setState({
+        likeList: res.data
+      })
     })
   }
 
-  componentWillMount() {
-
+  getStoreList = (id) => {
+    apiGetShop({ type_id: id, id: this.$router.params.id }).then(res => {
+      this.setState({
+        list: res.data
+      })
+    })
   }
 
   render() {
-    const { data } = this.props;
+    const { likeList } = this.state;
     return (
       <View className='container'>
         <View className="header">
@@ -57,18 +59,14 @@ class Index extends PureComponent {
         </View>
         <Image src={service} className="service"></Image>
         <View className="like">
-          <View className="like_title like_type">
-            <Text className="top">猜你喜欢</Text>
-            <Text className="title">随便逛逛</Text>
-          </View>
           <ScrollView scrollX scrollWithAnimation className="scroll_view">
             {
-              this.state.likeList.map(item => {
-                return <View className="like_type">
+              likeList.map(item => {
+                return <View className="like_type" onClick={this.getStoreList.bind(this, item.id)}>
                   <Text className="top">
-                    <Image src={item.src} />
+                    <Image src={'http://app.zuyuanzhang01.com/' + item.likeList} />
                   </Text>
-                  <Text className="title">{item.title}</Text>
+                  <Text className="title">{item.name}</Text>
                 </View>
               })
             }
@@ -76,19 +74,18 @@ class Index extends PureComponent {
         </View>
         <View className="recommended_list">
           {
-            data.newGoodsList && data.newGoodsList.length > 0 &&
-            data.newGoodsList.map(item => {
+            list.map(item => {
               return <View className='item' key={item.id}>
-                <Navigator url={`../goods/goods?id=${item.id}`}>
-                  <Image className='img' src={item.picUrl}></Image>
+                <Navigator url={`/pages/goods/goods?id=${item.id}`}>
+                  <Image className='img' src={'http://app.zuyuanzhang01.com/' + item.title_pic}></Image>
                   <View className="tag">
-                    <Text>全新</Text>
-                    <Text>大连发货</Text>
+                    {item.tag ? <Text>{item.tag}</Text> : ""}
+                    {item.address ? <Text>{item.address}</Text> : ""}
                   </View>
                   <Text className='name'>{item.name}</Text>
                   <View className="flex-space_center">
-                    <Text className="price"><Text className="icon">￥</Text>{item.retailPrice}<Text className="start">起</Text></Text>
-                    <Text className="time">90天起租</Text>
+                    <Text className="price"><Text className="icon">￥</Text>{item.price}<Text className="start">起</Text></Text>
+                    <Text className="time">{item.day}天起租</Text>
                   </View>
                 </Navigator>
               </View>

@@ -2,40 +2,28 @@ import Taro, { PureComponent } from '@tarojs/taro'
 import { View, Text, Navigator, Swiper, SwiperItem, Image, ScrollView, Block, Input } from '@tarojs/components'
 import { connect } from '@tarojs/redux';
 import { get as getGlobalData } from '../../global_data';
-import { apiFindList, apiuserOauthToken,apiIndexList } from '../../services/home';
+import { apiFindList, apiuserOauthToken, apiIndexList } from '../../services/home';
+import { apiCatalogList } from "../../services/catalog"
 
 //图片
 import category from "../../assets/images/home/category.png"
-import adv from "../../assets/images/home/adv.png"
-import phone from "../../assets/images/home/sb.png"
 import coupons from "../../assets/images/home/coupons.png"
 
 import './index.less'
 
-@connect(({ home, goods }) => ({
-  data: home.data,
-  goodsCount: goods.goodsCount,
-}))
+// @connect(({ home }) => ({
+//   data: home.data,
+// }))
 
 class Index extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      menuList: [
-        { title: '智能手机', src: phone },
-        { title: '智能手机', src: phone },
-        { title: '智能手机', src: phone },
-        { title: '智能手机', src: phone },
-        { title: '智能手机', src: phone }
-      ],
-      likeList: [
-        { title: "iPhone", src: phone },
-        { title: "华为", src: phone },
-        { title: "左从", src: phone },
-        { title: "THink", src: phone },
-        { title: "iPhone", src: phone },
-        { title: "iPhone", src: phone }
-      ]
+      banner: [],
+      list: [],
+      value: "",
+      menuList: [],
+      likeList: []
     }
   }
 
@@ -44,27 +32,44 @@ class Index extends PureComponent {
   }
 
   componentDidMount() {
-    my.getAuthCode({
-      scopes: 'auth_base',
-      success: (res) => {
-        apiuserOauthToken({
-          authCode: res.authCode
-        })
-      },
-    });
+    // const { dispatch } = this.props;
+    // dispatch({type: 'home/actionIndexList'})
+    // my.getAuthCode({
+    //   scopes: 'auth_base',
+    //   success: (res) => {
+    //     apiuserOauthToken({
+    //       authCode: res.authCode
+    //     })
+    //   },
+    // });
     this.getData();
   }
 
   getData = () => {
-    apiIndexList().then(res=>{
-      
+    apiFindList({ type: 3 }).then(res => {
+      this.setState({
+        banner: res.data
+      })
     })
     apiFindList({ type: 2 }).then(res => {
+      this.setState({
+        likeList: res.data
+      })
+      this.handleLikelist(res.data[0].id)
+    })
+    apiCatalogList({ index: 1 }).then(res => {
+      this.setState({
+        menuList: res.data
+      })
     })
   }
 
-  componentWillMount() {
-
+  handleLikelist(acId) {
+    apiIndexList({ acId }).then(res => {
+      this.setState({
+        list: res.data
+      })
+    })
   }
 
   async onGetAuthorize(res) {
@@ -73,13 +78,13 @@ class Index extends PureComponent {
     console.log(userInfo)
   }
 
-  onShareAppMessage() {
-    return {
-      title: 'Taro mall小程序商场',
-      desc: 'Taro 开源微信小程序商城',
-      path: '/pages/index/index'
-    }
-  }
+  // onShareAppMessage() {
+  //   return {
+  //     title: 'Taro mall小程序商场',
+  //     desc: 'Taro 开源微信小程序商城',
+  //     path: '/pages/index/index'
+  //   }
+  // }
 
   getCoupon = (e) => {
     if (!getGlobalData('hasLogin')) {
@@ -98,8 +103,20 @@ class Index extends PureComponent {
     })
   }
 
+  handleToProduct() {
+    Taro.navigateTo({
+      url: "/pages/productList/index?txt=" + this.state.value
+    });
+  }
+
+  handleOnInput(e) {
+    this.setState({
+      value: e.detail.value
+    })
+  }
+
   render() {
-    const { data } = this.props;
+    const { menuList, banner, list, likeList, value } = this.state;
     return (
       <View className='container'>
         {/* <Button
@@ -112,22 +129,20 @@ class Index extends PureComponent {
           支付宝登录
       </Button> */}
         <View className="header">
-          <View className="search_box">
+          <View className="search_box" >
             <View className='search'>
-              <Input type='text' placeholder='请输入商品关键词' placeholderStyle='color:rgba(255,255,255,1);' />
+              <Input type='text' onInput={this.handleOnInput.bind(this)} value={value} placeholder='请输入商品关键词' placeholderStyle='color:rgba(255,255,255,1);' />
             </View>
-            <Image src={category} className="category" />
+            <Image src={category} className="category" onClick={this.handleToProduct.bind(this, value)} />
           </View>
           <View className="swiper_box">
             <Swiper className='banner' autoplay interval='3000' duration='100'>
               {
-                data.banner && data.banner.map(item => {
+                banner.map(item => {
                   return <SwiperItem key={item.id}>
-                    {
-                      item.link > 0 ? <Navigator url={`/pages/goods/goods?id=${item.link}`}>
-                        <Image className='img' src={item.url} />
-                      </Navigator> : <Image className='img' src={item.url} />
-                    }
+                    <Navigator url={`/pages/activeList/index?id=${item.id}`}>
+                      <Image className='img' src={'https://app.zuyuanzhang01.com/' + item.title_pic} />
+                    </Navigator>
                   </SwiperItem>
                 })
               }
@@ -147,10 +162,10 @@ class Index extends PureComponent {
 
         <View className="menu_list">
           {
-            this.state.menuList.map(item => {
-              return <Navigator className="menu_item" url={`/pages/category/category?id=${item.id}`}>
-                <Image className="img" src={item.src} />
-                <Text>{item.title}</Text>
+            menuList.map(item => {
+              return <Navigator className="menu_item" url={`/pages/catalog/catalog?id=${item.id}`}>
+                <Image className="img" src={'http://app.zuyuanzhang01.com/' + item.type_img} />
+                <Text>{item.name}</Text>
               </Navigator>
             })
           }
@@ -167,12 +182,12 @@ class Index extends PureComponent {
           </View>
           <ScrollView scrollX scrollWithAnimation className="scroll_view">
             {
-              this.state.likeList.map(item => {
-                return <View className="like_type">
+              likeList.map(item => {
+                return <View className="like_type" onClick={this.handleLikelist.bind(this, item.id)}>
                   <Text className="top">
-                    <Image src={item.src} />
+                    <Image src={'http://app.zuyuanzhang01.com/' + item.title_pic} />
                   </Text>
-                  <Text className="title">{item.title}</Text>
+                  <Text className="title">{item.name}</Text>
                 </View>
               })
             }
@@ -180,19 +195,19 @@ class Index extends PureComponent {
         </View>
         <View className="recommended_list">
           {
-            data.newGoodsList && data.newGoodsList.length > 0 &&
-            data.newGoodsList.map(item => {
+            list.length > 0 &&
+            list.map(item => {
               return <View className='item' key={item.id}>
-                <Navigator url={`../goods/goods?id=${item.id}`}>
-                  <Image className='img' src={item.picUrl}></Image>
+                <Navigator url={`/pages/goods/goods?id=${item.id}`}>
+                  <Image className='img' src={'http://app.zuyuanzhang01.com/' + item.title_pic}></Image>
                   <View className="tag">
-                    <Text>全新</Text>
-                    <Text>大连发货</Text>
+                    {item.tag ? <Text>{item.tag}</Text> : ""}
+                    {item.address ? <Text>{item.address}</Text> : ""}
                   </View>
                   <Text className='name'>{item.name}</Text>
                   <View className="flex-space_center">
-                    <Text className="price"><Text className="icon">￥</Text>{item.retailPrice}<Text className="start">起</Text></Text>
-                    <Text className="time">90天起租</Text>
+                    <Text className="price"><Text className="icon">￥</Text>{item.price}<Text className="start">起</Text></Text>
+                    <Text className="time">{item.day}天起租</Text>
                   </View>
                 </Navigator>
               </View>
