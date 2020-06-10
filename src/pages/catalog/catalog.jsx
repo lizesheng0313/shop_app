@@ -1,7 +1,7 @@
 import Taro, { Component, closeBLEConnection } from '@tarojs/taro';
 import { View, Text, Navigator, ScrollView, Image } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
-import { apiCatalogList, apiFindTypeList } from '../../services/catalog';
+import { apiCatalogList, apiFindTypeList, apifindListByType, apiFindBrandList } from '../../services/catalog';
 
 import './index.less';
 
@@ -63,13 +63,20 @@ class Index extends Component {
     this.setState({
       currentActve: 0
     })
-    Taro.showLoading({
-      title: '加载中'
-    })
-    apiCatalogList({
-      id
+    // Taro.showLoading({
+    //   title: '加载中'
+    // })
+    apifindListByType({
+      typeId: id
     }).then(res => {
-      this.fetchGoodsList(res.data[0].id)
+      if (res.data.length > 0) {
+        this.fetchGoodsList(res.data[0].id)
+      }
+      else {
+        this.setState({
+          list: []
+        })
+      }
       Taro.hideLoading();
       this.setState({
         secondList: res.data
@@ -82,8 +89,8 @@ class Index extends Component {
     Taro.showLoading({
       title: '加载中'
     })
-    apiFindTypeList({
-      typeId
+    apiFindBrandList({
+      bId: typeId
     }).then(res => {
       Taro.hideLoading();
       this.setState({
@@ -129,16 +136,18 @@ class Index extends Component {
               }
             </View>
             <View className='bd' style={{ marginTop: secondList.length % 3 * 30 + 'px' }}>
-              {
-                list.map((item, index) => {
-                  return <Navigator url={`/pages/goods/goods?id=${item.id}`} key={item.id} className="item" >
-                    <Text className="num">{item.tag}</Text>
-                    <Image className='icon' src={'http://app.zuyuanzhang01.com/' + item.title_pic}></Image>
-                    <Text className='txt'>{item.name}</Text>
-                    <Text class="money">￥{item.price}/<Text className="symbol">天</Text></Text>
-                  </Navigator>
-                })
-              }
+              <View className="bd_c">
+                {
+                  list.map((item, index) => {
+                    return <Navigator url={`/pages/goods/goods?id=${item.id}`} key={item.id} className="item" >
+                      <Text className="num">{item.tag}</Text>
+                      <Image className='icon' src={'http://app.zuyuanzhang01.com/' + item.title_pic}></Image>
+                      <Text className='txt'>{item.name}</Text>
+                      <Text class="money">￥{item.price}/<Text className="symbol">天</Text></Text>
+                    </Navigator>
+                  })
+                }
+              </View>
             </View>
           </ScrollView>
         </View>

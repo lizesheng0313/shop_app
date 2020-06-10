@@ -11,9 +11,9 @@ import coupons from "../../assets/images/home/coupons.png"
 
 import './index.less'
 
-// @connect(({ home }) => ({
-//   data: home.data,
-// }))
+@connect(({ user }) => ({
+  userInfo: user.userInfo
+}))
 
 class Index extends PureComponent {
   constructor(props) {
@@ -31,17 +31,28 @@ class Index extends PureComponent {
     navigationBarTitleText: '首页',
   }
 
-  componentDidMount() {
-    // const { dispatch } = this.props;
-    // dispatch({type: 'home/actionIndexList'})
-    // my.getAuthCode({
-    //   scopes: 'auth_base',
-    //   success: (res) => {
-    //     apiuserOauthToken({
-    //       authCode: res.authCode
-    //     })
-    //   },
-    // });
+  async componentDidMount() {
+    Taro.showLoading({
+      title: '加载中'
+    })
+    const { dispatch } = this.props;
+    let authCode, user_id;
+    await my.getAuthCode({
+      scopes: 'auth_base',
+      success: (res) => {
+        authCode = res.authCode
+      },
+    });
+    //拿到用户id
+    await apiuserOauthToken({
+      authCode
+    }).then(res => {
+      user_id = res.data.alipay_system_oauth_token_response.user_id
+    })
+    //获取用户信息
+    await dispatch({ type: 'user/apiFindUserByUserId', payload: user_id }).then(res => {
+      
+    })
     this.getData();
   }
 
@@ -61,6 +72,7 @@ class Index extends PureComponent {
       this.setState({
         menuList: res.data
       })
+      Taro.hideLoading()
     })
   }
 
@@ -72,36 +84,11 @@ class Index extends PureComponent {
     })
   }
 
-  async onGetAuthorize(res) {
-    let userInfo = await Taro.getOpenUserInfo()
-    userInfo = JSON.parse(userInfo.response).response
-    console.log(userInfo)
-  }
-
-  // onShareAppMessage() {
-  //   return {
-  //     title: 'Taro mall小程序商场',
-  //     desc: 'Taro 开源微信小程序商城',
-  //     path: '/pages/index/index'
-  //   }
+  // async onGetAuthorize(res) {
+  //   let userInfo = await Taro.getOpenUserInfo()
+  //   userInfo = JSON.parse(userInfo.response).response
   // }
 
-  getCoupon = (e) => {
-    if (!getGlobalData('hasLogin')) {
-      Taro.navigateTo({
-        url: "/pages/auth/login/login"
-      });
-    }
-
-    let couponId = e.currentTarget.dataset.index;
-    couponReceive({
-      couponId: couponId
-    }).then(() => {
-      Taro.showToast({
-        title: "领取成功"
-      })
-    })
-  }
 
   handleToProduct() {
     Taro.navigateTo({
@@ -160,7 +147,7 @@ class Index extends PureComponent {
           <View className="process_box"><Text className="num">4</Text>续租/买断/归还</View>
         </View>
 
-        <View className="menu_list">
+        <ScrollView scrollX scrollWithAnimation className="menu_list">
           {
             menuList.map(item => {
               return <Navigator className="menu_item" url={`/pages/catalog/catalog?id=${item.id}`}>
@@ -169,7 +156,7 @@ class Index extends PureComponent {
               </Navigator>
             })
           }
-        </View>
+        </ScrollView>
 
         <View>
           <Image src={coupons} className="coupons" />

@@ -19,16 +19,12 @@ import l6 from "../../../assets/images/mine/l6.png"
 import recommended from "../../../assets/images/mine/recommended.png"
 
 
-@connect(({ home, goods }) => ({
-  data: home.data
+@connect(({ user }) => ({
+  userInfo: user.userInfo
 }))
 
 class Index extends Component {
   state = {
-    userInfo: {
-      nickName: '',
-      avatarUrl: '/static/images/my.png'
-    },
     list: [],
     orderTypeList: [
       { title: "待付款", src: d1, url: "" },
@@ -53,21 +49,6 @@ class Index extends Component {
 
   componentDidMount() {
     this.getData();
-    //获取用户的登录信息
-    // if (getGlobalData('hasLogin')) {
-    //   let userInfo = Taro.getStorageSync('userInfo');
-    //   this.setState({
-    //     userInfo: userInfo,
-    //     hasLogin: true
-    //   });
-
-    //   getUserIndex().then(res => {
-    //     this.setState({
-    //       order: res.order
-    //     });
-    //   });
-    // }
-
   }
 
   async getData() {
@@ -97,12 +78,11 @@ class Index extends Component {
   }
 
   render() {
-    const { userInfo } = this.state;
-    const { data } = this.props;
+    const { userInfo } = this.props;
     return (
       <View className='container'>
         <View className='profile-info' onClick={this.goLogin}>
-          <Image className='avatar' src={userInfo.avatarUrl}></Image>
+          <Image className='avatar' src={userInfo.avatar}></Image>
           <View className='info'>
             <Text className='name'>{userInfo.nickName}</Text>
           </View>

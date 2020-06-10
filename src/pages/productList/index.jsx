@@ -2,11 +2,9 @@ import Taro, { PureComponent, connectSocket } from '@tarojs/taro'
 import { View, Text, Navigator, Swiper, SwiperItem, Image, ScrollView, Block, Input } from '@tarojs/components'
 import { connect } from '@tarojs/redux';
 import { AtDrawer } from 'taro-ui'
-import { get as getGlobalData } from '../../global_data';
-import { apiSeachList } from '../../services/catalog';
+import { apiSeachList, apiBrandFindList } from '../../services/catalog';
 
 //图片
-import phone from "../../assets/images/home/sb.png"
 
 import './index.less'
 
@@ -20,26 +18,39 @@ class Index extends PureComponent {
     this.state = {
       current: 0,
       show: false,
+      txt: "",
       queryObj: {
         txt: "",
         order: "",
         day: "",
         brandId: "",
         type_id: "",
-        tag: "",
+        tag: ""
       },
       list: [],
-      likeList: [
-        { title: "iPhone", src: phone },
-        { title: "华为", src: phone },
-        { title: "左从", src: phone },
-        { title: "THink", src: phone },
-        { title: "iPhone", src: phone },
-        { title: "iPhone", src: phone }
-      ],
+      likeList: [],
+      currentTime: 0,
+      currentNew: 0,
+      currentBrand: -1,
       quickList: [
-        '全新',
-        '非全新'
+        { title: '全新', num: 1 },
+        { title: '非全新', num: 2 }
+      ],
+      timeList: [
+        { title: '3天起租', num: 3 },
+        { title: '7天起租', num: 7 },
+        { title: '30天起租', num: 30 },
+        { title: '90天起租', num: 90 },
+        { title: '180天起租', num: 180 },
+        { title: '365天起租', num: 365 },
+      ],
+      price: [
+        {
+          title: "价格",
+          desc: true,
+          icon: "icon-xiajiantou",
+          order: 2
+        },
       ],
       tab: [
         {
@@ -50,8 +61,8 @@ class Index extends PureComponent {
         {
           title: "价格",
           desc: true,
-          icon: "icon-shangxiajiantouheise",
-          order: 2
+          icon: "icon-shangjiantou",
+          order: 3
         },
         {
           title: "筛选",
@@ -66,21 +77,26 @@ class Index extends PureComponent {
   }
 
   componentDidMount() {
-    // this.setState((state) => {
-    //   state.queryObj.txt = this.$router.params.txt
-    // })
-    // this.getData(this.state.queryObj);
+    let data = { ...this.state.queryObj, txt: this.$router.params.txt }
+    this.setState({
+      queryObj: data
+    }, () =>
+      this.getData()
+    )
+    apiBrandFindList().then(res => {
+      this.setState({
+        likeList: res.data
+      })
+    })
   }
 
-  // getData = (queryObj) => {
-  //   // console.log(this.state.queryObj)
-  //   console.log(queryObj)
-  //   apiSeachList(queryObj).then(res => {
-  //     this.setState({
-  //       list: res.data
-  //     })
-  //   })
-  // }
+  getData = () => {
+    apiSeachList(this.state.queryObj).then(res => {
+      this.setState({
+        list: res.data
+      })
+    })
+  }
 
   onClose() {
     this.setState({
@@ -88,28 +104,97 @@ class Index extends PureComponent {
     })
   }
 
-  handleToggleTab(index, item) {
-    if (index === 2) {
+  handleToQuick(item, index) {
+    this.state.queryObj.tag = item.num;
+    this.setState({
+      queryObj: this.state.queryObj,
+      currentNew: index
+    })
+  }
+
+  handleToTime(item, index) {
+    this.state.queryObj.day = item.num;
+    this.setState({
+      queryObj: this.state.queryObj,
+      currentTime: index
+    })
+  }
+
+  handleToBrand(item, index) {
+    this.state.queryObj.brandId = item.id;
+    this.setState({
+      queryObj: this.state.queryObj,
+      currentBrand: index
+    })
+  }
+
+  handleToSubmit() {
+    this.getData()
+    this.setState({
+      show: false
+    })
+  }
+
+  handleToReset() {
+    let data = { ...this.state.queryObj, tag: "", brandId: "", day: "" }
+    this.setState({
+      queryObj: data,
+      currentBrand: -1,
+      currentNew: 0,
+      currentTime: 0
+    })
+  }
+
+
+  handleToggleTab(index) {
+    this.setState({
+      current: index,
+    })
+    if (index === 0) {
+      let data = { ...this.state.queryObj, order: 1 }
+      this.setState({
+        queryObj: data,
+      }, () =>
+        this.getData()
+      )
+    }
+    if (index === 1) {
+      if (this.state.tab[1].icon === 'icon-xiajiantou') {
+        this.state.tab[1].icon = "icon-shangjiantou"
+        let data = { ...this.state.queryObj, order: 3 }
+        this.setState({
+          queryObj: data,
+          tab: this.state.tab,
+        }, () =>
+          this.getData()
+        )
+      }
+      else {
+        this.state.tab[1].icon = "icon-xiajiantou"
+        let data = { ...this.state.queryObj, order: 2 }
+        this.setState({
+          queryObj: data,
+          tab: this.state.tab
+        }, () =>
+          this.getData()
+        )
+      }
+    }
+    else if (index === 2) {
       this.setState({
         show: true
       })
     }
-    let data = Object.assign({}, this.state.queryObj, { order: item.order })
-    this.setState({
-      current: index,
-      queryObj: data
-    })
-    this.getData()
   }
 
   render() {
-    const { tab, current, likeList, quickList } = this.state;
+    const { tab, current, likeList, quickList, timeList } = this.state;
     return (
       <View className='container'>
         <View className="header flex-around_center">
           {
             tab.map((item, index) => {
-              return <View onClick={this.handleToggleTab.bind(this, index, item)} className={`item ${current === index ? 'active' : ""}`}>
+              return <View onClick={this.handleToggleTab.bind(this, index)} className={`item ${current === index ? 'active' : ""}`}>
                 {item.title}
                 <Text className={`iconfont ${item.icon}`}></Text>
               </View>
@@ -120,16 +205,16 @@ class Index extends PureComponent {
           {
             list.map(item => {
               return <View className='item' key={item.id}>
-                <Navigator url={`../goods/goods?id=${item.id}`}>
-                  <Image className='img' src={item.picUrl}></Image>
+                <Navigator url={`/pages/goods/goods?id=${item.id}`}>
+                  <Image className='img' src={'http://app.zuyuanzhang01.com/' + item.title_pic}></Image>
                   <View className="tag">
-                    <Text>全新</Text>
-                    <Text>大连发货</Text>
+                    {item.tag ? <Text>{item.tag}</Text> : ""}
+                    {item.address ? <Text>{item.address}</Text> : ""}
                   </View>
                   <Text className='name'>{item.name}</Text>
                   <View className="flex-space_center">
-                    <Text className="price"><Text className="icon">￥</Text>{item.retailPrice}<Text className="start">起</Text></Text>
-                    <Text className="time">90天起租</Text>
+                    <Text className="price"><Text className="icon">￥</Text>{item.price}<Text className="start">起</Text></Text>
+                    <Text className="time">{item.day}天起租</Text>
                   </View>
                 </Navigator>
               </View>
@@ -148,8 +233,8 @@ class Index extends PureComponent {
               <View className="title">品牌专栏</View>
               <View className="like_type">
                 {
-                  likeList.map(item => {
-                    return <View className="top">
+                  likeList.map((item, index) => {
+                    return <View onClick={this.handleToBrand.bind(this, item, index)} className={`top ${currentBrand === index ? 'active' : ''}`}>
                       <Image src={item.src} className="image" />
                     </View>
                   })
@@ -158,9 +243,9 @@ class Index extends PureComponent {
               <View className="title second_title">快捷筛选</View>
               <View className="like_type">
                 {
-                  quickList.map(item => {
-                    return <View className="top">
-                      {item}
+                  quickList.map((item, index) => {
+                    return <View onClick={this.handleToQuick.bind(this, item, index)} className={`top ${currentNew === index ? 'active' : ''}`} >
+                      {item.title}
                     </View>
                   })
                 }
@@ -168,16 +253,16 @@ class Index extends PureComponent {
               <View className="title second_title">起租日</View>
               <View className="like_type">
                 {
-                  quickList.map(item => {
-                    return <View className="top">
-                      {item}
+                  timeList.map((item, index) => {
+                    return <View onClick={this.handleToTime.bind(this, item, index)} className={`top ${currentTime === index ? 'active' : ''}`} >
+                      {item.title}
                     </View>
                   })
                 }
               </View>
               <View className="footer_button">
-                <View className="reset btn">重置</View>
-                <View className="submit btn">确定</View>
+                <View className="reset btn" onClick={this.handleToReset.bind(this)}>重置</View>
+                <View className="submit btn" onClick={this.handleToSubmit.bind(this)}>确定</View>
               </View>
             </View>
           </View>

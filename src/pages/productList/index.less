@@ -42,7 +42,7 @@
       flex-wrap: wrap;
       .top{
         margin-bottom:17px;
-        width:155px;
+        width:140px;
         height:68px;
         font-size:24px;
         background:rgba(243,243,243,1);
@@ -52,9 +52,16 @@
         margin-right:18px;
         justify-content:center;
       }
+      .top:nth-child(3n){
+        margin-right:0;
+      }
       .image{
         width:70px;
         height:26px;
+      }
+      .active{
+        background:@mainPrice;
+        color:#fff;
       }
     }
   }

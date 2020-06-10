@@ -1,7 +1,9 @@
 import Taro, { Component } from '@tarojs/taro';
+import { connect } from '@tarojs/redux';
 import { View, Swiper, SwiperItem, Button, Navigator, Text, Block, Input, Image, RichText } from '@tarojs/components';
 import { AtSegmentedControl } from 'taro-ui';
 import { getGoodsDetails, apiRandShop } from '../../services/goods';
+import { apiRegisterUser } from "../../services/user"
 import parse from 'mini-html-parser2';
 
 import home from "../../assets/images/goods/home.png"
@@ -11,6 +13,11 @@ import zm from "../../assets/images/goods/zm.png"
 
 import './index.less';
 
+@connect(({ user }) => ({
+  userInfo: user.userInfo,
+  user_id: user.user_id
+}))
+
 class Goods extends Component {
 
   config = {
@@ -18,11 +25,8 @@ class Goods extends Component {
   }
 
   state = {
-    canShare: false,
-    id: 0,
+    choosePackage: "请选择规格",
     goods: {},
-    groupon: [], //该商品支持的团购规格
-    grouponLink: {}, //参与的团购
     attribute: [],
     issueList: [],
     comment: {},
@@ -39,8 +43,6 @@ class Goods extends Component {
     openShare: false,
     collect: false,
     shareImage: '',
-    isGroupon: false, //标识是否是一个参团购买
-    soldout: false,
     canWrite: false, //用户是否获取了保存相册的权限
     tagInfo: [
       "免押金",
@@ -59,7 +61,13 @@ class Goods extends Component {
     current: 0,
     likeList: [],
     currentPack: 0,
-    currDay: 0
+    currDay: 0,
+    orderDetails: {
+      goods_item_id: "",
+      countPrice: "",
+      day: "",
+      goods_id: "",
+    }
   }
 
   componentWillMount() {
@@ -126,54 +134,10 @@ class Goods extends Component {
     })
   }
 
-  //获取选中的规格信息
-  getCheckedSpecValue = () => {
-    let checkedValues = [];
-    let _specificationList = this.state.specificationList;
-    for (let i = 0; i < _specificationList.length; i++) {
-      let _checkedObj = {
-        name: _specificationList[i].name,
-        valueId: 0,
-        valueText: ''
-      };
-      for (let j = 0; j < _specificationList[i].valueList.length; j++) {
-        if (_specificationList[i].valueList[j].checked) {
-          _checkedObj.valueId = _specificationList[i].valueList[j].id;
-          _checkedObj.valueText = _specificationList[i].valueList[j].value;
-        }
-      }
-      checkedValues.push(_checkedObj);
-    }
-
-    return checkedValues;
-  }
-
-  isCheckedAllSpec = () => {
-    return !this.getCheckedSpecValue().some(function (v) {
-      if (v.valueId == 0) {
-        return true;
-      }
-    });
-  }
-
-  getCheckedProductItem = (key) => {
-    return this.state.productList.filter(function (v) {
-      if (v.specifications.toString() == key.toString()) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-  }
-
-  getCheckedSpecKey = () => {
-    let checkedValue = this.getCheckedSpecValue().map(function (v) {
-      return v.valueText;
-    });
-    return checkedValue;
-  }
 
   clickSkuValue = (item, index) => {
+    this.state.orderDetails.goods_item_id = item.id;
+    console.log(item)
     this.setState({
       currentPack: index,
       currentObj: item,
@@ -201,7 +165,7 @@ class Goods extends Component {
 
   handleToStore = (id) => {
     Taro.navigateTo({
-      url: '/pages/store/index?id='+id
+      url: '/pages/store/index?id=' + id
     });
   }
 
@@ -212,17 +176,54 @@ class Goods extends Component {
   }
 
   handleSelectDay(item, index) {
+    this.state.orderDetails.day = item.day
     this.setState({
       currDay: index
     })
   }
 
   addFast = () => {
+    const { userInfo } = this.props
+    if (this.state.choosePackage === "请选择规格") {
+      this.setState({
+        openAttr: true
+      })
+      return;
+    }
+    Taro.navigateTo({
+      url: '/pages/payDetails/index?details='+this.state.orderDetails
+    });
+  }
+  //租用
+  handleRent() {
+    if (this.state.choosePackage === "请选择规格") {
+      this.setState({
+        choosePackage: this.state.currentObj.name
+      })
+    }
+    this.state.orderDetails.countPrice = this.state.currentObj.dayItem[this.state.currDay].monery * this.state.currentObj.dayItem[this.state.currDay].day
+    this.setState({
+      openAttr: false,
+    })
 
   }
 
+  async onGetAuthorize(res) {
+    const { user_id, dispatch, userInfo } = this.props
+    let user_info = await Taro.getOpenUserInfo()
+    user_info = JSON.parse(user_info.response).response
+    await apiRegisterUser({
+      user_id,
+      avatar: user_info.avatar,
+      nickName: user_info.nickName
+    })
+    await dispatch({ type: 'user/apiFindUserByUserId', payload: user_id })
+  }
+
+
   render() {
-    const { current, nodes, currentObj, tagInfo, goodsInfo, soldout, openAttr, goods, orderObj, likeList } = this.state;
+    const { userInfo } = this.props
+    const { choosePackage, current, nodes, currentObj, tagInfo, goodsInfo, openAttr, goods, orderObj, likeList } = this.state;
     return (
       <Block>
         <View className='container'>
@@ -269,7 +270,7 @@ class Goods extends Component {
           <View className='section-nav section-attr' onClick={this.switchAttrPop}>
             <View className='t'>
               {
-                orderObj.checkedSpecText ? orderObj.checkedSpecText : <Text className="tips">请选择规格</Text>
+                orderObj.checkedSpecText ? orderObj.checkedSpecText : <Text className="tips">{choosePackage}</Text>
               }
             </View>
             <Text className='at-icon at-icon-chevron-right'></Text>
@@ -356,7 +357,7 @@ class Goods extends Component {
                   <View className="package">
                     {
                       goodsInfo.itemList && goodsInfo.itemList.map((item, index) => {
-                        return <View className={`value ${currentPack === index ? 'selected' : ''}`} onClick={() => this.clickSkuValue(item, index)}>{'套餐' + (index + 1)}</View>
+                        return <View className={`value ${currentPack === index ? 'selected' : ''}`} onClick={() => this.clickSkuValue(item, index)}>{item.name}</View>
                       })
                     }
                   </View>
@@ -374,7 +375,7 @@ class Goods extends Component {
                   </View>
                 </View>
               </View>
-              <View className="btn_rent">立即租用</View>
+              <View className="btn_rent" onClick={this.handleRent.bind(this)}>立即租用</View>
             </View>
           </View>
         }
@@ -392,7 +393,17 @@ class Goods extends Component {
             <Image src={customer}></Image>
             客服
           </View>
-          {!soldout && <View className='c' onClick={this.addFast}>免押租赁</View>}
+
+          {userInfo.nickName ? <View className='c' onClick={this.addFast}>免押租赁</View> :
+            <Button
+              openType="getAuthorize"
+              scope="userInfo"
+              onClick={this.onGetAuthorize.bind(this)}
+              type="primary"
+              className="c"
+            >
+              免押租赁
+           </Button>}
         </View>
       </Block>
     );

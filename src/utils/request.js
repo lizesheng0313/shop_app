@@ -13,7 +13,7 @@ function request(url, data = {}) {
       },
       success: function (res) {
         if (res.statusCode == 200) {
-          if (res.data.code === 200) {
+          if (res.data.code == 200) {
             resolve(res.data);
             // 清除登录相关内容
             // try {
@@ -28,7 +28,7 @@ function request(url, data = {}) {
             // });
           } else if (res.data.data !== 200) {
             showErrorToast(res.data.msg);
-            reject(res.data);
+            resolve(res.data);
           }
         } else {
           showErrorToast(res.data.msg);

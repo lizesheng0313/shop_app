@@ -20,7 +20,7 @@ class Index extends Component {
 
   handleToAddress(flag) {
     Taro.navigateTo({
-      url: "/pages/ucenter/addressAdd/index"
+      url: "/pages/ucenter/address/index?order=yes"
     })
   }
 
@@ -57,9 +57,9 @@ class Index extends Component {
                 <View class="name">粉色公主<Text className="txt">15840834280</Text></View>
                 <View class="address">辽宁省大连市甘井子区高新园区银海万向</View>
               </View>
-              <View className="modify" onClick={this.handleToAddress.bind(this,'modify')}>编辑</View>
+              <View className="modify" onClick={this.handleToAddress.bind(this, 'modify')}>编辑</View>
             </View>
-              : <View className="add_res" onClick={this.handleToAddress.bind(this,'add')}>
+              : <View className="add_res" onClick={this.handleToAddress.bind(this, 'add')}>
                 +新增收货地址
               </View>
           }

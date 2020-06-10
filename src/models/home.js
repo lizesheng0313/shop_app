@@ -11,8 +11,8 @@ export default {
     },
   },
   effects: {
-    *actionIndexList(_, { call, put }) {
-      const res = yield call(apiIndexList);
+    *actionIndexList({ payload }, { call, put }) {
+      const res = yield call(apiIndexList,payload);
       console.log('--home--', res);
       yield put({ type: 'save', payload: res });
     }
