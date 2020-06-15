@@ -25,25 +25,9 @@ class Goods extends Component {
   }
 
   state = {
-    choosePackage: "请选择规格",
     goods: {},
-    attribute: [],
-    issueList: [],
-    comment: {},
-    brand: {},
-    specificationList: [],
-    productList: [],
-    relatedGoods: [],
-    cartGoodsCount: 0,
-    userHasCollect: 0,
-    number: 1,
-    tmpSpecText: '请选择规格数量',
-    checkedSpecPrice: 0,
     openAttr: false,
     openShare: false,
-    collect: false,
-    shareImage: '',
-    canWrite: false, //用户是否获取了保存相册的权限
     tagInfo: [
       "免押金",
       "分期月付",
@@ -67,26 +51,34 @@ class Goods extends Component {
       countPrice: "",
       day: "",
       goods_id: "",
+      name: "",
+      yj_money: "",
+      goodsName: ""
     }
   }
 
   componentWillMount() {
-
   }
 
   componentDidMount() {
     this.fetchGoodsInfo();
     this.fetchRandList()
+    this.state.orderDetails.goods_id = this.$router.params.id
   }
 
   fetchGoodsInfo = () => {
+    Taro.showLoading({
+      title:"加载中"
+    })
     getGoodsDetails({
       id: this.$router.params.id
     }).then(res => {
+      Taro.hideLoading()
       this.setState({
         goodsInfo: res.data,
         currentObj: res.data.itemList[0]
       })
+      this.state.orderDetails.goodsName = res.data.name
       parse(res.data.content, (err, nodes) => {
         if (!err) {
           this.setState({
@@ -112,16 +104,6 @@ class Goods extends Component {
     })
   }
 
-  componentDidShow() { }
-
-  switchAttrPop = () => {
-    if (this.state.openAttr == false) {
-      this.setState({
-        openAttr: !this.state.openAttr
-      });
-    }
-  }
-
   closeAttr = () => {
     this.setState({
       openAttr: false,
@@ -137,24 +119,13 @@ class Goods extends Component {
 
   clickSkuValue = (item, index) => {
     this.state.orderDetails.goods_item_id = item.id;
-    console.log(item)
+    this.state.orderDetails.name = item.name;
+    this.state.orderDetails.yj_money = item.yj_money;
     this.setState({
       currentPack: index,
       currentObj: item,
       currDay: 0
     })
-  }
-
-  cutNumber = () => {
-    this.setState({
-      number: (this.state.number - 1 > 1) ? this.state.number - 1 : 1
-    });
-  }
-
-  addNumber = () => {
-    this.setState({
-      number: this.state.number + 1
-    });
   }
 
   handleSwitchIndex = () => {
@@ -183,33 +154,30 @@ class Goods extends Component {
   }
 
   addFast = () => {
-    const { userInfo } = this.props
-    if (this.state.choosePackage === "请选择规格") {
-      this.setState({
-        openAttr: true
-      })
-      return;
-    }
-    Taro.navigateTo({
-      url: '/pages/payDetails/index?details='+this.state.orderDetails
-    });
+    this.setState({
+      openAttr: true
+    })
+
   }
   //租用
   handleRent() {
-    if (this.state.choosePackage === "请选择规格") {
-      this.setState({
-        choosePackage: this.state.currentObj.name
-      })
+    if (!this.state.orderDetails.goods_item_id) {
+      this.state.orderDetails.goods_item_id = this.state.currentObj.id;
+      this.state.orderDetails.name = this.state.currentObj.name;
+      this.state.orderDetails.yj_money = this.state.currentObj.yj_money;
+      this.state.orderDetails.day = this.state.currentObj.dayItem[0].day;
     }
     this.state.orderDetails.countPrice = this.state.currentObj.dayItem[this.state.currDay].monery * this.state.currentObj.dayItem[this.state.currDay].day
     this.setState({
       openAttr: false,
     })
-
+    Taro.navigateTo({
+      url: '/pages/payDetails/index?details=' + JSON.stringify(this.state.orderDetails)
+    });
   }
 
   async onGetAuthorize(res) {
-    const { user_id, dispatch, userInfo } = this.props
+    const { user_id, dispatch } = this.props
     let user_info = await Taro.getOpenUserInfo()
     user_info = JSON.parse(user_info.response).response
     await apiRegisterUser({
@@ -220,10 +188,16 @@ class Goods extends Component {
     await dispatch({ type: 'user/apiFindUserByUserId', payload: user_id })
   }
 
+  handleToProduct() {
+    Taro.navigateTo({
+      url: "/pages/productList/index"
+    });
+  }
+
 
   render() {
     const { userInfo } = this.props
-    const { choosePackage, current, nodes, currentObj, tagInfo, goodsInfo, openAttr, goods, orderObj, likeList } = this.state;
+    const { current, nodes, currentObj, tagInfo, goodsInfo, openAttr, goods, orderObj, likeList } = this.state;
     return (
       <Block>
         <View className='container'>
@@ -249,7 +223,7 @@ class Goods extends Component {
                 }))
               }
             </View>
-            <View className='title'>{currentObj.name}</View>
+            <View className='title'>{goodsInfo.name} {currentObj.name}</View>
             <View className="courier flex-space_center">
               <View>不包邮</View>
               {/* <View>{goodsInfo.kd}</View> */}
@@ -267,14 +241,14 @@ class Goods extends Component {
           </View>
 
 
-          <View className='section-nav section-attr' onClick={this.switchAttrPop}>
+          {/* <View className='section-nav section-attr' onClick={this.switchAttrPop}>
             <View className='t'>
               {
                 orderObj.checkedSpecText ? orderObj.checkedSpecText : <Text className="tips">{choosePackage}</Text>
               }
             </View>
             <Text className='at-icon at-icon-chevron-right'></Text>
-          </View>
+          </View> */}
 
 
 
@@ -291,7 +265,7 @@ class Goods extends Component {
           <View className="recommend_list">
             <View className="header">
               <Text className="title">为您推荐</Text>
-              <Text className="check_all">查看全部<Text className='at-icon at-icon-chevron-right'></Text></Text>
+              <Text className="check_all" onClick={this.handleToProduct.bind(this)}>查看全部<Text className='at-icon at-icon-chevron-right'></Text></Text>
             </View>
             <ScrollView scrollX scrollWithAnimation className="scroll_view">
               {
@@ -300,7 +274,7 @@ class Goods extends Component {
                     <Text className="num">{item.tag}</Text>
                     <Image className='icon' src={'http://app.zuyuanzhang01.com/' + item.title_pic}></Image>
                     <Text className='txt'>{item.name}</Text>
-                    <Text className="money">￥{item.price}/<Text className="symbol">{item.day}</Text></Text>
+                    <Text className="money">￥{item.price}</Text>
                   </Navigator>
                 })
               }
@@ -393,7 +367,6 @@ class Goods extends Component {
             <Image src={customer}></Image>
             客服
           </View>
-
           {userInfo.nickName ? <View className='c' onClick={this.addFast}>免押租赁</View> :
             <Button
               openType="getAuthorize"

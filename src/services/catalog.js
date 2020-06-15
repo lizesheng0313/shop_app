@@ -32,7 +32,6 @@ export async function apiGetShop(payload) {
 
 //商品搜索
 export async function apiSeachList(payload) {
-  console.log('请求------------',payload)
   return request("core_api/shopapi/seachList", payload);
 }
 

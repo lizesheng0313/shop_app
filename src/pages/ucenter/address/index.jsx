@@ -1,4 +1,5 @@
 import Taro, { Component } from '@tarojs/taro';
+import { connect } from '@tarojs/redux';
 import { View, Text, Button } from '@tarojs/components';
 import { AtModal, AtModalHeader, AtModalContent, AtModalAction } from "taro-ui"
 
@@ -8,6 +9,10 @@ import nothing from "../../../assets/images/nothing1.jpg"
 
 import './index.less';
 
+@connect(({ order }) => ({
+ 
+}))
+
 class Index extends Component {
 
   config = {
@@ -15,9 +20,11 @@ class Index extends Component {
   }
 
   state = {
+    isOrder: "",
     isOpened: false,
     addressList: [
       {
+        id: 123,
         default: true,
         fullname: "张三",
         mobilePhone: "18210572133",
@@ -27,8 +34,10 @@ class Index extends Component {
     total: 0
   }
 
-  componentWillMount(e) {
-    console.log(this.$router.params)
+  componentWillMount() {
+    this.setState({
+      isOrder: this.$router.params.order
+    })
   }
 
   handleToDelete() {
@@ -58,8 +67,12 @@ class Index extends Component {
     // });
   }
 
-  handleSelectAddress() {
-
+  handleSelectAddress(item) {
+    const { dispatch } = this.props;
+    if (this.state.isOrder === 'yes') {
+      dispatch({ type: 'order/actionAddress', payload: item })
+    }
+    Taro.navigateBack()
   }
 
   addressAddOrUpdate() {
@@ -74,7 +87,7 @@ class Index extends Component {
       <View className='container'>
         {
           addressList.length > 0 ? addressList.map(item => {
-            return <View className='address_list' onClick={this.handleSelectAddress.bind(this)}>
+            return <View className='address_list' onClick={this.handleSelectAddress.bind(this, item)}>
               <View className="address_box">
                 <View className='flex-space_center'>
                   <View className='name'>{item.fullname}</View>

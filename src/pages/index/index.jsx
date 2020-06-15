@@ -31,7 +31,8 @@ class Index extends PureComponent {
     navigationBarTitleText: '首页',
   }
 
-  async componentDidMount() {
+
+  async componentWillMount() {
     Taro.showLoading({
       title: '加载中'
     })
@@ -50,8 +51,12 @@ class Index extends PureComponent {
       user_id = res.data.alipay_system_oauth_token_response.user_id
     })
     //获取用户信息
-    await dispatch({ type: 'user/apiFindUserByUserId', payload: user_id }).then(res => {
-      
+    await dispatch({ type: 'user/apiFindUserByUserId', payload: user_id })
+  }
+
+  async componentDidShow() {
+    Taro.showLoading({
+      title: '加载中'
     })
     this.getData();
   }
@@ -84,12 +89,6 @@ class Index extends PureComponent {
     })
   }
 
-  // async onGetAuthorize(res) {
-  //   let userInfo = await Taro.getOpenUserInfo()
-  //   userInfo = JSON.parse(userInfo.response).response
-  // }
-
-
   handleToProduct() {
     Taro.navigateTo({
       url: "/pages/productList/index?txt=" + this.state.value
@@ -106,15 +105,6 @@ class Index extends PureComponent {
     const { menuList, banner, list, likeList, value } = this.state;
     return (
       <View className='container'>
-        {/* <Button
-          openType="getAuthorize"
-          scope="userInfo"
-          onClick={this.onGetAuthorize.bind(this)}
-          type="primary"
-          className="login-button"
-        >
-          支付宝登录
-      </Button> */}
         <View className="header">
           <View className="search_box" >
             <View className='search'>
@@ -152,7 +142,7 @@ class Index extends PureComponent {
             menuList.map(item => {
               return <Navigator className="menu_item" url={`/pages/catalog/catalog?id=${item.id}`}>
                 <Image className="img" src={'http://app.zuyuanzhang01.com/' + item.type_img} />
-                <Text>{item.name}</Text>
+                <Text >{item.name}</Text>
               </Navigator>
             })
           }
@@ -193,7 +183,7 @@ class Index extends PureComponent {
                   </View>
                   <Text className='name'>{item.name}</Text>
                   <View className="flex-space_center">
-                    <Text className="price"><Text className="icon">￥</Text>{item.price}<Text className="start">起</Text></Text>
+                    <Text className="price"><Text className="icon">￥</Text>{item.price}元/天<Text className="start">起</Text></Text>
                     <Text className="time">{item.day}天起租</Text>
                   </View>
                 </Navigator>

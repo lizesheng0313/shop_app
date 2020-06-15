@@ -188,13 +188,38 @@ page {
     .btn{
       width:149px;
       height:60px;
-      background:@mainPrice;
+      background: @mainPrice!important;
+      border:none!important;
       border-radius:30px;
       color:#fff;
       font-size:26px;
       display:flex;
       justify-content:center;
       align-items:center;
+    }
+  }
+  .auth{
+    margin:20px 17px;
+    font-size:28px;
+    padding:30px 15px;
+    border-radius:20px;
+    background:#fff;
+    .select_con{
+      color:26px;
+      color:@mainPrice;
+    }
+  }
+  .auth_button{
+    color:#000 !important;
+    background:#fff!important;
+    margin:20px 17px;
+    padding:0 !important;
+    border-radius:20px!important;;
+    overflow:auto!important;
+    border:none!important;
+    line-height:0!important;
+    .auth{
+      padding:15px 0 0 0 ;
     }
   }
 }

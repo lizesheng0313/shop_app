@@ -76,7 +76,7 @@ class Index extends PureComponent {
     navigationBarTitleText: '产品列表',
   }
 
-  componentDidMount() {
+  componentDidShow() {
     let data = { ...this.state.queryObj, txt: this.$router.params.txt }
     this.setState({
       queryObj: data
@@ -213,7 +213,7 @@ class Index extends PureComponent {
                   </View>
                   <Text className='name'>{item.name}</Text>
                   <View className="flex-space_center">
-                    <Text className="price"><Text className="icon">￥</Text>{item.price}<Text className="start">起</Text></Text>
+                    <Text className="price"><Text className="icon">￥</Text>{item.price}元/天<Text className="start">起</Text></Text>
                     <Text className="time">{item.day}天起租</Text>
                   </View>
                 </Navigator>
@@ -235,7 +235,7 @@ class Index extends PureComponent {
                 {
                   likeList.map((item, index) => {
                     return <View onClick={this.handleToBrand.bind(this, item, index)} className={`top ${currentBrand === index ? 'active' : ''}`}>
-                      <Image src={item.src} className="image" />
+                      <Image src={'https://app.zuyuanzhang01.com/' + item.title_pic} className="image" />
                     </View>
                   })
                 }

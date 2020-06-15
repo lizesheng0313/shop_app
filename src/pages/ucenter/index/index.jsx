@@ -142,7 +142,7 @@ class Index extends Component {
                   </View>
                   <Text className='name'>{item.name}</Text>
                   <View className="flex-space_center">
-                    <Text className="price"><Text class="icon">￥</Text>{item.price}<Text className="start">起</Text></Text>
+                    <Text className="price"><Text class="icon">￥</Text>{item.price}元/天<Text className="start">起</Text></Text>
                     <Text className="time">{item.day}天起租</Text>
                   </View>
                 </Navigator>

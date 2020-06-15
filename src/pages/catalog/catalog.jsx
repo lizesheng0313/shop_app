@@ -135,7 +135,7 @@ class Index extends Component {
                 })
               }
             </View>
-            <View className='bd' style={{ marginTop: secondList.length % 3 * 30 + 'px' }}>
+            <View className='bd' style={{ marginTop: Math.floor(secondList.length / 3) * 30 + 'px' }}>
               <View className="bd_c">
                 {
                   list.map((item, index) => {
@@ -143,7 +143,7 @@ class Index extends Component {
                       <Text className="num">{item.tag}</Text>
                       <Image className='icon' src={'http://app.zuyuanzhang01.com/' + item.title_pic}></Image>
                       <Text className='txt'>{item.name}</Text>
-                      <Text class="money">￥{item.price}/<Text className="symbol">天</Text></Text>
+                      <Text class="money">￥{item.price}元/天<Text className="symbol">起</Text></Text>
                     </Navigator>
                   })
                 }

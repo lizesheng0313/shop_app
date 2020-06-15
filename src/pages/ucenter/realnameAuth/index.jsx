@@ -5,21 +5,20 @@ import { AtInput, AtForm, AtButton, AtToast } from 'taro-ui'
 import './index.less';
 import name from "../../../assets/images/mine/name.png"
 import reset from "../../../assets/images/mine/reset.png"
+import { actionrealPersonCreate, actionUserUpdate } from "../../../services/user"
 
-
-// @connect(({ home, goods }) => ({
-//   data: home.data
-// }))
+@connect(({ user }) => ({
+  userInfo: user.userInfo,
+  user_id: user.user_id
+}))
 
 class Index extends Component {
   state = {
     countDown: "点击获取",
     queryObj: {
-      name: "",
-      idcard: "",
-      phone: "",
-      card: "",
-      code: ""
+      certName: "",
+      certNo: "",
+      returnUrl: "/pages/ucenter/realnameAuth/index",
     }
   }
 
@@ -27,13 +26,52 @@ class Index extends Component {
     'navigationBarTitleText': '实名认证'
   }
 
-  componentDidMount() {
-
-  }
-
   onSubmit() {
-    console.log(this.state.queryObj)
+    let that = this;
+    const { dispatch, user_id } = this.props
+    if (!this.state.queryObj.certName) {
+      Taro.showToast({
+        title: '请输入姓名'
+      })
+      return;
+    }
+    if (!/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(this.state.queryObj.certNo)) {
+      Taro.showToast({
+        title: '请输入身份证号'
+      })
+      return;
+    }
+    Taro.showLoading({
+      title: '提交中'
+    })
+    actionrealPersonCreate(this.state.queryObj).then(res => {
+      Taro.hideLoading()
+      my.startAPVerify({
+        url: res.data.certifyUrl,
+        certifyId: res.data.certifyId,
+        success: async function (res) {
+          if (res.resultStatus === "9000") {
+            await actionUserUpdate({
+              user_id,
+              card_num: that.state.queryObj.certNo,
+              name: that.state.queryObj.certName,
+            })
+            await dispatch({ type: 'user/apiFindUserByUserId', payload: user_id }).then(res => {
+              Taro.navigateBack()
+            })
+          }
+        },
+        fail: function (err) {
+          Taro.showToast({
+            title: '系统错误，请重新认证'
+          })
+          console.log('fail', err)
+        }
+      })
+    })
   }
+
+
 
   handleChange(e, value) {
     let data = Object.assign({}, this.state.queryObj, { [e]: value })
@@ -42,37 +80,40 @@ class Index extends Component {
     })
   }
 
-  handleGetCode() {
 
-    if (this.state.countDown !== "点击获取") {
-      return
-    }
-    this.setState({
-      countDown: 60
-    })
-    let countDown = 60;
-    let timer = ""
-    if (!timer) {
-      timer = setInterval(() => {
-        if (countDown > 1 && countDown <= 60) {
-          countDown--;
-          this.setState({
-            countDown
-          })
-        } else {
-          this.setState({
-            count: "点击获取"
-          })
-          clearInterval(timer)
-          timer = null
-        }
-      }, 1000)
-    }
-  }
+
+  // handleGetCode() {
+  //   if (this.state.countDown !== "点击获取") {
+  //     return
+  //   }
+  //   this.setState({
+  //     countDown: 60
+  //   })
+  //   let countDown = 60;
+  //   let timer = ""
+  //   if (!timer) {
+  //     timer = setInterval(() => {
+  //       if (countDown > 1 && countDown <= 60) {
+  //         countDown--;
+  //         this.setState({
+  //           countDown
+  //         })
+  //       } else {
+  //         this.setState({
+  //           count: "点击获取"
+  //         })
+  //         clearInterval(timer)
+  //         timer = null
+  //       }
+  //     }, 1000)
+  //   }
+  // }
 
   render() {
+    const { userInfo } = this.props
+    const { queryObj } = this.state
     return (
-      <AtForm
+      < AtForm
         className='realname-auth container'
         onSubmit={this.onSubmit.bind(this)}
       >
@@ -83,9 +124,9 @@ class Index extends Component {
               type='text'
               className="name"
               placeholder='请输入姓名'
-              value={this.state.queryObj.name}
+              value={queryObj.certName}
               placeholderClass="place_class"
-              onChange={this.handleChange.bind(this, 'name')}
+              onChange={this.handleChange.bind(this, 'certName')}
             />
             <Image src={name} className="name" />
           </View>
@@ -96,47 +137,22 @@ class Index extends Component {
               type='idcard'
               placeholder='请输入身份证号码'
               placeholderClass="place_class"
-              value={this.state.queryObj.idcard}
-              onChange={this.handleChange.bind(this, 'idcard')}
+              value={queryObj.certNo}
+              onChange={this.handleChange.bind(this, 'certNo')}
             />
           </View>
-          <View className="auth_input">
+          {/* <View className="auth_input">
             <AtInput
               name='phone'
               border={false}
+              editable={false}
               title='手机号'
               type='phone'
               placeholder='请输入手机号'
               placeholderClass="place_class"
-              value={this.state.queryObj.phone}
-              onChange={this.handleChange.bind(this, "phone")}
+              value={userInfo.bind_phone}
             />
-          </View>
-          <View className="auth_input">
-            <AtInput
-              name='card'
-              title='图形验证码'
-              type='text'
-              placeholder='请输入图形验证码'
-              placeholderClass="place_class"
-              value={this.state.queryObj.card}
-              onChange={this.handleChange.bind(this, 'card')}
-            />
-            <Image src={reset} className="reset" />
-          </View>
-          <View className="auth_input">
-            <AtInput
-              name='code'
-              title='短信验证码'
-              type='number'
-              placeholder='请输入短信验证码'
-              placeholderClass="place_class"
-              value={this.state.queryObj.code}
-              onChange={this.handleChange.bind(this, "code")}
-            >
-              <Text className="get_code" onClick={this.handleGetCode}>{this.state.countDown}</Text>
-            </AtInput>
-          </View>
+          </View> */}
         </View>
         <AtButton formType='submit' className="btn_submit">提交</AtButton>
         <View className="tips">认证即表示阅读并同意<Text className="t">《用户注册协议》</Text></View>

@@ -1,9 +1,13 @@
 import Taro, { Component } from '@tarojs/taro';
 import { View, Text, Image, Navigator } from '@tarojs/components';
-import nothing from "../../../assets/images/nothing.jpg"
-
+import { connect } from '@tarojs/redux';
+import nothing from "../../../assets/images/nothing1.jpg"
+import { actionOrderlist } from "../../../services/order"
 import './index.less';
 
+@connect(({ order, user }) => ({
+  user_id: user.user_id
+}))
 class Index extends Component {
 
   config = {
@@ -13,66 +17,51 @@ class Index extends Component {
   state = {
     current: 0,
     orderType: [
-      "全部",
-      "待付款",
-      "待发货",
-      "待收货",
-      "租用中",
-      "已逾期",
-      "已完结"
+      { title: "全部", status: "" },
+      { title: "待付款", status: 0 },
+      { title: "待发货", status: 4 },
+      { title: "待收货", status: 41 },
+      { title: "租用中", status: 5 },
+      { title: "已逾期", status: 6 },
+      { title: "已完结", status: 7 },
     ],
-    list: [
-      {
-        time: "2020-03-03 10:14:57",
-        type: "等待支付",
-        img: "",
-        title: "全新国行 iphone 6s plus",
-        color: "规格灰色 16GB",
-        total: "￥1496.5"
-      },
-      {
-        time: "2020-03-03 10:14:57",
-        type: "等待支付",
-        img: "",
-        title: "全新国行 iphone 6s plus",
-        color: "规格灰色 16GB",
-        total: "￥1496.5"
-      }
-    ]
+    status: '',
+    list: []
   }
 
   componentDidMount() {
     this.setState({
       current: Math.floor(this.$router.params.index)
     })
+    this.getOrderList();
   }
 
   componentDidShow() {
-    // this.getOrderList();
   }
 
-  handleChangeCurrent(index) {
+  handleChangeCurrent(index, item) {
     this.setState({
+      status: item.status,
       current: index
+    }, () => {
+      this.getOrderList();
     })
   }
 
-  handleToDetails() {
+  handleToDetails(id) {
     Taro.navigateTo({
-      url:"/pages/ucenter/orderDetail/index"
+      url: "/pages/ucenter/orderDetail/index?id=" + id
     })
   }
 
   getOrderList = () => {
-    getOrderListApi({
-      showType: this.state.showType,
-      page: this.state.page,
-      limit: this.state.limit
+    const { user_id } = this.props
+    actionOrderlist({
+      user_id,
+      status: this.state.status
     }).then(res => {
-      console.log(res.data);
       this.setState({
-        orderList: this.state.orderList.concat(res.list),
-        totalPages: res.pages
+        list: res.data
       });
     })
   }
@@ -99,7 +88,7 @@ class Index extends Component {
         <ScrollView scrollX scrollWithAnimation className="orders-switch">
           {
             this.state.orderType.map((item, index) => {
-              return <View onClick={this.handleChangeCurrent.bind(this, index)} className={`item ${this.state.current === index ? 'active' : ''} `}> {item} </View>
+              return <View onClick={this.handleChangeCurrent.bind(this, index, item)} className={`item ${this.state.current === index ? 'active' : ''} `}> {item.title} </View>
             })
 
           }
@@ -107,26 +96,26 @@ class Index extends Component {
         </ScrollView>
         {
           this.state.list.length > 0 ? this.state.list.map((item, index) => {
-            return <View className="order_list" onClick={this.handleToDetails.bind(this)}>
+            return <View className="order_list" onClick={this.handleToDetails.bind(this, item.id)}>
               <View className="flex-space_center top">
                 <Text>{item.time}</Text>
-                <Text>{item.type}</Text>
+                <Text>{item.statusName}</Text>
               </View>
               <View className="flex-space_center c">
                 <View className="flex-start_center">
                   <Image src={item.src} className='img'></Image>
                   <View>
-                    <Text className="title">{item.title}</Text>
-                    <View className="color">{item.color}</View>
-                    <View className="total">总租金：<Text class="t">{item.total}</Text></View>
+                    <Text className="title">{item.goodName}</Text>
+                    <View className="color">{item.goodItemName}</View>
+                    <View className="total">总租金：<Text class="t">{item.countPrice}</Text></View>
                   </View>
                 </View>
                 <Text className='at-icon at-icon-chevron-right'></Text>
               </View>
               <View className="button_group">
                 <View className="btn">联系商家</View>
-                <View className="btn">联系商家</View>
-                <View className="btn_pay btn">联系商家</View>
+                {/* <View className="btn">联系商家</View> */}
+                <View className="btn_pay btn">去支付</View>
               </View>
             </View>
           })

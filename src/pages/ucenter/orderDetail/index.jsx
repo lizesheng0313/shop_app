@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro';
 import { View, Text, Image, Navigator } from '@tarojs/components';
-import * as ApiOrder from '../../../services/order';
+import { actionOrderDetails } from "../../../services/order"
 import './index.less';
 
 class Index extends Component {
@@ -10,10 +10,22 @@ class Index extends Component {
   }
 
   state = {
-
+    order_id: "",
+    orderInfo: {}
   }
 
   componentDidMount() {
+    this.setState({
+      order_id: this.$router.params.id
+    }, () => {
+      actionOrderDetails({
+        order_id: this.state.order_id
+      }).then(res => {
+        this.setState({
+          orderInfo: res.data
+        })
+      })
+    })
 
   }
 
@@ -40,15 +52,16 @@ class Index extends Component {
   }
 
   render() {
+    const { orderInfo } = this.state
     return (
       <View className='order-details'>
         <View className="goods_details">
           <View className="flex-start_center ">
             <Image className="image"></Image>
             <View className="goods_details_right">
-              <View className="title">【全新国行】ThinkPad X1c 极速版14英寸</View>
-              <View className="sp">规格：15/28G/256G/黑色</View>
-              <View className="total">总租金: ￥23720.50</View>
+              <View className="title">{orderInfo.goodName}</View>
+              <View className="sp">规格：{orderInfo.goodItemName}</View>
+              <View className="total">总租金: {orderInfo.countPrice}</View>
             </View>
           </View>
         </View>

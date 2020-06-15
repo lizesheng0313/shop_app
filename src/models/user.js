@@ -1,4 +1,4 @@
-import { apiFindUserByUserId,apiRegisterUser } from '../services/user';
+import { apiFindUserByUserId } from '../services/user';
 
 export default {
     namespace: 'user',
