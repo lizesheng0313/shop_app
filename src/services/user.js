@@ -31,8 +31,8 @@ export async function actionrealPersonCreate(payload) {
 }
 
 //地址列表
-export async function actionSaveAddress(payload) {
-  return request("core_api/userapi/saveAddress", payload);
+export async function actionListAddress(payload) {
+  return request("core_api/userapi/listAddress", payload);
 }
 
 //保存收件地址

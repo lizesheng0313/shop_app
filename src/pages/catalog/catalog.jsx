@@ -1,7 +1,7 @@
 import Taro, { Component, closeBLEConnection } from '@tarojs/taro';
 import { View, Text, Navigator, ScrollView, Image } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
-import { apiCatalogList, apiFindTypeList, apifindListByType, apiFindBrandList } from '../../services/catalog';
+import { apiCatalogList, apiFindTypeList } from '../../services/catalog';
 
 import './index.less';
 
@@ -23,7 +23,7 @@ class Index extends Component {
     currentSecondId: ""
   }
 
-  componentDidMount() {
+  componentDidShow() {
     this.fetchCategoryList();
   }
 
@@ -63,11 +63,8 @@ class Index extends Component {
     this.setState({
       currentActve: 0
     })
-    // Taro.showLoading({
-    //   title: '加载中'
-    // })
-    apifindListByType({
-      typeId: id
+    apiCatalogList({
+      pId: id
     }).then(res => {
       if (res.data.length > 0) {
         this.fetchGoodsList(res.data[0].id)
@@ -89,8 +86,8 @@ class Index extends Component {
     Taro.showLoading({
       title: '加载中'
     })
-    apiFindBrandList({
-      bId: typeId
+    apiFindTypeList({
+      typeId
     }).then(res => {
       Taro.hideLoading();
       this.setState({

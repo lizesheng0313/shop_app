@@ -6,10 +6,6 @@ import { getGoodsDetails, apiRandShop } from '../../services/goods';
 import { apiRegisterUser } from "../../services/user"
 import parse from 'mini-html-parser2';
 
-import home from "../../assets/images/goods/home.png"
-import shape from "../../assets/images/goods/shape.png"
-import customer from "../../assets/images/goods/customer.png"
-import zm from "../../assets/images/goods/zm.png"
 
 import './index.less';
 
@@ -25,6 +21,7 @@ class Goods extends Component {
   }
 
   state = {
+    woqu: "",
     goods: {},
     openAttr: false,
     openShare: false,
@@ -68,7 +65,7 @@ class Goods extends Component {
 
   fetchGoodsInfo = () => {
     Taro.showLoading({
-      title:"加载中"
+      title: "加载中"
     })
     getGoodsDetails({
       id: this.$router.params.id
@@ -76,7 +73,8 @@ class Goods extends Component {
       Taro.hideLoading()
       this.setState({
         goodsInfo: res.data,
-        currentObj: res.data.itemList[0]
+        currentObj: res.data.itemList[0],
+        currDay: res.data.itemList[0].dayItem.length - 1
       })
       this.state.orderDetails.goodsName = res.data.name
       parse(res.data.content, (err, nodes) => {
@@ -121,6 +119,7 @@ class Goods extends Component {
     this.state.orderDetails.goods_item_id = item.id;
     this.state.orderDetails.name = item.name;
     this.state.orderDetails.yj_money = item.yj_money;
+    this.state.orderDetails.day = this.state.currentObj.dayItem[0].day;
     this.setState({
       currentPack: index,
       currentObj: item,
@@ -179,6 +178,9 @@ class Goods extends Component {
   async onGetAuthorize(res) {
     const { user_id, dispatch } = this.props
     let user_info = await Taro.getOpenUserInfo()
+    this.setState({
+      woqu: JSON.stringify(user_info)
+    })
     user_info = JSON.parse(user_info.response).response
     await apiRegisterUser({
       user_id,
@@ -197,11 +199,10 @@ class Goods extends Component {
 
   render() {
     const { userInfo } = this.props
-    const { current, nodes, currentObj, tagInfo, goodsInfo, openAttr, goods, orderObj, likeList } = this.state;
+    const { current, nodes, currentObj, tagInfo, goodsInfo, openAttr, goods, orderObj, likeList, currDay } = this.state;
     return (
       <Block>
         <View className='container'>
-
           <Swiper className='goodsimgs' indicator-dots='true' autoplay='true' interval='5000' duration='1000'>
             {goodsInfo.title_pic.map(item => {
               return <SwiperItem key={item}>
@@ -211,11 +212,11 @@ class Goods extends Component {
           </Swiper>
 
           <View>
-            <Image src={zm} className="zm_icon"></Image>
+            <Image src="http://app.zuyuanzhang01.com/shop_app/goods/zm.png" className="zm_icon"></Image>
           </View>
 
           <View className='goods-info'>
-            <View className='price'>￥{currentObj.price}</View>
+            <View className='price'>￥{currentObj.dayItem[currDay].monery}元/天</View>
             <View className="tag">
               {
                 goodsInfo.tag.map((item => {
@@ -293,7 +294,11 @@ class Goods extends Component {
             }
             {
               current === 1
-                ? <View className='tab-content'>标签2的内容</View>
+                ? <View className='tab-content'>
+                  <Image className='in_img' mode="widthFix" src="http://app.zuyuanzhang01.com/shop_app/goods/in1.jpg" />
+                  <Image className='in_img' mode="widthFix" src="http://app.zuyuanzhang01.com/shop_app/goods/in2.jpg" />
+                  <Image className='in_img' mode="widthFix" src="http://app.zuyuanzhang01.com/shop_app/goods/in3.jpg" />
+                </View>
                 : null
             }
             {
@@ -306,68 +311,69 @@ class Goods extends Component {
         </View>
 
         {
-          <View className='attr-pop-box' style={{ display: !openAttr ? 'none' : 'block' }}>
-            <View className='attr-pop'>
-              <View className='close' onClick={this.closeAttr}>
-                <View className='at-icon at-icon-close'></View>
-              </View>
-              <View className='img-info'>
-                <View className="tag-box">
-                  <Image className='img' src={'http://app.zuyuanzhang01.com/' + currentObj.pic}>
-                  </Image>
-                  <Text className="tag">{goodsInfo.old_new_type}</Text>
+          openAttr === true ?
+            <View className='attr-pop-box'>
+              <View className='attr-pop'>
+                <View className='close' onClick={this.closeAttr}>
+                  <View className='at-icon at-icon-close'></View>
                 </View>
-                <View className='info'>
-                  <View className='c'>
-                    <View className='p'>￥{currentObj.dayItem[currDay].monery}元/天</View>
-                    <View className='total'>总租金：￥{currentObj.dayItem[currDay].monery * currentObj.dayItem[currDay].day}</View>
-                    <View className='buy'>买断金：￥{currentObj.dayItem[currDay].full_money}</View>
+                <View className='img-info'>
+                  <View className="tag-box">
+                    <Image className='img' src={'http://app.zuyuanzhang01.com/' + currentObj.pic}>
+                    </Image>
+                  </View>
+                  <View className='info'>
+                    <View className='c'>
+                      <View className='p'>￥{currentObj.dayItem[currDay].monery}元/天</View>
+                      <View className='total'>总租金：￥{Math.round(currentObj.dayItem[currDay].monery * currentObj.dayItem[currDay].day)}</View>
+                      <View className='buy'>买断金：￥{currentObj.dayItem[currDay].full_money}</View>
+                    </View>
                   </View>
                 </View>
-              </View>
-              <View className='spec-con'>
-                <View className='spec-item'>
-                  <View className='name'>套餐</View>
-                  <View className="package">
-                    {
-                      goodsInfo.itemList && goodsInfo.itemList.map((item, index) => {
-                        return <View className={`value ${currentPack === index ? 'selected' : ''}`} onClick={() => this.clickSkuValue(item, index)}>{item.name}</View>
-                      })
-                    }
+                <View className='spec-con'>
+                  <View className='spec-item'>
+                    <View className='name'>套餐</View>
+                    <View className="package">
+                      {
+                        goodsInfo.itemList && goodsInfo.itemList.map((item, index) => {
+                          return <View className={`value ${currentPack === index ? 'selected' : ''}`} onClick={() => this.clickSkuValue(item, index)}>{item.name}</View>
+                        })
+                      }
+                    </View>
                   </View>
                 </View>
-              </View>
-              <View className='spec-con rent_day'>
-                <View className='spec-item'>
-                  <View className='name'>租用天数（最少30天，最多365天）</View>
-                  <View className="package">
-                    {
-                      currentObj.dayItem && currentObj.dayItem.map((item, index) => {
-                        return <View className={`value ${currDay === index ? 'selected' : ''}`} onClick={() => this.handleSelectDay(item, index)}>{item.day + '天'}</View>
-                      })
-                    }
+                <View className='spec-con rent_day'>
+                  <View className='spec-item'>
+                    <View className='name'>租用天数（最少30天，最多365天）</View>
+                    <View className="package">
+                      {
+                        currentObj.dayItem && currentObj.dayItem.map((item, index) => {
+                          return <View className={`value ${currDay === index ? 'selected' : ''}`} onClick={() => this.handleSelectDay(item, index)}>{item.day + '天'}</View>
+                        })
+                      }
+                    </View>
                   </View>
                 </View>
+                <View className="btn_rent" onClick={this.handleRent.bind(this)}>立即租用</View>
               </View>
-              <View className="btn_rent" onClick={this.handleRent.bind(this)}>立即租用</View>
             </View>
-          </View>
+            : ""
         }
 
         <View className='bottom-btn'>
           <View className='l l-cart' onClick={this.handleSwitchIndex}>
-            <Image src={home}></Image>
+            <Image src="http://app.zuyuanzhang01.com/shop_app/goods/home.png"></Image>
             首页
           </View>
           <View className='l l-cart' onClick={this.handleToStore.bind(this, goodsInfo.id)}>
-            <Image src={shape}></Image>
+            <Image src="http://app.zuyuanzhang01.com/shop_app/goods/shape.png"></Image>
             店铺
           </View>
           <View className='l l-cart'>
-            <Image src={customer}></Image>
+            <Image src="http://app.zuyuanzhang01.com/shop_app/goods/customer.png"></Image>
             客服
           </View>
-          {userInfo.nickName ? <View className='c' onClick={this.addFast}>免押租赁</View> :
+          {userInfo.avatar ? <View className='c' onClick={this.addFast}>免押租赁</View> :
             <Button
               openType="getAuthorize"
               scope="userInfo"

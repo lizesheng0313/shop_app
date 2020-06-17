@@ -3,6 +3,7 @@ import { connect } from '@tarojs/redux';
 import { View, Text, Image, Navigator, Input } from '@tarojs/components';
 import { actionGetOneBill, actionSubOrder } from "../../services/order"
 import { actionGetPhoneNumber, actionUserUpdate } from "../../services/user"
+// import { actionFundAuthOrderAppFreeze } from "../../services/order"
 import './index.less';
 
 @connect(({ order, user }) => ({
@@ -108,7 +109,7 @@ class Index extends Component {
     this.state.orderDetails.descption = e.detail.value;
   }
 
-  handlePay() {
+  async handlePay() {
     const { user_id, userInfo } = this.props;
     this.state.orderDetails.user_id = user_id
     if (!this.state.orderDetails.address_id) {
@@ -123,7 +124,11 @@ class Index extends Component {
       })
       return;
     }
-    actionSubOrder(this.state.orderDetails)
+    await actionSubOrder(this.state.orderDetails)
+    await actionFundAuthOrderAppFreeze({
+      orderTitle: this.state.orderDetails.goodsName,
+      amount: this.state.orderDetails.amount
+    })
   }
 
 
@@ -138,8 +143,8 @@ class Index extends Component {
           {
             isAddress ? <View className="flex-space_center">
               <View>
-                <View class="name">{addressInfo.fullname}<Text className="txt">{addressInfo.mobilePhone}</Text></View>
-                <View class="address">{addressInfo.address}</View>
+                <View class="name">{addressInfo.name}<Text className="txt">{addressInfo.phone}</Text></View>
+                <View class="address">{item.region}{item.address}</View>
               </View>
               <View className="modify" onClick={this.handleToAddress.bind(this, 'modify')}>编辑</View>
             </View>
@@ -169,16 +174,16 @@ class Index extends Component {
             </Button>
         }
         {
-          userInfo.bind_phone && !userInfo.card_num ? 
-          <View className="auth">
-            <View className="flex-space_center title">
-              <View>实名认证</View>
-              <View className="select_con" onClick={this.handleToAuth.bind(this)}>
-                还未进行实名认证，去认证
+          userInfo.bind_phone && !userInfo.card_num ?
+            <View className="auth">
+              <View className="flex-space_center title">
+                <View>实名认证</View>
+                <View className="select_con" onClick={this.handleToAuth.bind(this)}>
+                  还未进行实名认证，去认证
               <View className='at-icon  at-icon-chevron-right'></View>
+                </View>
               </View>
-            </View>
-          </View> : ""
+            </View> : ""
         }
         <View className="goods_details">
           <View className="flex-start_center ">
@@ -216,20 +221,20 @@ class Index extends Component {
               <View>运费</View>
               <View>￥0.00</View>
             </View>
-            {/* <View className="flex-space_center">
+            <View className="flex-space_center">
               <View>应付押金（根据个人信用减免）</View>
-              <View>￥0.00</View>
-            </View> */}
+              <View>{}</View>
+            </View>
           </View>
           <View className="c9 deposit">
             <View className="flex-space_center">
               <View>商品总押金 </View>
               <View>￥{orderDetails.yj_money}</View>
             </View>
-            {/* <View className="flex-space_center">
+            <View className="flex-space_center">
               <View>最高押金减免</View>
-              <View>-￥3300.00</View>
-            </View> */}
+              <View>{orderDetails.yj_money}</View>
+            </View>
           </View>
         </View>
         <View className="message">

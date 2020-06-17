@@ -17,3 +17,7 @@ export async function actionOrderlist(payload) {
 export async function actionOrderDetails(payload) {
   return request("core_api/orderapi/orderDetails", payload);
 }
+//冻结资金
+export async function actionFundAuthOrderAppFreeze(payload) {
+  return request("/ext_api/fundAuthOrderAppFreeze", payload);
+}

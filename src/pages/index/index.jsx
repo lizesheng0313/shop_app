@@ -6,8 +6,6 @@ import { apiFindList, apiuserOauthToken, apiIndexList } from '../../services/hom
 import { apiCatalogList } from "../../services/catalog"
 
 //图片
-import category from "../../assets/images/home/category.png"
-import coupons from "../../assets/images/home/coupons.png"
 
 import './index.less'
 
@@ -20,6 +18,7 @@ class Index extends PureComponent {
     super(props);
     this.state = {
       banner: [],
+      currentBrand: -1,
       list: [],
       value: "",
       menuList: [],
@@ -71,7 +70,7 @@ class Index extends PureComponent {
       this.setState({
         likeList: res.data
       })
-      this.handleLikelist(res.data[0].id)
+      this.handleLikelist(0, -1)
     })
     apiCatalogList({ index: 1 }).then(res => {
       this.setState({
@@ -81,10 +80,11 @@ class Index extends PureComponent {
     })
   }
 
-  handleLikelist(acId) {
+  handleLikelist(acId, index) {
     apiIndexList({ acId }).then(res => {
       this.setState({
-        list: res.data
+        list: res.data,
+        currentBrand: index
       })
     })
   }
@@ -102,7 +102,7 @@ class Index extends PureComponent {
   }
 
   render() {
-    const { menuList, banner, list, likeList, value } = this.state;
+    const { menuList, banner, list, likeList, value, currentBrand } = this.state;
     return (
       <View className='container'>
         <View className="header">
@@ -110,7 +110,7 @@ class Index extends PureComponent {
             <View className='search'>
               <Input type='text' onInput={this.handleOnInput.bind(this)} value={value} placeholder='请输入商品关键词' placeholderStyle='color:rgba(255,255,255,1);' />
             </View>
-            <Image src={category} className="category" onClick={this.handleToProduct.bind(this, value)} />
+            <Image src="http://app.zuyuanzhang01.com/shop_app/home/category.png" className="category" onClick={this.handleToProduct.bind(this, value)} />
           </View>
           <View className="swiper_box">
             <Swiper className='banner' autoplay interval='3000' duration='100'>
@@ -149,19 +149,18 @@ class Index extends PureComponent {
         </ScrollView>
 
         <View>
-          <Image src={coupons} className="coupons" />
+          <Image src="http://app.zuyuanzhang01.com/shop_app/home/coupons.png" className="coupons" />
         </View>
-
         <View className="like">
-          <View className="like_title like_type">
-            <Text className="top">猜你喜欢</Text>
+          <View className="like_title like_type" onClick={this.handleLikelist.bind(this, 0, -1)}>
+            <Text className={`top ${currentBrand === -1 ? 'active' : ''}`}>猜你喜欢</Text>
             <Text className="title">随便逛逛</Text>
           </View>
           <ScrollView scrollX scrollWithAnimation className="scroll_view">
             {
-              likeList.map(item => {
-                return <View className="like_type" onClick={this.handleLikelist.bind(this, item.id)}>
-                  <Text className="top">
+              likeList.map((item, index) => {
+                return <View className="like_type" onClick={this.handleLikelist.bind(this, item.id, index)}>
+                  <Text className={`top ${currentBrand === index ? 'active' : ''}`}>
                     <Image src={'http://app.zuyuanzhang01.com/' + item.title_pic} />
                   </Text>
                   <Text className="title">{item.name}</Text>
