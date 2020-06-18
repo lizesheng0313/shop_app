@@ -28,7 +28,7 @@ function request(url, data = {}) {
             // });
           } else if (res.data.data !== 200) {
             showErrorToast(res.data.msg);
-            resolve(res.data);
+            reject(res.data);
           }
         } else {
           showErrorToast(res.data.msg);

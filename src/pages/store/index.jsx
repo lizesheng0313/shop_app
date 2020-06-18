@@ -22,6 +22,7 @@ class Index extends PureComponent {
     super(props);
     this.state = {
       likeList: [],
+      currentBrand: 0,
       list: []
     }
   }
@@ -30,7 +31,7 @@ class Index extends PureComponent {
     navigationBarTitleText: '店铺',
   }
 
-  componentDidMount() {
+  componentDidShow() {
     this.getData();
   }
 
@@ -39,19 +40,22 @@ class Index extends PureComponent {
       this.setState({
         likeList: res.data
       })
+      this.getStoreList(res.data[0].id, 0)
+
     })
   }
 
-  getStoreList = (id) => {
+  getStoreList = (id, index) => {
     apiGetShop({ type_id: id, id: this.$router.params.id }).then(res => {
       this.setState({
-        list: res.data
+        list: res.data,
+        currentBrand: index
       })
     })
   }
 
   render() {
-    const { likeList } = this.state;
+    const { likeList, currentBrand } = this.state;
     return (
       <View className='container'>
         <View className="header">
@@ -61,13 +65,13 @@ class Index extends PureComponent {
         <View className="like">
           <ScrollView scrollX scrollWithAnimation className="scroll_view">
             {
-              likeList.map(item => {
-                return <View className="like_type" onClick={this.getStoreList.bind(this, item.id)}>
-                  <Text className="top">
-                    <Image src={'http://app.zuyuanzhang01.com/' + item.likeList} />
-                  </Text>
-                  <Text className="title">{item.name}</Text>
-                </View>
+              likeList.map((item, index) => {
+                return <View className="like_type" onClick={this.getStoreList.bind(this, item.id, index)}>
+              <Text className={`top ${currentBrand === index ? 'active' : ''}`}>
+                <Image src={'http://app.zuyuanzhang01.com/' + item.type_img} />
+              </Text>
+              <Text className="title">{item.name}</Text>
+            </View>
               })
             }
           </ScrollView>
@@ -84,7 +88,7 @@ class Index extends PureComponent {
                   </View>
                   <Text className='name'>{item.name}</Text>
                   <View className="flex-space_center">
-                    <Text className="price"><Text className="icon">￥</Text>{item.price}<Text className="start">起</Text></Text>
+                    <Text className="price"><Text className="icon">￥</Text>{item.price}元/天<Text className="start">起</Text></Text>
                     <Text className="time">{item.day}天起租</Text>
                   </View>
                 </Navigator>

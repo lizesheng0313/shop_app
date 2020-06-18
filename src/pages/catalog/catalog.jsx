@@ -24,6 +24,11 @@ class Index extends Component {
   }
 
   componentDidShow() {
+    this.setState({
+      currentFirst: 0,
+      currentActve: 0,
+      currentSecondId: ""
+    })
     this.fetchCategoryList();
   }
 

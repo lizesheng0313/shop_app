@@ -39,3 +39,8 @@ export async function actionListAddress(payload) {
 export async function actionSaveAddress(payload) {
   return request("core_api/userapi/saveAddress", payload);
 }
+
+//删除地址
+export async function actionDelAddress(payload) {
+  return request("core_api/userapi/delAddress", payload);
+}

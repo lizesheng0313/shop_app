@@ -48,6 +48,7 @@ class Goods extends Component {
       countPrice: "",
       day: "",
       goods_id: "",
+      pic: "",
       name: "",
       yj_money: "",
       goodsName: ""
@@ -77,7 +78,8 @@ class Goods extends Component {
         currDay: res.data.itemList[0].dayItem.length - 1
       })
       this.state.orderDetails.goodsName = res.data.name
-      parse(res.data.content, (err, nodes) => {
+      let content = res.data.content.replace(/\<img/gi, '<img style="width:100%" mode="widthFix"')
+      parse(content, (err, nodes) => {
         if (!err) {
           this.setState({
             nodes
@@ -119,6 +121,7 @@ class Goods extends Component {
     this.state.orderDetails.goods_item_id = item.id;
     this.state.orderDetails.name = item.name;
     this.state.orderDetails.yj_money = item.yj_money;
+    this.state.orderDetails.pic = item.pic;
     this.state.orderDetails.day = this.state.currentObj.dayItem[0].day;
     this.setState({
       currentPack: index,
@@ -165,6 +168,7 @@ class Goods extends Component {
       this.state.orderDetails.name = this.state.currentObj.name;
       this.state.orderDetails.yj_money = this.state.currentObj.yj_money;
       this.state.orderDetails.day = this.state.currentObj.dayItem[0].day;
+      this.state.orderDetails.pic = this.state.currentObj.pic
     }
     this.state.orderDetails.countPrice = this.state.currentObj.dayItem[this.state.currDay].monery * this.state.currentObj.dayItem[this.state.currDay].day
     this.setState({
@@ -365,7 +369,7 @@ class Goods extends Component {
             <Image src="http://app.zuyuanzhang01.com/shop_app/goods/home.png"></Image>
             首页
           </View>
-          <View className='l l-cart' onClick={this.handleToStore.bind(this, goodsInfo.id)}>
+          <View className='l l-cart' onClick={this.handleToStore.bind(this, goodsInfo.dId)}>
             <Image src="http://app.zuyuanzhang01.com/shop_app/goods/shape.png"></Image>
             店铺
           </View>

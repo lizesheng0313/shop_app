@@ -19,5 +19,9 @@ export async function actionOrderDetails(payload) {
 }
 //冻结资金
 export async function actionFundAuthOrderAppFreeze(payload) {
-  return request("/ext_api/fundAuthOrderAppFreeze", payload);
+  return request("ext_api/api/fundAuthOrderAppFreeze", payload);
+}
+//冻结资金转支付
+export async function actionTradeRefund(payload) {
+  return request("ext_api/api/tradeRefund", payload);
 }

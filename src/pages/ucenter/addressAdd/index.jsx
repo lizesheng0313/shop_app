@@ -13,7 +13,9 @@ import TaroRegionPicker from '../../../components/taro-region-picker'
 
 class Index extends Component {
   state = {
+    addressTitle: "新增地址",
     queryObj: {
+      id: 0,
       user_id: "",
       name: "",
       phone: "",
@@ -29,7 +31,19 @@ class Index extends Component {
   }
 
   componentDidMount() {
-
+    if (this.$router.params.info) {
+      Taro.setNavigationBarTitle({
+        title: '修改地址'
+      })
+      let data = JSON.parse(this.$router.params.info);
+      this.setState({
+        addressTitle: '保存地址',
+        address: data.address,
+        queryObj: data
+      }, () => {
+        console.log(this.state.queryObj)
+      })
+    }
   }
 
   onSubmit() {
@@ -96,7 +110,7 @@ class Index extends Component {
 
 
   render() {
-    const { queryObj, address } = this.state;
+    const { queryObj, address, addressTitle } = this.state;
     return (
       <View>
         <AtForm
@@ -127,7 +141,7 @@ class Index extends Component {
               />
             </View>
             <View className="auth_input">
-              <TaroRegionPicker onGetRegion={this.onGetRegion.bind(this)} />
+              <TaroRegionPicker region={queryObj.region} onGetRegion={this.onGetRegion.bind(this)} />
             </View>
             <View className="auth_input address_details">
               <Text class="tit">详细地址</Text>
@@ -142,7 +156,7 @@ class Index extends Component {
               <AtSwitch title='设为默认地址' color='#F71279' checked={queryObj.is_default} onChange={this.handleChangeSwitch.bind(this)} />
             </View>
           </View>
-          <AtButton formType='submit' className="btn_submit">新增地址</AtButton>
+          <AtButton formType='submit' className="btn_submit">{addressTitle}</AtButton>
         </AtForm >
       </View>
     );

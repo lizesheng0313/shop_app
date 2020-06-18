@@ -83,6 +83,7 @@ class Index extends Component {
   // }
 
   render() {
+    const { list } = this.state
     return (
       <View className='container'>
         <ScrollView scrollX scrollWithAnimation className="orders-switch">
@@ -95,15 +96,15 @@ class Index extends Component {
 
         </ScrollView>
         {
-          this.state.list.length > 0 ? this.state.list.map((item, index) => {
+          list.length > 0 ? list.map((item, index) => {
             return <View className="order_list" onClick={this.handleToDetails.bind(this, item.id)}>
               <View className="flex-space_center top">
-                <Text>{item.time}</Text>
+                <Text>{item.create_time}</Text>
                 <Text>{item.statusName}</Text>
               </View>
               <View className="flex-space_center c">
                 <View className="flex-start_center">
-                  <Image src={item.src} className='img'></Image>
+                  <Image src={'https://app.zuyuanzhang01.com/' + item.goodItemPic} mode="widthFix" className='img'></Image>
                   <View>
                     <Text className="title">{item.goodName}</Text>
                     <View className="color">{item.goodItemName}</View>

@@ -15,9 +15,6 @@ export async function apiIndexList(payload) {
   return request("core_api/shopapi/indexList", payload);
 }
 
-// 交易退款
-// export async function apiTradeRefund(payload) {
-//   return request("ext_api/api/tradeRefund", payload);
-// }
+
 
 

@@ -1,9 +1,8 @@
 import Taro, { Component } from '@tarojs/taro';
 import { connect } from '@tarojs/redux';
 import { View, Text, Image, Navigator, Input } from '@tarojs/components';
-import { actionGetOneBill, actionSubOrder } from "../../services/order"
+import { actionGetOneBill, actionSubOrder, actionFundAuthOrderAppFreeze, actionTradeRefund } from "../../services/order"
 import { actionGetPhoneNumber, actionUserUpdate } from "../../services/user"
-// import { actionFundAuthOrderAppFreeze } from "../../services/order"
 import './index.less';
 
 @connect(({ order, user }) => ({
@@ -124,11 +123,36 @@ class Index extends Component {
       })
       return;
     }
-    await actionSubOrder(this.state.orderDetails)
-    await actionFundAuthOrderAppFreeze({
-      orderTitle: this.state.orderDetails.goodsName,
-      amount: this.state.orderDetails.amount
-    })
+    let res = await actionSubOrder(this.state.orderDetails)
+    if (res.code === 200) {
+      await actionFundAuthOrderAppFreeze({
+        orderTitle: this.state.orderDetails.goodsName,
+        // amount: this.state.orderDetails.yj_money,
+        amount: 0.01
+      }).then(res => {
+        my.tradePay({
+          orderStr: res.data,
+          success: (res) => {
+            console.log(res)
+            console.log(res.result)
+            let x = JSON.parse(res.result)
+            console.log(x)
+            console.log(x.alipay_fund_auth_order_app_freeze_response)
+            // actionTradeRefund({
+            //   authNo: res.result.alipay_fund_auth_order_app_freeze_response.auth_no,
+            //   payerUserId: res.result.alipay_fund_auth_order_app_freeze_response.payer_user_id,
+            //   amount: res.result.alipay_fund_auth_order_app_freeze_response.amount,
+            //   subject: this.state.orderDetails.goodsName
+            // }).then(res => {
+            //   console.log(res)
+            // })
+          },
+          fail: (err) => {
+            console.log(err)
+          }
+        });
+      })
+    }
   }
 
 
@@ -144,7 +168,7 @@ class Index extends Component {
             isAddress ? <View className="flex-space_center">
               <View>
                 <View class="name">{addressInfo.name}<Text className="txt">{addressInfo.phone}</Text></View>
-                <View class="address">{item.region}{item.address}</View>
+                <View class="address">{addressInfo.region}{addressInfo.address}</View>
               </View>
               <View className="modify" onClick={this.handleToAddress.bind(this, 'modify')}>编辑</View>
             </View>
@@ -187,7 +211,7 @@ class Index extends Component {
         }
         <View className="goods_details">
           <View className="flex-start_center ">
-            <Image className="image"></Image>
+            <Image className="image" src={'https://app.zuyuanzhang01.com/' + orderDetails.pic}></Image>
             <View className="goods_details_right">
               <View className="title">{orderDetails.goodsName}</View>
               <View className="sp">规格：{orderDetails.name}</View>
@@ -219,21 +243,15 @@ class Index extends Component {
           <View className="freight">
             <View className="flex-space_center">
               <View>运费</View>
-              <View>￥0.00</View>
+              <View>到付</View>
             </View>
-            <View className="flex-space_center">
-              <View>应付押金（根据个人信用减免）</View>
-              <View>{}</View>
-            </View>
-          </View>
-          <View className="c9 deposit">
             <View className="flex-space_center">
               <View>商品总押金 </View>
               <View>￥{orderDetails.yj_money}</View>
             </View>
             <View className="flex-space_center">
               <View>最高押金减免</View>
-              <View>{orderDetails.yj_money}</View>
+              <View>￥{orderDetails.yj_money}</View>
             </View>
           </View>
         </View>
@@ -242,7 +260,7 @@ class Index extends Component {
           <Input placeholder="请在这里留下您的备注" onInput={this.handleInput.bind(this)} placeholderClass="plcss" className="input" value={orderDetails.descption}></Input>
         </View>
         <View className="footer_btn">
-          <View className="total_box">预计：<Text className="symbol">￥</Text><Text className="total">197.80</Text></View>
+          <View className="total_box">预计：<Text className="symbol">￥</Text><Text className="total">{bill.bill_money}</Text></View>
           {userInfo.bind_phone ? <View className='btn' onClick={this.handlePay.bind(this)}>去支付</View> :
             <Button
               openType="getAuthorize"

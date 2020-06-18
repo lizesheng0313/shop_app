@@ -2,7 +2,7 @@ import Taro, { Component } from '@tarojs/taro';
 import { connect } from '@tarojs/redux';
 import { View, Text, Button } from '@tarojs/components';
 import { AtModal, AtModalHeader, AtModalContent, AtModalAction } from "taro-ui"
-import { actionListAddress } from "../../../services/user"
+import { actionListAddress, actionDelAddress } from "../../../services/user"
 import edit from "../../../assets/images/address/edit.png"
 import del from "../../../assets/images/address/del.png"
 import nothing from "../../../assets/images/nothing1.jpg"
@@ -23,7 +23,8 @@ class Index extends Component {
     isOrder: "",
     isOpened: false,
     addressList: [],
-    total: 0
+    total: 0,
+    currentId: ""
   }
 
   componentWillMount() {
@@ -33,15 +34,24 @@ class Index extends Component {
   }
 
   componentDidShow() {
+    this.fetchAddressList();
+  }
+
+  fetchAddressList() {
+    Taro.showLoading({
+      title: "加载中"
+    })
     const { user_id } = this.props
     actionListAddress({ user_id }).then(res => {
+      Taro.hideLoading();
       this.setState({
         addressList: res.data
       })
     })
   }
 
-  handleToDelete() {
+  handleToDelete(item) {
+    this.state.currentId = item.id;
     this.setState({
       isOpened: true
     })
@@ -53,8 +63,16 @@ class Index extends Component {
     })
   }
   handleToSubmit() {
-    this.setState({
-      isOpened: true
+    Taro.showLoading({
+      title: "删除中"
+    })
+    actionDelAddress({
+      id: this.state.currentId
+    }).then(res => {
+      this.fetchAddressList();
+      this.setState({
+        isOpened: false
+      })
     })
   }
 
@@ -74,7 +92,12 @@ class Index extends Component {
       dispatch({ type: 'order/actionAddress', payload: item })
       Taro.navigateBack()
     }
+  }
 
+  handleToEditAdress(item) {
+    Taro.navigateTo({
+      url: "/pages/ucenter/addressAdd/index?info=" + JSON.stringify(item)
+    });
   }
 
   addressAddOrUpdate() {
@@ -104,7 +127,7 @@ class Index extends Component {
                   {item.is_default === true ? "默认地址" : ''}
                 </View>
                 <View class="address_footer flex-start_center">
-                  <View className="edit flex-start_center">
+                  <View className="edit flex-start_center" onClick={this.handleToEditAdress.bind(this, item)}>
                     <Image src={edit} class="icon"></Image>
                     <Text class="text">编辑</Text>
                   </View>
