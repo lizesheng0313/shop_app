@@ -128,8 +128,8 @@ class Index extends Component {
     if (res.code === 200) {
       await actionFundAuthOrderAppFreeze({
         orderTitle: this.state.orderDetails.goodsName,
-        // amount: this.state.orderDetails.yj_money
-        amount:0.01
+        // amount: this.state.orderDetails.yj_money,
+        amount: 0.01
       }).then(res => {
         my.tradePay({
           orderStr: res.data,
@@ -138,8 +138,7 @@ class Index extends Component {
             actionTradePay({
               authNo: data.alipay_fund_auth_order_app_freeze_response.auth_no,
               payerUserId: data.alipay_fund_auth_order_app_freeze_response.payer_user_id,
-              // amount: that.bill.bill_money,
-              amount:0.05,
+              amount: data.alipay_fund_auth_order_app_freeze_response.amount,
               subject: that.state.orderDetails.goodsName
             }).then(res => {
                 if(res.data.alipay_trade_pay_response.code === "10000"){
