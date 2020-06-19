@@ -1,7 +1,7 @@
 import Taro, { Component } from '@tarojs/taro';
 import { connect } from '@tarojs/redux';
 import { View, Text, Image, Navigator, Input } from '@tarojs/components';
-import { actionGetOneBill, actionSubOrder, actionFundAuthOrderAppFreeze, actionTradeRefund } from "../../services/order"
+import { actionGetOneBill, actionSubOrder, actionFundAuthOrderAppFreeze, actionTradePay } from "../../services/order"
 import { actionGetPhoneNumber, actionUserUpdate } from "../../services/user"
 import './index.less';
 
@@ -109,6 +109,7 @@ class Index extends Component {
   }
 
   async handlePay() {
+    let that = this;
     const { user_id, userInfo } = this.props;
     this.state.orderDetails.user_id = user_id
     if (!this.state.orderDetails.address_id) {
@@ -127,25 +128,26 @@ class Index extends Component {
     if (res.code === 200) {
       await actionFundAuthOrderAppFreeze({
         orderTitle: this.state.orderDetails.goodsName,
-        // amount: this.state.orderDetails.yj_money,
-        amount: 0.01
+        // amount: this.state.orderDetails.yj_money
+        amount:0.01
       }).then(res => {
         my.tradePay({
           orderStr: res.data,
           success: (res) => {
-            console.log(res)
-            console.log(res.result)
-            let x = JSON.parse(res.result)
-            console.log(x)
-            console.log(x.alipay_fund_auth_order_app_freeze_response)
-            // actionTradeRefund({
-            //   authNo: res.result.alipay_fund_auth_order_app_freeze_response.auth_no,
-            //   payerUserId: res.result.alipay_fund_auth_order_app_freeze_response.payer_user_id,
-            //   amount: res.result.alipay_fund_auth_order_app_freeze_response.amount,
-            //   subject: this.state.orderDetails.goodsName
-            // }).then(res => {
-            //   console.log(res)
-            // })
+            let data = JSON.parse(res.result)
+            actionTradePay({
+              authNo: data.alipay_fund_auth_order_app_freeze_response.auth_no,
+              payerUserId: data.alipay_fund_auth_order_app_freeze_response.payer_user_id,
+              // amount: that.bill.bill_money,
+              amount:0.05,
+              subject: that.state.orderDetails.goodsName
+            }).then(res => {
+                if(res.data.alipay_trade_pay_response.code === "10000"){
+                  Taro.redirectTo({
+                    url:"/pages/ucenter/order/index"
+                  })
+                }
+            })
           },
           fail: (err) => {
             console.log(err)

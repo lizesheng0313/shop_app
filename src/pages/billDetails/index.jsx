@@ -7,111 +7,51 @@ class Index extends Component {
   s
 
   config = {
-    navigationBarTitleText: '订单详情'
+    navigationBarTitleText: '账单详情'
   }
 
   state = {
-    list: [
-      {
-        nepr: '4/12',
-        total: "￥197.80",
-        time: "2020年05月01日",
-        type: "待还款",
-        checked: false
-      },
-      {
-        nepr: '4/12',
-        total: "￥197.80",
-        time: "2020年05月01日",
-        type: "待还款",
-        checked: false
-      },
-      {
-        nepr: '4/12',
-        total: "￥197.80",
-        time: "2020年05月01日",
-        type: "待还款",
-        checked: false
-      },
-      {
-        nepr: '4/12',
-        total: "￥197.80",
-        time: "2020年05月01日",
-        type: "待还款",
-        checked: false
-      }, {
-        nepr: '4/12',
-        total: "￥197.80",
-        time: "2020年05月01日",
-        type: "待还款",
-        checked: false
-      }, {
-        nepr: '4/12',
-        total: "￥197.80",
-        time: "2020年05月01日",
-        type: "待还款",
-        checked: false
-      }
-    ]
+    orderInfo: {},
   }
 
-  componentDidMount() {
-
-  }
-
-  handleCooy() {
-    my.setClipboard({
-      text: "23423423",
-      success(res) {
-        console.log("成功", res)
-      }, fail(err) {
-        console.log('失败', err)
-      }
-    })
-    my.getClipboard({
-      success: ({ text }) => {
-        console.log(text)
-        Taro.showToast({
-          title: text
-        })
-      },
-      fail(err) {
-        console.log(err)
-      }
+  componentDidShow() {
+    console.log(this.$router.params)
+    let data = JSON.parse(this.$router.params.info)
+    this.setState({
+      orderInfo: data
     })
   }
 
   render() {
-    const { list } = this.state
+    const { orderInfo } = this.state
     return (
       <View className='order-details'>
         <View className="goods_details">
           <View className="flex-start_center ">
             <Image className="image"></Image>
             <View className="goods_details_right">
-              <View className="title">【全新国行】ThinkPad X1c 极速版14英寸</View>
-              <View className="sp">规格：15/28G/256G/黑色</View>
-              <View className="total">总租金: ￥23720.50</View>
+              <View className="title">{orderInfo.goodName}</View>
+              <View className="sp">规格：{orderInfo.goodItemName}</View>
+              <View className="total">总租金: ￥{orderInfo.countPrice}</View>
             </View>
           </View>
           <View className="flex-around_center total_info">
             <View className="flex_dir_center">
-              <View>8422.20</View>
               <View className="c9">应还金额(元)</View>
             </View>
             <View className="flex_dir_center">
-              <View>8422.20</View>
+              <View>{orderInfo.wh_money}</View>
               <View className="c9">未还金额(元)</View>
             </View>
             <View className="flex_dir_center">
-              <View>8422.20</View>
+              <View>{orderInfo.yh_money}</View>
               <View className="c9">已还金额(元)</View>
             </View>
           </View>
         </View>
         <View className="tips">可提前归还本金</View>
         {
-          list.map((item) => {
+          orderInfo.list.map((item) => {
             return <View className="coupons">
               <View className="nper">{item.nepr}期</View>
               <View className="flex-space_center">

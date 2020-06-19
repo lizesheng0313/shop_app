@@ -21,7 +21,6 @@ class Goods extends Component {
   }
 
   state = {
-    woqu: "",
     goods: {},
     openAttr: false,
     openShare: false,
@@ -181,17 +180,32 @@ class Goods extends Component {
 
   async onGetAuthorize(res) {
     const { user_id, dispatch } = this.props
+    let that = this;
     let user_info = await Taro.getOpenUserInfo()
-    this.setState({
-      woqu: JSON.stringify(user_info)
-    })
     user_info = JSON.parse(user_info.response).response
-    await apiRegisterUser({
-      user_id,
-      avatar: user_info.avatar,
-      nickName: user_info.nickName
+    my.getSetting({
+      success: async (res) => {
+        console.log(res)
+        if (res.authSetting.userInfo) {
+          Taro.showLoading({
+            title: "加载中"
+          })
+          await apiRegisterUser({
+            user_id,
+            avatar: user_info.avatar,
+            nickName: user_info.nickName
+          })
+          await dispatch({ type: 'user/apiFindUserByUserId', payload: user_id }).then(res => {
+            Taro.hideLoading()
+            that.setState({
+              openAttr: true
+            })
+          })
+        }
+      }
     })
-    await dispatch({ type: 'user/apiFindUserByUserId', payload: user_id })
+
+
   }
 
   handleToProduct() {

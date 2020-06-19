@@ -14,7 +14,7 @@ class Index extends Component {
     orderInfo: {}
   }
 
-  componentDidMount() {
+  componentDidShow() {
     this.setState({
       order_id: this.$router.params.id
     }, () => {
@@ -26,12 +26,18 @@ class Index extends Component {
         })
       })
     })
-
   }
 
-  handleCooy() {
+  handleToBill() {
+    Taro.navigateTo({
+      url: "/pages/billDetails/index?info=" + JSON.stringify(this.state.orderInfo)
+    })
+  }
+
+  handleCooy(id) {
+    console.log(id)
     my.setClipboard({
-      text: "23423423",
+      text: id,
       success(res) {
         console.log("成功", res)
       }, fail(err) {
@@ -79,8 +85,8 @@ class Index extends Component {
             <View>￥939.25</View>
           </View>
           <View className="flex-space_center">
-            <View>运费（运费到付）</View>
-            <View>￥939.25</View>
+            <View>运费</View>
+            <View>运费到付</View>
           </View>
         </View>
         <View className="coupons calc_amount">
@@ -100,8 +106,8 @@ class Index extends Component {
         <View className="coupons order_info">
           <View className="flex-space_center">
             <View>订单编号</View>
-            <View className="flex-space_center">1000000000000000
-              <Text className="copy" onClick={this.handleCooy.bind(this)}>复制</Text>
+            <View className="flex-space_center">{orderInfo.id}
+              <Text className="copy" onClick={this.handleCooy.bind(this, this.state.orderInfo.id)}>复制</Text>
             </View>
           </View>
           <View className="flex-space_center">
@@ -119,7 +125,7 @@ class Index extends Component {
         </View>
         <View className="footer_btn flex-box">
           <View className="btn upload">上传证件</View>
-          <View className="btn">分期账单</View>
+          <View className="btn" onClick={this.handleToBill.bind(this)}>分期账单</View>
         </View>
       </View>
 
