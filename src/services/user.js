@@ -44,3 +44,9 @@ export async function actionSaveAddress(payload) {
 export async function actionDelAddress(payload) {
   return request("core_api/userapi/delAddress", payload);
 }
+
+//上传
+export async function actionUploadFile(payload) {
+  return request("core_api/userapi/uploadFile", payload);
+}
+

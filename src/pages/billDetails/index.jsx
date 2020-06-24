@@ -4,31 +4,44 @@ import * as ApiOrder from '../../../services/order';
 import './index.less';
 
 class Index extends Component {
-  s
 
   config = {
     navigationBarTitleText: '账单详情'
   }
 
   state = {
+    status: {
+      0: "待扣款",
+      1: '已扣款',
+      2: '扣款失败'
+    },
+    didNotReturn: 0,
+    hasAlso: 0,
     orderInfo: {},
   }
 
   componentDidShow() {
-    console.log(this.$router.params)
+    let hasAlso = 0;
     let data = JSON.parse(this.$router.params.info)
+    data.list.forEach((item, index) => {
+      if (item.status === 1) {
+        hasAlso += item.money
+      }
+    })
     this.setState({
+      didNotReturn: (data.countPrice - hasAlso).toFixed(2),
+      hasAlso: hasAlso.toFixed(2),
       orderInfo: data
     })
   }
 
   render() {
-    const { orderInfo } = this.state
+    const { orderInfo, status, didNotReturn, hasAlso } = this.state
     return (
       <View className='order-details'>
         <View className="goods_details">
           <View className="flex-start_center ">
-            <Image className="image"></Image>
+            <Image className="image" mode="widthFix" src={'https://app.zuyuanzhang01.com/' + orderInfo.pic}></Image>
             <View className="goods_details_right">
               <View className="title">{orderInfo.goodName}</View>
               <View className="sp">规格：{orderInfo.goodItemName}</View>
@@ -37,30 +50,31 @@ class Index extends Component {
           </View>
           <View className="flex-around_center total_info">
             <View className="flex_dir_center">
+              <View>{orderInfo.countPrice}</View>
               <View className="c9">应还金额(元)</View>
             </View>
             <View className="flex_dir_center">
-              <View>{orderInfo.wh_money}</View>
+              <View>{didNotReturn}</View>
               <View className="c9">未还金额(元)</View>
             </View>
             <View className="flex_dir_center">
-              <View>{orderInfo.yh_money}</View>
+              <View>{hasAlso}</View>
               <View className="c9">已还金额(元)</View>
             </View>
           </View>
         </View>
         <View className="tips">可提前归还本金</View>
         {
-          orderInfo.list.map((item) => {
+          orderInfo.list.map((item, index) => {
             return <View className="coupons">
-              <View className="nper">{item.nepr}期</View>
+              <View className="nper">{index + 1}/{orderInfo.list.length}期</View>
               <View className="flex-space_center">
-                <View className="total">{item.total}</View>
+                <View className="total">￥{item.money}</View>
                 <Radio checked={item.checked} color="#F71279"></Radio>
               </View>
               <View className="flex-space_center time_border">
-                <View>还款时间：{item.time}</View>
-                <View>{item.type}</View>
+                <View>还款时间：{item.formatDate}</View>
+                <View>{status[item.status]}</View>
               </View>
             </View>
           })

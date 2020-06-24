@@ -2,8 +2,9 @@ import Taro, { Component } from '@tarojs/taro';
 import { View, Text, Image, Navigator } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
 import nothing from "../../../assets/images/nothing1.jpg"
-import { actionOrderlist } from "../../../services/order"
+import { actionOrderlist, actionCancelOrder, actionFundAuthOrderAppFreeze } from "../../../services/order"
 import './index.less';
+import Customer from '../../../components/customer'
 
 @connect(({ order, user }) => ({
   user_id: user.user_id
@@ -15,10 +16,12 @@ class Index extends Component {
   }
 
   state = {
+    isShowCustomer: false,
     current: 0,
     orderType: [
       { title: "全部", status: "" },
       { title: "待付款", status: 0 },
+      { title: "待风控", status: 2 },
       { title: "待发货", status: 4 },
       { title: "待收货", status: 41 },
       { title: "租用中", status: 5 },
@@ -33,10 +36,12 @@ class Index extends Component {
     this.setState({
       current: Math.floor(this.$router.params.index)
     })
-    this.getOrderList();
+
+
   }
 
   componentDidShow() {
+    this.getOrderList();
   }
 
   handleChangeCurrent(index, item) {
@@ -55,37 +60,84 @@ class Index extends Component {
   }
 
   getOrderList = () => {
+    Taro.showLoading({
+      title: '加载中',
+    })
     const { user_id } = this.props
     actionOrderlist({
       user_id,
       status: this.state.status
     }).then(res => {
+      Taro.hideLoading()
       this.setState({
         list: res.data
       });
     })
   }
-  // onReachBottom = () => {
-  //   if (this.state.totalPages > this.state.page) {
-  //     this.setState({
-  //       page: this.state.page + 1
-  //     }, () => {
-  //       this.getOrderList();
-  //     });
-  //   } else {
-  //     Taro.showToast({
-  //       title: '没有更多订单了',
-  //       icon: 'none',
-  //       duration: 2000
-  //     });
-  //     return false;
-  //   }
-  // }
+
+  handleToCancelOrder(id) {
+    Taro.showModal({
+      title: '确认取消订单吗',
+      success() {
+        actionCancelOrder({
+          order_id: id
+        }).then(res => {
+          this.getOrderList();
+        })
+      }
+    })
+  }
+
+  async handleToPay(item) {
+    await actionFundAuthOrderAppFreeze({
+      orderTitle: item.goodName,
+      amount: this.state.orderDetails.yj_money,
+    }).then(res => {
+      my.tradePay({
+        orderStr: res.data,
+        success: async (res) => {
+          console.log(res)
+          that.state.orderDetails.isAuthorization = false;
+          if (res.resultCode === "9000") {
+            let data = JSON.parse(res.result)
+            that.state.orderDetails.isAuthorization = true;
+            that.state.orderDetails.operation_id = data.alipay_fund_auth_order_app_freeze_response.auth_no
+            that.state.orderDetails.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amout || 0
+            that.state.orderDetails.fund_amount = data.alipay_fund_auth_order_app_freeze_response.fund_amount || 1
+          }
+          let resultData = await actionSubOrder(that.state.orderDetails)
+          Taro.redirectTo({
+            url: "/pages/ucenter/orderDetail/index?id=" + resultData.data
+          })
+        },
+        fail: (err) => {
+          console.log(err)
+        }
+      });
+    })
+  }
+
+  handleCloseCumster() {
+    this.setState({
+      isShowCustomer: false
+    })
+  }
+
+
+  handleShowCustomer(e) {
+    e.stopPropagation();
+    this.setState({
+      isShowCustomer: true
+    })
+  }
 
   render() {
-    const { list } = this.state
+    const { list,isShowCustomer} = this.state
     return (
       <View className='container'>
+        {
+          isShowCustomer ? <Customer handleCloseCumster={this.handleCloseCumster.bind(this)}></Customer> : ""
+        }
         <ScrollView scrollX scrollWithAnimation className="orders-switch">
           {
             this.state.orderType.map((item, index) => {
@@ -114,9 +166,11 @@ class Index extends Component {
                 <Text className='at-icon at-icon-chevron-right'></Text>
               </View>
               <View className="button_group">
-                <View className="btn">联系商家</View>
-                {/* <View className="btn">联系商家</View> */}
-                <View className="btn_pay btn">去支付</View>
+                <View className="btn" onClick={this.handleShowCustomer.bind(this)}>联系商家</View>
+                {
+                  item.status === 2 ? <View className="btn" onClick={this.handleToCancelOrder.bind(this, item.id)}>取消订单</View> : ""
+                }
+                <View className="btn_pay btn" onClick={this.handleToPay.bind(this, item)}>去支付</View>
               </View>
             </View>
           })

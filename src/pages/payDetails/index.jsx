@@ -1,7 +1,7 @@
 import Taro, { Component } from '@tarojs/taro';
 import { connect } from '@tarojs/redux';
 import { View, Text, Image, Navigator, Input } from '@tarojs/components';
-import { actionGetOneBill, actionSubOrder, actionFundAuthOrderAppFreeze, actionTradePay } from "../../services/order"
+import { actionGetOneBill, actionSubOrder, actionFundAuthOrderAppFreeze } from "../../services/order"
 import { actionGetPhoneNumber, actionUserUpdate } from "../../services/user"
 import './index.less';
 
@@ -20,8 +20,12 @@ class Index extends Component {
   state = {
     num: 1,
     orderDetails: {
+      operation_id: "",
       descption: "",
-      user_id: ""
+      user_id: "",
+      credit_amout: "",
+      fund_amount: "",
+      isAuthorization: ""
     },
     bill: {},
     isAddress: false,
@@ -118,46 +122,41 @@ class Index extends Component {
       })
       return;
     }
+
     if (!userInfo.card_num) {
       Taro.showToast({
         title: "请先完成实名认证"
       })
       return;
     }
-    let res = await actionSubOrder(this.state.orderDetails)
-    if (res.code === 200) {
-      await actionFundAuthOrderAppFreeze({
-        orderTitle: this.state.orderDetails.goodsName,
-        // amount: this.state.orderDetails.yj_money,
-        amount: 0.01
-      }).then(res => {
-        my.tradePay({
-          orderStr: res.data,
-          success: (res) => {
+    await actionFundAuthOrderAppFreeze({
+      orderTitle: this.state.orderDetails.goodsName,
+      amount: this.state.orderDetails.yj_money,
+      // amount: 0.01
+    }).then(res => {
+      my.tradePay({
+        orderStr: res.data,
+        success: async (res) => {
+          console.log(res)
+          that.state.orderDetails.isAuthorization = false;
+          if (res.resultCode === "9000") {
             let data = JSON.parse(res.result)
-            actionTradePay({
-              authNo: data.alipay_fund_auth_order_app_freeze_response.auth_no,
-              payerUserId: data.alipay_fund_auth_order_app_freeze_response.payer_user_id,
-              amount: data.alipay_fund_auth_order_app_freeze_response.amount,
-              subject: that.state.orderDetails.goodsName
-            }).then(res => {
-                if(res.data.alipay_trade_pay_response.code === "10000"){
-                  Taro.redirectTo({
-                    url:"/pages/ucenter/order/index"
-                  })
-                }
-            })
-          },
-          fail: (err) => {
-            console.log(err)
+            that.state.orderDetails.isAuthorization = true;
+            that.state.orderDetails.operation_id = data.alipay_fund_auth_order_app_freeze_response.auth_no
+            that.state.orderDetails.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amout || 0
+            that.state.orderDetails.fund_amount = data.alipay_fund_auth_order_app_freeze_response.fund_amount || 1
           }
-        });
-      })
-    }
+          let resultData = await actionSubOrder(that.state.orderDetails)
+          Taro.redirectTo({
+            url: "/pages/ucenter/orderDetail/index?id=" + resultData.data
+          })
+        },
+        fail: (err) => {
+          console.log(err)
+        }
+      });
+    })
   }
-
-
-
 
   render() {
     const { num, isAddress, orderDetails, bill } = this.state
@@ -261,6 +260,7 @@ class Index extends Component {
           <Input placeholder="请在这里留下您的备注" onInput={this.handleInput.bind(this)} placeholderClass="plcss" className="input" value={orderDetails.descption}></Input>
         </View>
         <View className="footer_btn">
+          
           <View className="total_box">预计：<Text className="symbol">￥</Text><Text className="total">{bill.bill_money}</Text></View>
           {userInfo.bind_phone ? <View className='btn' onClick={this.handlePay.bind(this)}>去支付</View> :
             <Button

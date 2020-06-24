@@ -3,6 +3,7 @@ import { connect } from '@tarojs/redux';
 import { View, Swiper, SwiperItem, Button, Navigator, Text, Block, Input, Image, RichText } from '@tarojs/components';
 import { AtSegmentedControl } from 'taro-ui';
 import { getGoodsDetails, apiRandShop } from '../../services/goods';
+import Customer from '../../components/customer'
 import { apiRegisterUser } from "../../services/user"
 import parse from 'mini-html-parser2';
 
@@ -22,6 +23,7 @@ class Goods extends Component {
 
   state = {
     goods: {},
+    isShowCustomer: false,
     openAttr: false,
     openShare: false,
     tagInfo: [
@@ -158,8 +160,8 @@ class Goods extends Component {
     this.setState({
       openAttr: true
     })
-
   }
+
   //租用
   handleRent() {
     if (!this.state.orderDetails.goods_item_id) {
@@ -185,7 +187,6 @@ class Goods extends Component {
     user_info = JSON.parse(user_info.response).response
     my.getSetting({
       success: async (res) => {
-        console.log(res)
         if (res.authSetting.userInfo) {
           Taro.showLoading({
             title: "加载中"
@@ -204,8 +205,12 @@ class Goods extends Component {
         }
       }
     })
+  }
 
-
+  handleCloseCumster() {
+    this.setState({
+      isShowCustomer: false
+    })
   }
 
   handleToProduct() {
@@ -213,14 +218,22 @@ class Goods extends Component {
       url: "/pages/productList/index"
     });
   }
-
+  
+  handleShowCustomer() {
+    this.setState({
+      isShowCustomer: true
+    })
+  }
 
   render() {
     const { userInfo } = this.props
-    const { current, nodes, currentObj, tagInfo, goodsInfo, openAttr, goods, orderObj, likeList, currDay } = this.state;
+    const { current, nodes, currentObj, tagInfo, goodsInfo, openAttr, goods, orderObj, likeList, currDay,isShowCustomer } = this.state;
     return (
       <Block>
         <View className='container'>
+          {
+            isShowCustomer ? <Customer handleCloseCumster={this.handleCloseCumster.bind(this)}></Customer> : ""
+          }
           <Swiper className='goodsimgs' indicator-dots='true' autoplay='true' interval='5000' duration='1000'>
             {goodsInfo.title_pic.map(item => {
               return <SwiperItem key={item}>
@@ -387,7 +400,7 @@ class Goods extends Component {
             <Image src="http://app.zuyuanzhang01.com/shop_app/goods/shape.png"></Image>
             店铺
           </View>
-          <View className='l l-cart'>
+          <View className='l l-cart' onClick={this.handleShowCustomer.bind(this)}>
             <Image src="http://app.zuyuanzhang01.com/shop_app/goods/customer.png"></Image>
             客服
           </View>

@@ -25,4 +25,13 @@ export async function actionFundAuthOrderAppFreeze(payload) {
 export async function actionTradePay(payload) {
   return request("ext_api/api/tradePay", payload);
 }
+//资金授权查询 
+export async function actionFundAuthOperationDetailQuery(payload) {
+  return request("ext_api/api/fundAuthOperationDetailQuery", payload);
+}
+//取消订单
+export async function actionCancelOrder(payload) {
+  return request("core_api/orderapi/cancelOrder", payload);
+}
+
 

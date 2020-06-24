@@ -3,7 +3,7 @@ import { View, Text, Button, Image } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
 import { apiFindList } from '../../../services/home';
 import { apiFindActiveList } from '../../../services/catalog';
-
+import Customer from '../../../components/customer'
 import './index.less';
 import d1 from "../../../assets/images/mine/d1.png"
 import d2 from "../../../assets/images/mine/d2.png"
@@ -26,6 +26,7 @@ import recommended from "../../../assets/images/mine/recommended.png"
 class Index extends Component {
   state = {
     list: [],
+    isShowCustomer: false,
     orderTypeList: [
       { title: "待付款", src: d1, url: "" },
       { title: "待收货", src: d2, url: "" },
@@ -71,14 +72,27 @@ class Index extends Component {
     });
   }
 
-  handleToUrl = (url) => {
+  handleCloseCumster() {
+    this.setState({
+      isShowCustomer: false
+    })
+  }
+
+  handleToUrl = (item) => {
+    if (item.type) {
+      this.setState({
+        isShowCustomer: true
+      })
+      return;
+    }
     Taro.navigateTo({
-      url
+      url: item.url
     });
   }
 
   render() {
     const { userInfo } = this.props;
+    const { isShowCustomer } = this.state;
     return (
       <View className='container'>
         <View className='profile-info' onClick={this.goLogin}>
@@ -110,17 +124,17 @@ class Index extends Component {
         <View className="mine_other_type">
           {
             this.state.otherTypeList.map((item => {
-              return item.type === 'weapp' ?
-                <View className="user_other_item">
-                  <contact-button className="user_other_item" session-from='weapp' size='27' icon={item.src}>
-                    <Image src={item.src} className="icon"></Image>
-                  </contact-button>
-                  <View class="title service_title">{item.title}</View>
-                </View> :
-                <View className="user_other_item" onClick={this.handleToUrl.bind(this, item.url)}>
-                  <Image src={item.src} className="icon"></Image>
-                  <View class="title">{item.title}</View>
-                </View>
+              // return item.type === 'weapp' ?
+              // <View className="user_other_item">
+              //   <contact-button className="user_other_item" session-from='weapp' size='27' icon={item.src}>
+              //     <Image src={item.src} className="icon"></Image>
+              //   </contact-button>
+              //   <View class="title service_title">{item.title}</View>
+              // </View> :
+              return <View className="user_other_item" onClick={this.handleToUrl.bind(this, item)}>
+                <Image src={item.src} className="icon"></Image>
+                <View class="title">{item.title}</View>
+              </View>
             }))
           }
         </View>
@@ -150,7 +164,9 @@ class Index extends Component {
             })
           }
         </View>
-
+        {
+          isShowCustomer ? <Customer handleCloseCumster={this.handleCloseCumster.bind(this)}></Customer> : ""
+        }
       </View>
     );
   }

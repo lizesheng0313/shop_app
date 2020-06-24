@@ -3,6 +3,7 @@ import { View, Text, Navigator, Swiper, SwiperItem, Image, ScrollView, Block, In
 import { connect } from '@tarojs/redux';
 import { get as getGlobalData } from '../../global_data';
 import { apiGetType, apiGetShop } from '../../services/catalog';
+import Customer from '../../components/customer'
 
 
 
@@ -21,6 +22,7 @@ class Index extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      isShowCustomer: false,
       likeList: [],
       currentBrand: 0,
       list: []
@@ -54,24 +56,40 @@ class Index extends PureComponent {
     })
   }
 
+  handleCloseCumster() {
+    this.setState({
+      isShowCustomer: false
+    })
+  }
+
+
+  handleShowCustomer() {
+    this.setState({
+      isShowCustomer: true
+    })
+  }
+
   render() {
-    const { likeList, currentBrand } = this.state;
+    const { likeList, currentBrand, isShowCustomer } = this.state;
     return (
       <View className='container'>
+        {
+          isShowCustomer ? <Customer handleCloseCumster={this.handleCloseCumster.bind(this)}></Customer> : ""
+        }
         <View className="header">
           <Image src={back} className="back" />
         </View>
-        <Image src={service} className="service"></Image>
+        <Image src={service} className="service" onClick={this.handleShowCustomer.bind(this)}></Image>
         <View className="like">
           <ScrollView scrollX scrollWithAnimation className="scroll_view">
             {
               likeList.map((item, index) => {
                 return <View className="like_type" onClick={this.getStoreList.bind(this, item.id, index)}>
-              <Text className={`top ${currentBrand === index ? 'active' : ''}`}>
-                <Image src={'http://app.zuyuanzhang01.com/' + item.type_img} />
-              </Text>
-              <Text className="title">{item.name}</Text>
-            </View>
+                  <Text className={`top ${currentBrand === index ? 'active' : ''}`}>
+                    <Image src={'http://app.zuyuanzhang01.com/' + item.type_img} />
+                  </Text>
+                  <Text className="title">{item.name}</Text>
+                </View>
               })
             }
           </ScrollView>
