@@ -33,5 +33,8 @@ export async function actionFundAuthOperationDetailQuery(payload) {
 export async function actionCancelOrder(payload) {
   return request("core_api/orderapi/cancelOrder", payload);
 }
-
+//更新订单
+export async function actionUpdateOrder(payload) {
+  return request("core_api/orderapi/updateOrder", payload);
+}
 

@@ -44,15 +44,17 @@ class App extends Component {
       'pages/goods/goods',
       'pages/catalog/catalog',
       'pages/activeList/index',
-
-      'pages/ucenter/orderDetail/index',  
+      
+      'pages/ucenter/logistics/index',
+      'pages/ucenter/orderDetail/index',
       'pages/ucenter/addressAdd/index',
       'pages/ucenter/address/index',
       'pages/ucenter/realnameAuth/index',
       'pages/ucenter/auth/index',
       'pages/ucenter/order/index',
       'pages/ucenter/coupons/index',
-      'pages/ucenter/feedback/index'
+      'pages/ucenter/feedback/index',
+      'pages/ucenter/refund/index'
     ],
     window: {
       backgroundTextStyle: 'light',

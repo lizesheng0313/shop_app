@@ -2,7 +2,7 @@ import Taro, { Component } from '@tarojs/taro';
 import { View, Text, Image, Navigator } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
 import nothing from "../../../assets/images/nothing1.jpg"
-import { actionOrderlist, actionCancelOrder, actionFundAuthOrderAppFreeze } from "../../../services/order"
+import { actionOrderlist, actionCancelOrder, actionFundAuthOrderAppFreeze, actionUpdateOrder } from "../../../services/order"
 import './index.less';
 import Customer from '../../../components/customer'
 
@@ -36,8 +36,6 @@ class Index extends Component {
     this.setState({
       current: Math.floor(this.$router.params.index)
     })
-
-
   }
 
   componentDidShow() {
@@ -89,26 +87,26 @@ class Index extends Component {
   }
 
   async handleToPay(item) {
+    let orderDetails = {};
+    orderDetails.order_id = item.id;
     await actionFundAuthOrderAppFreeze({
       orderTitle: item.goodName,
-      amount: this.state.orderDetails.yj_money,
+      // amount: this.state.orderDetails.yj_money,
+      amount: 0.01
     }).then(res => {
       my.tradePay({
         orderStr: res.data,
         success: async (res) => {
           console.log(res)
-          that.state.orderDetails.isAuthorization = false;
           if (res.resultCode === "9000") {
             let data = JSON.parse(res.result)
-            that.state.orderDetails.isAuthorization = true;
-            that.state.orderDetails.operation_id = data.alipay_fund_auth_order_app_freeze_response.auth_no
-            that.state.orderDetails.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amout || 0
-            that.state.orderDetails.fund_amount = data.alipay_fund_auth_order_app_freeze_response.fund_amount || 1
+            orderDetails.operation_id = data.alipay_fund_auth_order_app_freeze_response.auth_no;
+            orderDetails.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amout || 0;
+            orderDetails.fund_amount = data.alipay_fund_auth_order_app_freeze_response.fund_amount || 1;
+            await actionUpdateOrder(orderDetails).then(res => {
+              this.getOrderList();
+            })
           }
-          let resultData = await actionSubOrder(that.state.orderDetails)
-          Taro.redirectTo({
-            url: "/pages/ucenter/orderDetail/index?id=" + resultData.data
-          })
         },
         fail: (err) => {
           console.log(err)
@@ -131,8 +129,23 @@ class Index extends Component {
     })
   }
 
+  handleRenewal() {
+
+  }
+
+  handleToRefund(item) {
+    Taro.navigateTo({
+      url: 'pages/ucenter/refund/index?orderDetails=' + item
+    })
+  }
+  handleToLogistics(item) {
+    Taro.navigateTo({
+      url: 'pages/ucenter/logistics/index?orderDetails=' + item
+    })
+  }
+
   render() {
-    const { list,isShowCustomer} = this.state
+    const { list, isShowCustomer } = this.state
     return (
       <View className='container'>
         {
@@ -169,6 +182,15 @@ class Index extends Component {
                 <View className="btn" onClick={this.handleShowCustomer.bind(this)}>联系商家</View>
                 {
                   item.status === 2 ? <View className="btn" onClick={this.handleToCancelOrder.bind(this, item.id)}>取消订单</View> : ""
+                }
+                {
+                  item.status === 41 ? <View className="btn" onClick={this.handleToLogistics.bind(this, item)}>查看物流</View> : ""
+                }
+                {
+                  item.status === 5 ? <View>
+                    <View className="btn" onClick={this.handleRenewal.bind(this, item.id)}>续租</View>
+                    <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View>
+                  </View> : ""
                 }
                 <View className="btn_pay btn" onClick={this.handleToPay.bind(this, item)}>去支付</View>
               </View>

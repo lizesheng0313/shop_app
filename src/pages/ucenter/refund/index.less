@@ -1,0 +1,144 @@
+@import '../../../assets/less/variables.less';
+page{
+  min-height:100%;
+  background:#f7f7f7;
+}
+.refund {
+  padding:0 20px;
+  font-size:28px;
+  box-sizing:border-box;
+.container {
+  background:#f7f7f7;
+  min-height: 100vh;
+  width: 100%;
+}
+.at-form::after{
+  border:none!important;
+}
+.realname-auth{
+  .auth_box{
+    background:#fff;
+    border-radius:20px;
+  }
+  .name,.reset{
+    height:40px;
+    background-position:right center;
+    background-size:contain!important;
+  }
+  .at-input{
+    padding:20px 0;
+    flex-shrink:0;
+    flex-grow:6;
+    font-size:28px;
+    margin-left:0;
+    height:40px;
+  }
+  .auth_input{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid #E5E5E5;
+    margin:0 39px;
+    box-sizing:border-box;
+  }
+  .auth_input:last-child{
+    border:none;
+  }
+  .at-input__title{
+    font-size:26px;
+  }
+  .at-input::after{
+    border:none;
+  }
+  .place_class{
+    font-size:26px;
+  }
+  .get_code{
+    font-size:23px;
+    color:@mainPrice;
+    padding-right:0;
+  }
+  .tips{
+     margin-top:26px;
+     text-align:center;
+     font-size:23px;
+     color:#363636;
+     .t{
+      color:@mainPrice
+     }
+  }
+}
+
+
+  .first_title{
+    padding:10px 0;
+  }
+  .adress_info{
+    background:#fff;
+    border-radius:20px;
+    padding:30px 20px;  
+    font-size:26px;
+    line-height:45px;
+    .title{
+      color:#999;
+      font-size:24px;
+    }
+  }
+  .goods_details{
+    position: relative;
+    padding:37px 42px 24px 15px;
+    background:#fff;  
+    border-radius:20px;
+    .image{
+      width:149px;
+      height:98px;
+    }
+    .title{
+      font-size:28px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      color:#333;
+    }
+    .sp{
+      color:#7E7E7E;
+      font-size:24px; 
+      margin:25px 0;
+    }
+    .total{
+      color:#000;
+      font-size:26px;
+    }
+    &_right{
+      margin-left:17px;
+    }
+    .number{
+      position:absolute;
+      right:46px;
+      bottom:45px;
+      display: flex;
+      align-items:center;
+      justify-content:center;
+      .sym{
+        background:#EBEBEB;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        width:36px;
+        height:36px;
+        color:#333;
+        font-size:24px;
+      }
+      .sym1{
+        margin-right:24px;
+      }
+      .sym2{
+        margin-left:24px;
+      }
+      .num{
+        font-weight:bold;
+        font-size:24px;
+      }
+    }
+  }
+}

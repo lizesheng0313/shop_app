@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro';
 import { connect } from '@tarojs/redux';
-import { View, Text, Image, Navigator, Input } from '@tarojs/components';
+import { View, Text, Image, Navigator, Input,Checkbox } from '@tarojs/components';
 import { actionGetOneBill, actionSubOrder, actionFundAuthOrderAppFreeze } from "../../services/order"
 import { actionGetPhoneNumber, actionUserUpdate } from "../../services/user"
 import './index.less';
@@ -131,8 +131,8 @@ class Index extends Component {
     }
     await actionFundAuthOrderAppFreeze({
       orderTitle: this.state.orderDetails.goodsName,
-      amount: this.state.orderDetails.yj_money,
-      // amount: 0.01
+      // amount: this.state.orderDetails.yj_money,
+      amount: 0.01
     }).then(res => {
       my.tradePay({
         orderStr: res.data,
@@ -260,7 +260,9 @@ class Index extends Component {
           <Input placeholder="请在这里留下您的备注" onInput={this.handleInput.bind(this)} placeholderClass="plcss" className="input" value={orderDetails.descption}></Input>
         </View>
         <View className="footer_btn">
-          
+          <View>
+            {/* <Checkbox className='checkbox-list__checkbox' value='12' checked>我已阅读</Checkbox> */}
+          </View>
           <View className="total_box">预计：<Text className="symbol">￥</Text><Text className="total">{bill.bill_money}</Text></View>
           {userInfo.bind_phone ? <View className='btn' onClick={this.handlePay.bind(this)}>去支付</View> :
             <Button
