@@ -2,7 +2,7 @@ import Taro, { Component } from '@tarojs/taro';
 import { View, Text, Image, Navigator } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
 import nothing from "../../../assets/images/nothing1.jpg"
-import { actionOrderlist, actionCancelOrder, actionFundAuthOrderAppFreeze, actionUpdateOrder } from "../../../services/order"
+import { actionOrderlist, actionCancelOrder, actionFundAuthOrderAppFreeze, actionUpdateOrder, actionReceiptSub } from "../../../services/order"
 import './index.less';
 import Customer from '../../../components/customer'
 
@@ -77,6 +77,9 @@ class Index extends Component {
     Taro.showModal({
       title: '确认取消订单吗',
       success() {
+        Taro.showLoading({
+          title: "确认中"
+        })
         actionCancelOrder({
           order_id: id
         }).then(res => {
@@ -121,6 +124,21 @@ class Index extends Component {
     })
   }
 
+  handleSubmitGoods(item) {
+    Taro.showModal({
+      title: '确认收货吗',
+      success() {
+        Taro.showLoading({
+          ttile: "确认中"
+        })
+        actionReceiptSub({
+          order_id: item.id
+        }).then(res => {
+          this.getOrderList();
+        })
+      }
+    })
+  }
 
   handleShowCustomer(e) {
     e.stopPropagation();
@@ -140,7 +158,7 @@ class Index extends Component {
   }
   handleToLogistics(item) {
     Taro.navigateTo({
-      url: 'pages/ucenter/logistics/index?orderDetails=' + item
+      url: 'pages/ucenter/logistics/index?id=' + item.id
     })
   }
 
@@ -185,6 +203,9 @@ class Index extends Component {
                 }
                 {
                   item.status === 41 ? <View className="btn" onClick={this.handleToLogistics.bind(this, item)}>查看物流</View> : ""
+                }
+                {
+                  item.status === 41 ? <View className="btn" onClick={this.handleSubmitGoods.bind(this, item)}>确认收货</View> : ""
                 }
                 {
                   item.status === 5 ? <View>

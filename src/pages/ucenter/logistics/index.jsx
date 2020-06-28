@@ -3,20 +3,14 @@ import { View, Text, Button, Image } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
 import { AtTimeline } from 'taro-ui'
 import './index.less';
-import { actionrealPersonCreate, actionUserUpdate } from "../../../services/user"
+import { actionSeachAddress } from "../../../services/order"
 
-@connect(({ user }) => ({
-  userInfo: user.userInfo,
-  user_id: user.user_id
-}))
 
 class Index extends Component {
   state = {
     addressInfo: {
-      info: '北京朝阳区管庄西里南幸福小区37号楼3单元301',
-      title: "百事快递",
-      order: '234234234234234'
-    }
+    },
+    list: []
   }
 
   config = {
@@ -24,32 +18,39 @@ class Index extends Component {
   }
 
   componentDidMount() {
-    this.setState({
-      orderDetails: this.$router.params.orderDetails
+    actionSeachAddress({
+      order_id: this.$router.params.id
+    }).then(res => {
+
+      let arr = [];
+      res.data.list.forEach(item => {
+        arr.push({
+          title: item.txt,
+          content: [item.ftime]
+        })
+      })
+      this.setState({
+        addressInfo: res.data,
+        list: arr
+      })
     })
   }
 
   render() {
-    const { userInfo } = this.props
-    const { addressInfo } = this.state
+    const { addressInfo,list } = this.state
     return (
       <View className="logistics">
-        <View className="info">{addressInfo.info}</View>
+        <View className="info">{addressInfo.addr.address}</View>
         <View className="courier">
           <View class="courier_title">
-            {addressInfo.title}
+            {addressInfo.express_name}
           </View>
           <View class="order">
-            {addressInfo.order}
+            {addressInfo.express_code}
           </View>
           <AtTimeline
             pending
-            items={[
-              { title: '刷牙洗脸', content: ['大概8:00'], color: 'yellow' },
-              { title: '吃早餐', content: ['牛奶+面包'] },
-              { title: '上班', content: ['查看邮件'] },
-              { title: '睡觉', content: ['不超过23:00'] }
-            ]}
+            items={list}
           >
           </AtTimeline>
         </View>

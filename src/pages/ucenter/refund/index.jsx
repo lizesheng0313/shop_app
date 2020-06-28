@@ -1,24 +1,32 @@
 import Taro, { Component, clearStorage } from '@tarojs/taro';
-import { View, Text, Button, Image } from '@tarojs/components';
+import { View, Text, Button, Image, Picker } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
-import { AtInput, AtForm, AtButton, AtToast } from 'taro-ui'
+import { AtInput, AtForm, AtButton } from 'taro-ui'
 import './index.less';
-import name from "../../../assets/images/mine/name.png"
-import reset from "../../../assets/images/mine/reset.png"
-import { actionrealPersonCreate, actionUserUpdate } from "../../../services/user"
-
-@connect(({ user }) => ({
-  userInfo: user.userInfo,
-  user_id: user.user_id
-}))
+import { actoinSendSub } from "../../../services/order"
 
 class Index extends Component {
   state = {
     orderDetails: "",
+    name: "请选择快递公司",
     queryObj: {
-      certName: "",
-      certNo: "",
-    }
+      express_name: "",
+      express_code: "",
+    },
+    selector: [
+      {
+        name: "京东",
+        value: "jd"
+      },
+      {
+        name: "顺风",
+        value: "shunfeng"
+      },
+      {
+        name: "德邦",
+        value: "debangwuliu"
+      }],
+    index: 0,
   }
 
   config = {
@@ -31,16 +39,24 @@ class Index extends Component {
     })
   }
 
+  handleChangeExpress(e) {
+    let name = this.state.selector[e.detail.value].name;
+    let value = this.state.selector[e.detail.value].value;
+    let data = Object.assign({}, this.state.queryObj, { express_name: value })
+    this.setState({
+      name,
+      queryObj: data
+    })
+  }
+
   onSubmit() {
-    let that = this;
-    const { dispatch, user_id } = this.props
-    if (!this.state.queryObj.certName) {
+    if (!this.state.queryObj.express_name) {
       Taro.showToast({
-        title: '请输入快递公司'
+        title: '请选择快递公司'
       })
       return;
     }
-    if (!/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(this.state.queryObj.certNo)) {
+    if (!this.state.queryObj.express_code) {
       Taro.showToast({
         title: '请输入快递单号'
       })
@@ -48,6 +64,12 @@ class Index extends Component {
     }
     Taro.showLoading({
       title: '提交中'
+    })
+    actoinSendSub(this.state.queryObj).then(res => {
+      Taro.showToast({
+        title: '退租中'
+      })
+      Taro.navigateBack();
     })
   }
 
@@ -61,8 +83,7 @@ class Index extends Component {
   }
 
   render() {
-    const { userInfo } = this.props
-    const { queryObj,orderDetails } = this.state
+    const { queryObj, orderDetails, selector, name } = this.state
     return (
       <View className="refund">
         <View className="first_title">设备退还地址</View>
@@ -97,16 +118,19 @@ class Index extends Component {
           onSubmit={this.onSubmit.bind(this)}
         >
           <View className="auth_box">
-            <View className="auth_input">
-              <AtInput
-                title='快递公司'
-                type='text'
-                className="name"
-                placeholder='请输入快递公司'
-                value={queryObj.certName}
-                placeholderClass="place_class"
-                onChange={this.handleChange.bind(this, 'certName')}
-              />
+            <View className="auth_input refund_picker">
+              <Picker
+                range="value"
+                range-key="name"
+                range={selector}
+                onChange={this.handleChangeExpress}
+                value={this.state.index}
+              >
+                <View>
+                  <Text className="express_title">快递公司</Text>
+                  <Text className="express_value">{name}</Text>
+                </View>
+              </Picker>
             </View>
             <View className="auth_input">
               <AtInput
@@ -115,7 +139,7 @@ class Index extends Component {
                 placeholder='请输入快递单号'
                 placeholderClass="place_class"
                 value={queryObj.certNo}
-                onChange={this.handleChange.bind(this, 'certNo')}
+                onChange={this.handleChange.bind(this, 'express_code')}
               />
             </View>
           </View>

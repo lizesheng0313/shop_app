@@ -37,4 +37,19 @@ export async function actionCancelOrder(payload) {
 export async function actionUpdateOrder(payload) {
   return request("core_api/orderapi/updateOrder", payload);
 }
+//快递查询
+export async function actionSeachAddress(payload) {
+  return request("core_api/orderapi/seach_express", payload);
+}
+//确认收货
+export async function actionReceiptSub(payload) {
+  return request("core_api/orderapi/receipt_sub", payload);
+}
+//退还
+export async function actoinSendSub(payload) {
+  return request("core_api/orderapi/send_sub", payload);
+}
+
+
+
 

@@ -45,6 +45,7 @@ class App extends Component {
       'pages/catalog/catalog',
       'pages/activeList/index',
       
+      'pages/ucenter/refund/index',
       'pages/ucenter/logistics/index',
       'pages/ucenter/orderDetail/index',
       'pages/ucenter/addressAdd/index',
@@ -54,7 +55,6 @@ class App extends Component {
       'pages/ucenter/order/index',
       'pages/ucenter/coupons/index',
       'pages/ucenter/feedback/index',
-      'pages/ucenter/refund/index'
     ],
     window: {
       backgroundTextStyle: 'light',
