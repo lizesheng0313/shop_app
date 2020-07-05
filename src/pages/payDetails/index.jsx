@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro';
 import { connect } from '@tarojs/redux';
-import { View, Text, Image, Navigator, Input,Checkbox } from '@tarojs/components';
+import { View, Text, Image, Navigator, Input, Checkbox } from '@tarojs/components';
 import { actionGetOneBill, actionSubOrder, actionFundAuthOrderAppFreeze } from "../../services/order"
 import { actionGetPhoneNumber, actionUserUpdate } from "../../services/user"
 import './index.less';
@@ -20,6 +20,7 @@ class Index extends Component {
   state = {
     num: 1,
     orderDetails: {
+      order_id: "",
       operation_id: "",
       descption: "",
       user_id: "",
@@ -132,24 +133,28 @@ class Index extends Component {
     await actionFundAuthOrderAppFreeze({
       orderTitle: this.state.orderDetails.goodsName,
       // amount: this.state.orderDetails.yj_money,
-      amount: 0.01
+      amount: 0.07
     }).then(res => {
+      that.state.orderDetails.order_id = res.data.outOrderNo;
       my.tradePay({
-        orderStr: res.data,
+        orderStr: res.data.orderStr,
         success: async (res) => {
-          console.log(res)
           that.state.orderDetails.isAuthorization = false;
           if (res.resultCode === "9000") {
             let data = JSON.parse(res.result)
             that.state.orderDetails.isAuthorization = true;
+            that.state.orderDetails.order_id = data.alipay_fund_auth_order_app_freeze_response.out_order_no
             that.state.orderDetails.operation_id = data.alipay_fund_auth_order_app_freeze_response.auth_no
-            that.state.orderDetails.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amout || 0
+            that.state.orderDetails.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amount || 0
             that.state.orderDetails.fund_amount = data.alipay_fund_auth_order_app_freeze_response.fund_amount || 1
           }
-          let resultData = await actionSubOrder(that.state.orderDetails)
+          let queryForm = { ...that.state.orderDetails };
+          delete queryForm.yj_money;
+          let resultData = await actionSubOrder(queryForm)
           Taro.redirectTo({
             url: "/pages/ucenter/orderDetail/index?id=" + resultData.data
           })
+
         },
         fail: (err) => {
           console.log(err)

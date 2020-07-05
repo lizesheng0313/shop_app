@@ -21,12 +21,12 @@ class Index extends Component {
     orderType: [
       { title: "全部", status: "" },
       { title: "待付款", status: 0 },
-      { title: "待风控", status: 2 },
+      { title: "待风控", status: 3 },
       { title: "待发货", status: 4 },
       { title: "待收货", status: 41 },
-      { title: "租用中", status: 5 },
-      { title: "已逾期", status: 6 },
-      { title: "已完结", status: 7 },
+      { title: "租用中", status: 6 },
+      { title: "已逾期", status: -3 },
+      { title: "已完结", status: 8 },
     ],
     status: '',
     list: []
@@ -104,7 +104,7 @@ class Index extends Component {
           if (res.resultCode === "9000") {
             let data = JSON.parse(res.result)
             orderDetails.operation_id = data.alipay_fund_auth_order_app_freeze_response.auth_no;
-            orderDetails.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amout || 0;
+            orderDetails.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amount || 0;
             orderDetails.fund_amount = data.alipay_fund_auth_order_app_freeze_response.fund_amount || 1;
             await actionUpdateOrder(orderDetails).then(res => {
               this.getOrderList();
@@ -199,7 +199,7 @@ class Index extends Component {
               <View className="button_group">
                 <View className="btn" onClick={this.handleShowCustomer.bind(this)}>联系商家</View>
                 {
-                  item.status === 2 ? <View className="btn" onClick={this.handleToCancelOrder.bind(this, item.id)}>取消订单</View> : ""
+                  item.status === 0 || item.status === 4 ? <View className="btn" onClick={this.handleToCancelOrder.bind(this, item.id)}>取消订单</View> : ""
                 }
                 {
                   item.status === 41 ? <View className="btn" onClick={this.handleToLogistics.bind(this, item)}>查看物流</View> : ""
@@ -208,7 +208,7 @@ class Index extends Component {
                   item.status === 41 ? <View className="btn" onClick={this.handleSubmitGoods.bind(this, item)}>确认收货</View> : ""
                 }
                 {
-                  item.status === 5 ? <View>
+                  item.status === 6 ? <View>
                     <View className="btn" onClick={this.handleRenewal.bind(this, item.id)}>续租</View>
                     <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View>
                   </View> : ""

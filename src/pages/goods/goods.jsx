@@ -171,7 +171,7 @@ class Goods extends Component {
       this.state.orderDetails.day = this.state.currentObj.dayItem[0].day;
       this.state.orderDetails.pic = this.state.currentObj.pic
     }
-    this.state.orderDetails.countPrice = this.state.currentObj.dayItem[this.state.currDay].monery * this.state.currentObj.dayItem[this.state.currDay].day
+    this.state.orderDetails.countPrice = (this.state.currentObj.dayItem[this.state.currDay].monery * this.state.currentObj.dayItem[this.state.currDay].day).toFixed(2)
     this.setState({
       openAttr: false,
     })
