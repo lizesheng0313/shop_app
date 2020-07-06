@@ -26,6 +26,17 @@ class Index extends Component {
     'navigationBarTitleText': '实名认证'
   }
 
+  componentDidMount() {
+    const { userInfo } = this.props;
+    if (userInfo.card_num) {
+      const { card_num, name } = userInfo
+      let data = Object.assign({}, this.state.queryObj, { certName: name, certNo: card_num })
+      this.setState({
+        queryObj: data
+      })
+    }
+  }
+
   onSubmit() {
     let that = this;
     const { dispatch, user_id } = this.props
@@ -124,6 +135,7 @@ class Index extends Component {
               type='text'
               className="name"
               placeholder='请输入姓名'
+              disabled={userInfo.card_num}
               value={queryObj.certName}
               placeholderClass="place_class"
               onChange={this.handleChange.bind(this, 'certName')}
@@ -135,6 +147,7 @@ class Index extends Component {
               name='idcard'
               title='身份证号'
               type='idcard'
+              disabled={userInfo.card_num}
               placeholder='请输入身份证号码'
               placeholderClass="place_class"
               value={queryObj.certNo}
@@ -154,8 +167,13 @@ class Index extends Component {
             />
           </View> */}
         </View>
-        <AtButton formType='submit' className="btn_submit">提交</AtButton>
-        <View className="tips">认证即表示阅读并同意<Text className="t">《用户注册协议》</Text></View>
+        {
+          userInfo.card_num ? "" :
+            <View>
+              <AtButton formType='submit' className="btn_submit">提交</AtButton>
+              <View className="tips">认证即表示阅读并同意<Text className="t">《用户注册协议》</Text></View>
+            </View>
+        }
       </AtForm >
     );
   }

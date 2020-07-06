@@ -152,11 +152,11 @@ class Index extends PureComponent {
           <Image src="http://app.zuyuanzhang01.com/shop_app/home/coupons.png" className="coupons" />
         </View>
         <View className="like">
-          <View className="like_title like_type" onClick={this.handleLikelist.bind(this, 0, -1)}>
-            <Text className={`top ${currentBrand === -1 ? 'active' : ''}`}>猜你喜欢</Text>
-            <Text className="title">随便逛逛</Text>
-          </View>
           <ScrollView scrollX scrollWithAnimation className="scroll_view">
+            <View className="like_title like_type" onClick={this.handleLikelist.bind(this, 0, -1)}>
+              <Text className={`top ${currentBrand === -1 ? 'active' : ''}`}>猜你喜欢</Text>
+              <Text className="title">随便逛逛</Text>
+            </View>
             {
               likeList.map((item, index) => {
                 return <View className="like_type" onClick={this.handleLikelist.bind(this, item.id, index)}>

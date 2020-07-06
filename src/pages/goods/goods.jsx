@@ -356,7 +356,7 @@ class Goods extends Component {
                   <View className='info'>
                     <View className='c'>
                       <View className='p'>￥{currentObj.dayItem[currDay].monery}元/天</View>
-                      <View className='total'>总租金：￥{Math.round(currentObj.dayItem[currDay].monery * currentObj.dayItem[currDay].day)}</View>
+                      <View className='total'>总租金：￥{(currentObj.dayItem[currDay].monery * currentObj.dayItem[currDay].day).toFixed(2)}</View>
                       <View className='buy'>买断金：￥{currentObj.dayItem[currDay].full_money}</View>
                     </View>
                   </View>
