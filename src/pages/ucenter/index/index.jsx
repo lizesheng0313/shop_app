@@ -28,11 +28,11 @@ class Index extends Component {
     list: [],
     isShowCustomer: false,
     orderTypeList: [
-      { title: "待付款", src: d1, url: "" },
-      { title: "待收货", src: d2, url: "" },
-      { title: "租用中", src: d3, url: "" },
-      { title: "已逾期", src: d4, url: "" },
-      { title: "已完结", src: d5, url: "" }
+      { title: "待付款", src: d1, url: "", index: 1 },
+      { title: "待收货", src: d2, url: "", index: 3 },
+      { title: "租用中", src: d3, url: "", index: 5 },
+      { title: "已逾期", src: d4, url: "", index: 6 },
+      { title: "已完结", src: d5, url: "", index: 7 }
     ],
     otherTypeList: [
       { title: "我的优惠券", src: l1, url: "/pages/ucenter/coupons/index" },
@@ -112,7 +112,7 @@ class Index extends Component {
           <View className='user_column'>
             {
               this.state.orderTypeList.map((item, index) => {
-                return <View className='user_column_item' onClick={this.handleToOrder.bind(this, index + 1)}>
+                return <View className='user_column_item' onClick={this.handleToOrder.bind(this, item.index)}>
                   <Image className='user_column_item_image' src={item.src}></Image>
                   <View className='user_column_item_text'>{item.title}</View>
                 </View>

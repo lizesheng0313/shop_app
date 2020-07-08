@@ -21,10 +21,10 @@ class Index extends Component {
     orderType: [
       { title: "全部", status: "" },
       { title: "待付款", status: 0 },
-      { title: "待风控", status: 3 },
+      { title: "待风控", status: 1 },
       { title: "待发货", status: 4 },
       { title: "待收货", status: 41 },
-      { title: "租用中", status: 6 },
+      { title: "租用中", status: 5 },
       { title: "已逾期", status: -3 },
       { title: "已完结", status: 8 },
     ],
@@ -73,34 +73,39 @@ class Index extends Component {
     })
   }
 
-  handleToCancelOrder(id) {
+  handleToCancelOrder(id, e) {
+    e.stopPropagation();
     Taro.showModal({
+      cancelText: '取消',
       title: '确认取消订单吗',
-      success() {
-        Taro.showLoading({
-          title: "确认中"
-        })
-        actionCancelOrder({
-          order_id: id
-        }).then(res => {
-          this.getOrderList();
-        })
+      success(res) {
+        if (res.confirm) {
+          Taro.showLoading({
+            title: "确认中"
+          })
+          actionCancelOrder({
+            order_id: id
+          }).then(res => {
+            Taro.hideLoading()
+            this.getOrderList();
+          })
+        }
       }
     })
   }
 
-  async handleToPay(item) {
+  async handleToPay(item, e) {
+    e.stopPropagation();
     let orderDetails = {};
     orderDetails.order_id = item.id;
     await actionFundAuthOrderAppFreeze({
       orderTitle: item.goodName,
       // amount: this.state.orderDetails.yj_money,
-      amount: 0.01
+      amount: 0.07
     }).then(res => {
       my.tradePay({
-        orderStr: res.data,
+        orderStr: res.data.orderStr,
         success: async (res) => {
-          console.log(res)
           if (res.resultCode === "9000") {
             let data = JSON.parse(res.result)
             orderDetails.operation_id = data.alipay_fund_auth_order_app_freeze_response.auth_no;
@@ -124,18 +129,22 @@ class Index extends Component {
     })
   }
 
-  handleSubmitGoods(item) {
+  handleSubmitGoods(item, e) {
+    e.stopPropagation();
     Taro.showModal({
+      cancelText: '取消',
       title: '确认收货吗',
-      success() {
-        Taro.showLoading({
-          ttile: "确认中"
-        })
-        actionReceiptSub({
-          order_id: item.id
-        }).then(res => {
-          this.getOrderList();
-        })
+      success(res) {
+        if (res.confirm) {
+          Taro.showLoading({
+            ttile: "确认中"
+          })
+          actionReceiptSub({
+            order_id: item.id
+          }).then(res => {
+            this.getOrderList();
+          })
+        }
       }
     })
   }
@@ -151,14 +160,17 @@ class Index extends Component {
 
   }
 
-  handleToRefund(item) {
+  handleToRefund(item, e) {
+    e.stopPropagation();
     Taro.navigateTo({
-      url: 'pages/ucenter/refund/index?orderDetails=' + item
+      url: '/pages/ucenter/refund/index?orderDetails=' + item
     })
   }
-  handleToLogistics(item) {
+  handleToLogistics(item, e) {
+    console.log(e, item)
+    e.stopPropagation();
     Taro.navigateTo({
-      url: 'pages/ucenter/logistics/index?id=' + item.id
+      url: '/pages/ucenter/logistics/index?id=' + item.id
     })
   }
 
@@ -208,12 +220,12 @@ class Index extends Component {
                   item.status === 41 ? <View className="btn" onClick={this.handleSubmitGoods.bind(this, item)}>确认收货</View> : ""
                 }
                 {
-                  item.status === 6 ? <View>
+                  item.status === 5 ? <View>
                     <View className="btn" onClick={this.handleRenewal.bind(this, item.id)}>续租</View>
                     <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View>
                   </View> : ""
                 }
-                <View className="btn_pay btn" onClick={this.handleToPay.bind(this, item)}>去支付</View>
+                {item.status === 0 ? <View className="btn_pay btn" onClick={this.handleToPay.bind(this, item)}>去支付</View> : ""}
               </View>
             </View>
           })

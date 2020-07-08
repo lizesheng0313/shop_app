@@ -70,17 +70,17 @@ class Index extends Component {
               <View className="nper">{index + 1}/{orderInfo.list.length}期</View>
               <View className="flex-space_center">
                 <View className="total">￥{item.money}</View>
-                <Radio checked={item.checked} color="#F71279"></Radio>
-              </View>
+                <Radio checked={item.checked} disabled={item.status !== 0} color="#F71279"></Radio>
+            </View>
               <View className="flex-space_center time_border">
                 <View>还款时间：{item.formatDate}</View>
                 <View>{status[item.status]}</View>
               </View>
             </View>
           })
-        }
-        <View className="btn_submit">支付</View>
-      </View>
+}
+<View className="btn_submit">支付</View>
+      </View >
     );
   }
 }
