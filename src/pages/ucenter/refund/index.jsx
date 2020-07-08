@@ -7,7 +7,7 @@ import { actoinSendSub } from "../../../services/order"
 
 class Index extends Component {
   state = {
-    orderDetails: "",
+    orderDetails: {},
     name: "请选择快递公司",
     queryObj: {
       express_name: "",
@@ -35,7 +35,9 @@ class Index extends Component {
 
   componentDidMount() {
     this.setState({
-      orderDetails: this.$router.params.orderDetails
+      orderDetails: JSON.parse(this.$router.params.orderDetails)
+    },()=>{
+      console.log(this.state.orderDetails)
     })
   }
 
@@ -104,10 +106,10 @@ class Index extends Component {
         <View className="first_title">设备信息</View>
         <View className="goods_details">
           <View className="flex-start_center ">
-            <Image className="image" src={'https://app.zuyuanzhang01.com/' + orderDetails.pic}></Image>
+            <Image className="image" src={'https://app.zuyuanzhang01.com/' + orderDetails.goodItemPic}></Image>
             <View className="goods_details_right">
-              <View className="title">{orderDetails.goodsName}</View>
-              <View className="sp">规格：{orderDetails.name}</View>
+              <View className="title">{orderDetails.goodName}</View>
+              <View className="sp">规格：{orderDetails.goodItemName}</View>
               <View className="total">总租金: ￥{orderDetails.countPrice}</View>
             </View>
           </View>

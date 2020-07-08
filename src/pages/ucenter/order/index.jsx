@@ -100,8 +100,7 @@ class Index extends Component {
     orderDetails.order_id = item.id;
     await actionFundAuthOrderAppFreeze({
       orderTitle: item.goodName,
-      // amount: this.state.orderDetails.yj_money,
-      amount: 0.07
+      amount: item.yj_money,
     }).then(res => {
       my.tradePay({
         orderStr: res.data.orderStr,
@@ -163,7 +162,7 @@ class Index extends Component {
   handleToRefund(item, e) {
     e.stopPropagation();
     Taro.navigateTo({
-      url: '/pages/ucenter/refund/index?orderDetails=' + item
+      url: '/pages/ucenter/refund/index?orderDetails=' + JSON.stringify(item)
     })
   }
   handleToLogistics(item, e) {
@@ -220,14 +219,16 @@ class Index extends Component {
                   item.status === 41 ? <View className="btn" onClick={this.handleSubmitGoods.bind(this, item)}>确认收货</View> : ""
                 }
                 {
-                  item.status === 5 ? <View>
-                    <View className="btn" onClick={this.handleRenewal.bind(this, item.id)}>续租</View>
-                    <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View>
-                  </View> : ""
+                  item.status === 5 ? <View className="btn" onClick={this.handleRenewal.bind(this, item.id)}>续租</View> : ""
                 }
-                {item.status === 0 ? <View className="btn_pay btn" onClick={this.handleToPay.bind(this, item)}>去支付</View> : ""}
+                {
+                  item.status === 5 ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""
+                }
+                {
+                  item.status === 0 ? <View className="btn_pay btn" onClick={this.handleToPay.bind(this, item)}>去支付</View> : ""
+                }
               </View>
-            </View>
+            </View >
           })
             : <View className="nothing">
               <Image src={nothing} className="img"></Image>
