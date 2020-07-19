@@ -44,6 +44,7 @@ class App extends Component {
       'pages/goods/goods',
       'pages/catalog/catalog',
       'pages/activeList/index',
+      'pages/xzPayDetails/index',
       
       'pages/ucenter/refund/index',
       'pages/ucenter/logistics/index',

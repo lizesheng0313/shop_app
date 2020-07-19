@@ -24,22 +24,23 @@ class Index extends Component {
       { title: "待风控", status: 1 },
       { title: "待发货", status: 4 },
       { title: "待收货", status: 41 },
-      { title: "租用中", status: 5 },
-      { title: "已逾期", status: -3 },
-      { title: "已完结", status: 8 },
+      { title: "租用中", status: 55 },
+      { title: "已逾期", status: 66 },
+      { title: "归还中", status: 7 },
+      { title: "已完成", status: 88 },
     ],
     status: '',
     list: []
   }
 
-  componentDidMount() {
-    this.setState({
-      current: Math.floor(this.$router.params.index)
-    })
-  }
 
   componentDidShow() {
-    this.getOrderList();
+    this.setState({
+      status: this.$router.params.status,
+      current: Math.floor(this.$router.params.index)
+    }, () => {
+      this.getOrderList();
+    })
   }
 
   handleChangeCurrent(index, item) {
@@ -155,8 +156,13 @@ class Index extends Component {
     })
   }
 
-  handleRenewal() {
-
+  handleRenewal(item,e) {
+    let data = {...item}
+    data.descption = ""
+    e.stopPropagation();
+    Taro.navigateTo({
+      url:"/pages/xzPayDetails/index?details="+JSON.stringify(data)
+    })
   }
 
   handleToRefund(item, e) {
@@ -213,19 +219,20 @@ class Index extends Component {
                   item.status === 0 || item.status === 4 ? <View className="btn" onClick={this.handleToCancelOrder.bind(this, item.id)}>取消订单</View> : ""
                 }
                 {
+                  item.status === 0 ? <View className="btn_pay btn" onClick={this.handleToPay.bind(this, item)}>去支付</View> : ""
+                }
+                {
                   item.status === 41 ? <View className="btn" onClick={this.handleToLogistics.bind(this, item)}>查看物流</View> : ""
                 }
                 {
                   item.status === 41 ? <View className="btn" onClick={this.handleSubmitGoods.bind(this, item)}>确认收货</View> : ""
                 }
+                {/* {
+                  item.status === 55 ? <View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> : ""
+                } */}
+                <View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> 
                 {
-                  item.status === 5 ? <View className="btn" onClick={this.handleRenewal.bind(this, item.id)}>续租</View> : ""
-                }
-                {
-                  item.status === 5 ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""
-                }
-                {
-                  item.status === 0 ? <View className="btn_pay btn" onClick={this.handleToPay.bind(this, item)}>去支付</View> : ""
+                  item.status === 55 ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""
                 }
               </View>
             </View >

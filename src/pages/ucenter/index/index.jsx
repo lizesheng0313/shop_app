@@ -28,11 +28,11 @@ class Index extends Component {
     list: [],
     isShowCustomer: false,
     orderTypeList: [
-      { title: "待付款", src: d1, url: "", index: 1 },
-      { title: "待收货", src: d2, url: "", index: 3 },
-      { title: "租用中", src: d3, url: "", index: 5 },
-      { title: "已逾期", src: d4, url: "", index: 6 },
-      { title: "已完结", src: d5, url: "", index: 7 }
+      { title: "待付款", src: d1, url: "", index: 1, status: 0 },
+      { title: "待收货", src: d2, url: "", index: 3, status: 4 },
+      { title: "租用中", src: d3, url: "", index: 5, status: 55 },
+      { title: "已逾期", src: d4, url: "", index: 6, status: 66 },
+      { title: "已完结", src: d5, url: "", index: 8, status: 88 }
     ],
     otherTypeList: [
       { title: "我的优惠券", src: l1, url: "/pages/ucenter/coupons/index" },
@@ -66,9 +66,9 @@ class Index extends Component {
     })
   }
 
-  handleToOrder = (index) => {
+  handleToOrder = (item) => {
     Taro.navigateTo({
-      url: "/pages/ucenter/order/index?index=" + index
+      url: "/pages/ucenter/order/index?index=" + item.index + '&status=' + item.status
     });
   }
 
@@ -105,14 +105,14 @@ class Index extends Component {
         <View className='user_area'>
           <View className='user_row' onClick={this.goOrder}>
             <View className='user_row_left'>我的订单</View>
-            <View className='user_row_right flex-space_center' onClick={this.handleToOrder.bind(this, 0)}>全部订单
+            <View className='user_row_right flex-space_center' onClick={this.handleToOrder.bind(this, {index:0,status:""})}>全部订单
                <Text className='at-icon at-icon-chevron-right'></Text>
             </View>
           </View>
           <View className='user_column'>
             {
               this.state.orderTypeList.map((item, index) => {
-                return <View className='user_column_item' onClick={this.handleToOrder.bind(this, item.index)}>
+                return <View className='user_column_item' onClick={this.handleToOrder.bind(this, item)}>
                   <Image className='user_column_item_image' src={item.src}></Image>
                   <View className='user_column_item_text'>{item.title}</View>
                 </View>

@@ -49,6 +49,14 @@ export async function actionReceiptSub(payload) {
 export async function actoinSendSub(payload) {
   return request("core_api/orderapi/send_sub", payload);
 }
+//主动扣款
+export async function actionTradeCreate(payload) {
+  return request("ext_api/pay/tradeCreate", payload);
+}
+//更新订单
+export async function actionUpdateBill(payload) {
+  return request("core_api/orderapi/updateBill", payload);
+}
 
 
 

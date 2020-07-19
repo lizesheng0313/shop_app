@@ -137,10 +137,13 @@ class Index extends Component {
               : ""
           }
         </View>
-        <View className="contract flex-space_center">
-          <View>租赁合同</View>
-          <View className="look_contract">查看</View>
-        </View>
+        {orderInfo.status !== 0 ?
+          <View className="contract flex-space_center">
+            <View>租赁合同</View>
+            <View className="look_contract">查看</View>
+          </View>
+          : ""
+        }
         <View className="footer_btn flex-box">
           {
             userInfo.card_img1 && userInfo.card_img2 ? "" : <View className="btn upload" onClick={this.handleAuth.bind(this)}>上传证件</View>

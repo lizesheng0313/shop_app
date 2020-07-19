@@ -16,6 +16,7 @@ class Index extends Component {
   state = {
     countDown: "点击获取",
     queryObj: {
+      email:"",
       certName: "",
       certNo: "",
       returnUrl: "/pages/ucenter/realnameAuth/index",
@@ -29,8 +30,8 @@ class Index extends Component {
   componentDidMount() {
     const { userInfo } = this.props;
     if (userInfo.card_num) {
-      const { card_num, name } = userInfo
-      let data = Object.assign({}, this.state.queryObj, { certName: name, certNo: card_num })
+      const { card_num, name,email } = userInfo
+      let data = Object.assign({}, this.state.queryObj, { certName: name, certNo: card_num,email })
       this.setState({
         queryObj: data
       })
@@ -48,10 +49,18 @@ class Index extends Component {
     }
     if (!/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(this.state.queryObj.certNo)) {
       Taro.showToast({
-        title: '请输入身份证号'
+        title: '请输入正确的身份证号'
       })
       return;
     }
+    
+    if (!/^([a-zA-Z]|[0-9]).+(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/.test(this.state.queryObj.email)) {
+      Taro.showToast({
+        title: '请输入正确的邮箱'
+      })
+      return;
+    }
+
     Taro.showLoading({
       title: '提交中'
     })
@@ -63,6 +72,7 @@ class Index extends Component {
         success: async function (res) {
           if (res.resultStatus === "9000") {
             await actionUserUpdate({
+              email:that.state.queryObj.email,
               user_id,
               card_num: that.state.queryObj.certNo,
               name: that.state.queryObj.certName,
@@ -154,24 +164,23 @@ class Index extends Component {
               onChange={this.handleChange.bind(this, 'certNo')}
             />
           </View>
-          {/* <View className="auth_input">
+          <View className="auth_input">
             <AtInput
-              name='phone'
+              name='email'
               border={false}
               editable={false}
-              title='手机号'
-              type='phone'
-              placeholder='请输入手机号'
+              title='邮箱'
+              type='text'
+              placeholder='请输入邮箱'
               placeholderClass="place_class"
-              value={userInfo.bind_phone}
+              value={queryObj.email}
             />
-          </View> */}
+          </View>
         </View>
         {
           userInfo.card_num ? "" :
             <View>
               <AtButton formType='submit' className="btn_submit">提交</AtButton>
-              <View className="tips">认证即表示阅读并同意<Text className="t">《用户注册协议》</Text></View>
             </View>
         }
       </AtForm >

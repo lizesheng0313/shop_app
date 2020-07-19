@@ -1,7 +1,7 @@
 import Taro, { Component } from '@tarojs/taro';
 import { connect } from '@tarojs/redux';
-import { AtCheckbox } from 'taro-ui'
-import { View, Text, Image, Navigator, Input, Checkbox } from '@tarojs/components';
+import { View, Text, Image, Navigator, Input, Checkbox, Picker } from '@tarojs/components';
+import { AtList, AtListItem, AtCheckbox } from 'taro-ui'
 import { actionGetOneBill, actionSubOrder, actionFundAuthOrderAppFreeze } from "../../services/order"
 import { actionGetPhoneNumber, actionUserUpdate } from "../../services/user"
 import './index.less';
@@ -15,10 +15,13 @@ import './index.less';
 class Index extends Component {
 
   config = {
-    navigationBarTitleText: '支付详情'
+    navigationBarTitleText: '续租'
   }
 
   state = {
+    index: 0,
+    selector: ['7', '14', '30', '90', '180', '360'],
+    selectorChecked: "",
     num: 1,
     orderDetails: {
       order_id: "",
@@ -41,16 +44,28 @@ class Index extends Component {
 
 
   componentWillMount() {
+    let data = JSON.parse(this.$router.params.details)
+    console.log(data)
     this.setState({
-      orderDetails: { ...this.state.orderDetails, ...JSON.parse(this.$router.params.details) },
+      orderDetails: { ...this.state.orderDetails, ...data },
+      selectorChecked: data.goods_day.toString()
     }, () => {
-      actionGetOneBill({
-        countPrice: this.state.orderDetails.countPrice,
-        day: this.state.orderDetails.day
-      }).then(res => {
-        this.setState({
-          bill: res.data
-        })
+      this.state.orderDetails.address_id = ""
+      this.fetchBill()
+    })
+  }
+
+  async fetchBill() {
+    Taro.showLoading({
+      title:"加载中"
+    })
+    actionGetOneBill({
+      countPrice: this.state.orderDetails.countPrice,
+      day: this.state.selectorChecked
+    }).then(res => {
+      Taro.hideLoading()
+      this.setState({
+        bill: res.data
       })
     })
   }
@@ -65,23 +80,15 @@ class Index extends Component {
     }
   }
 
-  handleToAddress(flag) {
-    Taro.navigateTo({
-      url: "/pages/ucenter/address/index?order=yes"
+  async onChange(e) {
+    this.setState({
+      selectorChecked:this.state.selector[e.detail.value]
     })
   }
 
-  handleToRedu(num) {
-    if (this.state.num !== 1) {
-      this.setState({
-        num: num - 1
-      })
-    }
-  }
-
-  handleToAdd(num) {
-    this.setState({
-      num: num + 1
+  handleToAddress() {
+    Taro.navigateTo({
+      url: "/pages/ucenter/address/index?order=yes"
     })
   }
 
@@ -89,32 +96,6 @@ class Index extends Component {
     Taro.navigateTo({
       url: "/pages/ucenter/coupons/index"
     })
-  }
-
-  handleToAuth() {
-    Taro.navigateTo({
-      url: "/pages/ucenter/realnameAuth/index"
-    })
-  }
-
-  onGetPhoneNumber() {
-    const { user_id, dispatch } = this.props
-    let bind_phone;
-    my.getPhoneNumber({
-      success: async (res) => {
-        let encryptedData = res.response;
-        await actionGetPhoneNumber({
-          encryptedData
-        }).then(res => {
-          bind_phone = res.data.mobile
-        })
-        await actionUserUpdate({
-          user_id,
-          bind_phone
-        })
-        await dispatch({ type: 'user/apiFindUserByUserId', payload: user_id })
-      }
-    });
   }
 
   handleInput(e) {
@@ -153,20 +134,16 @@ class Index extends Component {
     })
   }
 
+
+
   async handlePay() {
     let that = this;
-    const { user_id, userInfo } = this.props;
+    console.log(this.state.addressInfo)
+    const { user_id } = this.props;
     this.state.orderDetails.user_id = user_id
     if (!this.state.orderDetails.address_id) {
       Taro.showToast({
         title: "请添加收货地址"
-      })
-      return;
-    }
-
-    if (!userInfo.card_num) {
-      Taro.showToast({
-        title: "请先完成实名认证"
       })
       return;
     }
@@ -177,11 +154,11 @@ class Index extends Component {
       })
       return;
     }
-    
+
     await actionFundAuthOrderAppFreeze({
-      orderTitle: this.state.orderDetails.goodsName,
+      orderTitle: this.state.orderDetails.goodName,
       amount: this.state.orderDetails.yj_money,
-      // amount: 0.07
+      outOrderNo:this.state.orderDetails.id
     }).then(res => {
       that.state.orderDetails.order_id = res.data.outOrderNo;
       my.tradePay({
@@ -212,8 +189,8 @@ class Index extends Component {
   }
 
   render() {
-    const { num, isAddress, orderDetails, bill, checkboxOption, checkedList } = this.state
-    const { addressInfo, userInfo } = this.props
+    const { num, isAddress, orderDetails, bill, checkboxOption, checkedList, selector, selectorChecked } = this.state
+    const { addressInfo } = this.props
     return (
       <View className='order-details'>
         <View className="address_box">
@@ -230,51 +207,14 @@ class Index extends Component {
               </View>
           }
         </View>
-        {
-          userInfo.bind_phone ? "" :
-            <Button
-              openType="getAuthorize"
-              scope="phoneNumber"
-              onClick={this.onGetPhoneNumber.bind(this)}
-              type="primary"
-              className="auth_button"
-            >
-              <View className="auth">
-                <View className="flex-space_center title">
-                  <View>实名认证</View>
-                  <View className="select_con" >
-                    还未进行实名认证，去认证
-                    <View className='at-icon  at-icon-chevron-right'></View>
-                  </View>
-                </View>
-              </View>
-            </Button>
-        }
-        {
-          userInfo.bind_phone && !userInfo.card_num ?
-            <View className="auth">
-              <View className="flex-space_center title">
-                <View>实名认证</View>
-                <View className="select_con" onClick={this.handleToAuth.bind(this)}>
-                  还未进行实名认证，去认证
-              <View className='at-icon  at-icon-chevron-right'></View>
-                </View>
-              </View>
-            </View> : ""
-        }
         <View className="goods_details">
           <View className="flex-start_center ">
-            <Image className="image" src={'https://app.zuyuanzhang01.com/' + orderDetails.pic}></Image>
+            <Image className="image" src={'https://app.zuyuanzhang01.com/' + orderDetails.goodItemPic}></Image>
             <View className="goods_details_right">
-              <View className="title">{orderDetails.goodsName}</View>
-              <View className="sp">规格：{orderDetails.name}</View>
+              <View className="title">{orderDetails.goodName}</View>
+              <View className="sp">规格：{orderDetails.goodItemName}</View>
               <View className="total">总租金: ￥{orderDetails.countPrice}</View>
             </View>
-            {/* <View className="number">
-              <View className="sym1 sym" onClick={this.handleToRedu.bind(this, num)}>-</View>
-              <View className="num">{num}</View>
-              <View className="sym2 sym" onClick={this.handleToAdd.bind(this, num)}>+</View>
-            </View> */}
           </View>
         </View>
         <View className="coupons">
@@ -308,6 +248,14 @@ class Index extends Component {
             </View>
           </View>
         </View>
+        <View className="selector">
+          <Picker mode='selector' range={selector} title='选择租期' onChange={this.onChange} >
+            <View class="selector-box">
+              <Text className="express_title">选择租期</Text>
+              <Text className="express_value">{selectorChecked}</Text>
+            </View>
+          </Picker>
+        </View>
         <View className="message">
           <Text>留言：</Text>
           <Input placeholder="请在这里留下您的备注" onInput={this.handleInput.bind(this)} placeholderClass="plcss" className="input" value={orderDetails.descption}></Input>
@@ -328,16 +276,7 @@ class Index extends Component {
               </View>
             </View>
           </View>
-          {userInfo.bind_phone ? <View className='btn' onClick={this.handlePay.bind(this)}>去支付</View> :
-            <Button
-              openType="getAuthorize"
-              scope="phoneNumber"
-              onClick={this.onGetPhoneNumber.bind(this)}
-              type="primary"
-              className="btn"
-            >
-              去支付
-           </Button>}
+          <View className='btn' onClick={this.handlePay.bind(this)}>去支付</View>
         </View>
       </View>
 
