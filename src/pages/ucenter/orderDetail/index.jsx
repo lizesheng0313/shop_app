@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro';
 import { View, Text, Image, Navigator } from '@tarojs/components';
-import { actionOrderDetails } from "../../../services/order"
+import { actionOrderDetails,actionDownloadContractDocument } from "../../../services/order"
 import { connect } from '@tarojs/redux';
 import './index.less';
 @connect(({ order, user }) => ({
@@ -26,6 +26,7 @@ class Index extends Component {
       actionOrderDetails({
         order_id: this.state.order_id
       }).then(res => {
+        console.log(res.data)
         this.setState({
           orderInfo: res.data
         })
@@ -42,6 +43,30 @@ class Index extends Component {
   handleAuth() {
     Taro.navigateTo({
       url: "/pages/ucenter/auth/index"
+    })
+  }
+ 
+  handleCheck() {
+    actionDownloadContractDocument({
+      flowId:this.state.orderInfo.flowid
+    }).then(res=>{
+      Taro.showLoading({
+        title: "加载中"
+      })
+      my.downloadFile({
+        url: 'https://app.zuyuanzhang01.com/ext_api'+res.data.contractDownloadUrl,
+        success({ apFilePath }) {
+          Taro.hideLoading();
+          my.openDocument({
+            filePath: apFilePath,
+            fileType: 'pdf',
+            success: (res) => {
+              console.log('open document success')
+            }
+          })
+        }
+      })
+      console.log(res)
     })
   }
 
@@ -137,19 +162,26 @@ class Index extends Component {
               : ""
           }
         </View>
-        {orderInfo.status !== 0 ?
-          <View className="contract flex-space_center">
+        
+        {orderInfo.status !== 0  && orderInfo.status !== 1 && orderInfo.status !== 4 ?
+          <View className="contract flex-space_center" onClick={this.handleCheck.bind(this)}>
             <View>租赁合同</View>
             <View className="look_contract">查看</View>
           </View>
           : ""
         }
-        <View className="footer_btn flex-box">
-          {
-            userInfo.card_img1 && userInfo.card_img2 ? "" : <View className="btn upload" onClick={this.handleAuth.bind(this)}>上传证件</View>
-          }
-          <View className="btn" onClick={this.handleToBill.bind(this)}>分期账单</View>
-        </View>
+        {
+          (!userInfo.card_img1 || !userInfo.card_img2) || (orderInfo.status !== 0 && orderInfo.status !== 1) ?
+            <View className="footer_btn flex-box">
+              {
+                userInfo.card_img1 && userInfo.card_img2 ? "" : <View className="btn upload" onClick={this.handleAuth.bind(this)}>上传证件</View>
+              }
+              {
+                orderInfo.status !== 0 && orderInfo.status !== 1 ? <View className="btn" onClick={this.handleToBill.bind(this)}>分期账单</View> : ""
+              }
+            </View>
+            : ""
+        }
       </View >
 
     );

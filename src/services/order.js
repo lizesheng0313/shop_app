@@ -57,7 +57,13 @@ export async function actionTradeCreate(payload) {
 export async function actionUpdateBill(payload) {
   return request("core_api/orderapi/updateBill", payload);
 }
-
-
+//续租
+export async function actionxzSubOrder(payload) {
+  return request("core_api/orderapi/xzSubOrder", payload);
+}
+//合同
+export async function actionDownloadContractDocument(payload) {
+  return request("ext_api/contract/downloadContractDocument", payload);
+}
 
 

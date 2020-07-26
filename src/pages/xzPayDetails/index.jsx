@@ -2,8 +2,8 @@ import Taro, { Component } from '@tarojs/taro';
 import { connect } from '@tarojs/redux';
 import { View, Text, Image, Navigator, Input, Checkbox, Picker } from '@tarojs/components';
 import { AtList, AtListItem, AtCheckbox } from 'taro-ui'
-import { actionGetOneBill, actionSubOrder, actionFundAuthOrderAppFreeze } from "../../services/order"
-import { actionGetPhoneNumber, actionUserUpdate } from "../../services/user"
+import { actionGetOneBill, actionSubOrder, actionFundAuthOrderAppFreeze,actionxzSubOrder } from "../../services/order"
+import { getGoodsDetails } from '../../services/goods';
 import './index.less';
 
 @connect(({ order, user }) => ({
@@ -20,7 +20,8 @@ class Index extends Component {
 
   state = {
     index: 0,
-    selector: ['7', '14', '30', '90', '180', '360'],
+    goodsTimeList: [],
+    selector: [],
     selectorChecked: "",
     num: 1,
     orderDetails: {
@@ -45,19 +46,46 @@ class Index extends Component {
 
   componentWillMount() {
     let data = JSON.parse(this.$router.params.details)
-    console.log(data)
+
     this.setState({
       orderDetails: { ...this.state.orderDetails, ...data },
       selectorChecked: data.goods_day.toString()
     }, () => {
       this.state.orderDetails.address_id = ""
       this.fetchBill()
+      this.fetchDetails();
+    })
+  }
+
+  async fetchDetails() {
+    getGoodsDetails({
+      id: this.state.orderDetails.goods_id
+    }).then(res => {
+      let dayItem;
+      let current;
+      res.data.itemList.forEach((item) => {
+        if (item.id === this.state.orderDetails.goods_item_id) {
+          dayItem = item.dayItem
+        }
+      })
+      let selector = []
+      dayItem.forEach((item, index) => {
+        if (this.state.selectorChecked == item.day) {
+          current = index
+        }
+        selector.push(item.day)
+      })
+      this.setState({
+        goodsTimeList: dayItem,
+        selector,
+        current
+      })
     })
   }
 
   async fetchBill() {
     Taro.showLoading({
-      title:"加载中"
+      title: "加载中"
     })
     actionGetOneBill({
       countPrice: this.state.orderDetails.countPrice,
@@ -81,8 +109,12 @@ class Index extends Component {
   }
 
   async onChange(e) {
+    this.state.orderDetails.countPrice = (this.state.goodsTimeList[e.detail.value].monery * this.state.goodsTimeList[e.detail.value].day).toFixed(2)
     this.setState({
-      selectorChecked:this.state.selector[e.detail.value]
+      current:e.detail.value,
+      selectorChecked: this.state.selector[e.detail.value]
+    },()=>{
+      this.fetchBill();
     })
   }
 
@@ -138,7 +170,6 @@ class Index extends Component {
 
   async handlePay() {
     let that = this;
-    console.log(this.state.addressInfo)
     const { user_id } = this.props;
     this.state.orderDetails.user_id = user_id
     if (!this.state.orderDetails.address_id) {
@@ -154,28 +185,30 @@ class Index extends Component {
       })
       return;
     }
-
+    let queryForm = {};
+    queryForm.old_order_id = this.state.orderDetails.id;
+    queryForm.day = this.state.goodsTimeList[this.state.current].day
+    queryForm.countPrice= (this.state.goodsTimeList[this.state.current].monery * this.state.goodsTimeList[this.state.current].day).toFixed(2)
     await actionFundAuthOrderAppFreeze({
       orderTitle: this.state.orderDetails.goodName,
       amount: this.state.orderDetails.yj_money,
-      outOrderNo:this.state.orderDetails.id
+      outOrderNo: this.state.orderDetails.id
     }).then(res => {
-      that.state.orderDetails.order_id = res.data.outOrderNo;
+      queryForm.new_order_id = res.data.outOrderNo;
       my.tradePay({
         orderStr: res.data.orderStr,
         success: async (res) => {
-          that.state.orderDetails.isAuthorization = false;
+          console.log(res)
+         queryForm.isAuthorization = false;
           if (res.resultCode === "9000") {
             let data = JSON.parse(res.result)
-            that.state.orderDetails.isAuthorization = true;
-            that.state.orderDetails.order_id = data.alipay_fund_auth_order_app_freeze_response.out_order_no
-            that.state.orderDetails.operation_id = data.alipay_fund_auth_order_app_freeze_response.auth_no
-            that.state.orderDetails.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amount || 0
-            that.state.orderDetails.fund_amount = data.alipay_fund_auth_order_app_freeze_response.fund_amount || 1
+           queryForm.isAuthorization = true;
+          //  queryForm.order_id = data.alipay_fund_auth_order_app_freeze_response.out_order_no
+           queryForm.operation_id = data.alipay_fund_auth_order_app_freeze_response.auth_no
+           queryForm.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amount || 0
+           queryForm.fund_amount = data.alipay_fund_auth_order_app_freeze_response.fund_amount || 1
           }
-          let queryForm = { ...that.state.orderDetails };
-          delete queryForm.yj_money;
-          let resultData = await actionSubOrder(queryForm)
+          let resultData = await actionxzSubOrder(queryForm)
           Taro.redirectTo({
             url: "/pages/ucenter/orderDetail/index?id=" + resultData.data
           })

@@ -17,7 +17,7 @@ class Index extends Component {
 
   state = {
     isShowCustomer: false,
-    current: 0,
+    current: "",
     orderType: [
       { title: "全部", status: "" },
       { title: "待付款", status: 0 },
@@ -35,9 +35,19 @@ class Index extends Component {
 
 
   componentDidShow() {
+    let current;
+    let status;
+    if (this.state.current || this.state.current === 0) {
+      current = this.state.current
+      status = this.state.status
+    }
+    else {
+      current = Math.floor(this.$router.params.index)
+      status = this.$router.params.status
+    }
     this.setState({
-      status: this.$router.params.status,
-      current: Math.floor(this.$router.params.index)
+      status: status,
+      current: current
     }, () => {
       this.getOrderList();
     })
@@ -75,20 +85,18 @@ class Index extends Component {
   }
 
   handleToCancelOrder(id, e) {
+    let that = this;
     e.stopPropagation();
     Taro.showModal({
       cancelText: '取消',
       title: '确认取消订单吗',
       success(res) {
         if (res.confirm) {
-          Taro.showLoading({
-            title: "确认中"
-          })
           actionCancelOrder({
             order_id: id
           }).then(res => {
             Taro.hideLoading()
-            this.getOrderList();
+            that.getOrderList();
           })
         }
       }
@@ -96,23 +104,37 @@ class Index extends Component {
   }
 
   async handleToPay(item, e) {
+    console.log(item)
     e.stopPropagation();
     let orderDetails = {};
     orderDetails.order_id = item.id;
+    if(item.id.indexOf("XZ") > -1){
+      orderDetails.status = 5;
+    }
+    else{
+      orderDetails.status = 1;
+    }
     await actionFundAuthOrderAppFreeze({
       orderTitle: item.goodName,
-      amount: item.yj_money,
+      // amount: item.yj_money,
+      amount: 0.07
     }).then(res => {
       my.tradePay({
         orderStr: res.data.orderStr,
         success: async (res) => {
+          console.log(res)
           if (res.resultCode === "9000") {
             let data = JSON.parse(res.result)
             orderDetails.operation_id = data.alipay_fund_auth_order_app_freeze_response.auth_no;
             orderDetails.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amount || 0;
             orderDetails.fund_amount = data.alipay_fund_auth_order_app_freeze_response.fund_amount || 1;
             await actionUpdateOrder(orderDetails).then(res => {
-              this.getOrderList();
+              this.setState({
+                status: "",
+                current: 0
+              }, () => {
+                this.getOrderList();
+              })
             })
           }
         },
@@ -130,19 +152,17 @@ class Index extends Component {
   }
 
   handleSubmitGoods(item, e) {
+    let that = this;
     e.stopPropagation();
     Taro.showModal({
       cancelText: '取消',
       title: '确认收货吗',
       success(res) {
         if (res.confirm) {
-          Taro.showLoading({
-            ttile: "确认中"
-          })
           actionReceiptSub({
             order_id: item.id
           }).then(res => {
-            this.getOrderList();
+            that.getOrderList();
           })
         }
       }
@@ -156,12 +176,12 @@ class Index extends Component {
     })
   }
 
-  handleRenewal(item,e) {
-    let data = {...item}
+  handleRenewal(item, e) {
+    let data = { ...item }
     data.descption = ""
     e.stopPropagation();
     Taro.navigateTo({
-      url:"/pages/xzPayDetails/index?details="+JSON.stringify(data)
+      url: "/pages/xzPayDetails/index?details=" + JSON.stringify(data)
     })
   }
 
@@ -227,12 +247,11 @@ class Index extends Component {
                 {
                   item.status === 41 ? <View className="btn" onClick={this.handleSubmitGoods.bind(this, item)}>确认收货</View> : ""
                 }
-                {/* {
-                  item.status === 55 ? <View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> : ""
-                } */}
-                <View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> 
                 {
-                  item.status === 55 ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""
+                  item.status === 5 ? <View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> : ""
+                }
+                {
+                  item.status === 5 ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""
                 }
               </View>
             </View >

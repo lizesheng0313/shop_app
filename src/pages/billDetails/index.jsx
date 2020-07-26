@@ -73,6 +73,7 @@ class Index extends Component {
   }
 
   handleSelectBill(item, index) {
+    if(item.status === 1) return 
     let data = this.state.orderInfo.list;
     data[index].checked = !item.checked;
     if (data[index].checked) {
