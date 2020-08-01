@@ -10,6 +10,7 @@ class Index extends Component {
     orderDetails: {},
     name: "请选择快递公司",
     queryObj: {
+      order_id:"",
       express_name: "",
       express_code: "",
     },
@@ -37,6 +38,7 @@ class Index extends Component {
     this.setState({
       orderDetails: JSON.parse(this.$router.params.orderDetails)
     },()=>{
+      this.state.queryObj.order_id = this.state.orderDetails.id;
       console.log(this.state.orderDetails)
     })
   }

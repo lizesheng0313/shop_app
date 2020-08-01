@@ -116,8 +116,8 @@ class Index extends Component {
     }
     await actionFundAuthOrderAppFreeze({
       orderTitle: item.goodName,
-      // amount: item.yj_money,
-      amount: 0.07
+      amount: item.yj_money,
+      // amount: 0.07
     }).then(res => {
       my.tradePay({
         orderStr: res.data.orderStr,
@@ -236,7 +236,7 @@ class Index extends Component {
               <View className="button_group">
                 <View className="btn" onClick={this.handleShowCustomer.bind(this)}>联系商家</View>
                 {
-                  item.status === 0 || item.status === 4 ? <View className="btn" onClick={this.handleToCancelOrder.bind(this, item.id)}>取消订单</View> : ""
+                  item.status === 0 ? <View className="btn" onClick={this.handleToCancelOrder.bind(this, item.id)}>取消订单</View> : ""
                 }
                 {
                   item.status === 0 ? <View className="btn_pay btn" onClick={this.handleToPay.bind(this, item)}>去支付</View> : ""
@@ -248,7 +248,7 @@ class Index extends Component {
                   item.status === 41 ? <View className="btn" onClick={this.handleSubmitGoods.bind(this, item)}>确认收货</View> : ""
                 }
                 {
-                  item.status === 5 ? <View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> : ""
+                  item.status === 5 && new Date(item.end_date).getMonth() + 1 === new Date().getMonth()+1 && new Date(item.end_date).getFullYear() === new Date().getFullYear()? <View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> : ""
                 }
                 {
                   item.status === 5 ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""

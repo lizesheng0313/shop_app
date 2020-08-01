@@ -16,7 +16,7 @@ class Index extends Component {
   state = {
     countDown: "点击获取",
     queryObj: {
-      email:"",
+      email: "",
       certName: "",
       certNo: "",
       returnUrl: "/pages/ucenter/realnameAuth/index",
@@ -30,8 +30,8 @@ class Index extends Component {
   componentDidMount() {
     const { userInfo } = this.props;
     if (userInfo.card_num) {
-      const { card_num, name,email } = userInfo
-      let data = Object.assign({}, this.state.queryObj, { certName: name, certNo: card_num,email })
+      const { card_num, name, email } = userInfo
+      let data = Object.assign({}, this.state.queryObj, { certName: name, certNo: card_num, email })
       this.setState({
         queryObj: data
       })
@@ -53,8 +53,8 @@ class Index extends Component {
       })
       return;
     }
-    
-    if (!/^([a-zA-Z]|[0-9]).+(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/.test(this.state.queryObj.email)) {
+    const reg = /^([a-zA-Z]|[0-9]).+(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+    if (!reg.test(this.state.queryObj.email)) {
       Taro.showToast({
         title: '请输入正确的邮箱'
       })
@@ -72,7 +72,7 @@ class Index extends Component {
         success: async function (res) {
           if (res.resultStatus === "9000") {
             await actionUserUpdate({
-              email:that.state.queryObj.email,
+              email: that.state.queryObj.email,
               user_id,
               card_num: that.state.queryObj.certNo,
               name: that.state.queryObj.certName,
@@ -168,9 +168,10 @@ class Index extends Component {
             <AtInput
               name='email'
               border={false}
-              editable={false}
+              editable={userInfo.card_num}
               title='邮箱'
               type='text'
+              onChange={this.handleChange.bind(this, 'email')}
               placeholder='请输入邮箱'
               placeholderClass="place_class"
               value={queryObj.email}

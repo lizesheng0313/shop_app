@@ -97,7 +97,7 @@ class Index extends Component {
     const { userInfo } = this.props
     return (
       <View className="auth">
-        <View className="tips">请上传<Text className="text">**公主</Text>本人身份证</View>
+        <View className="tips">请上传<Text className="text">{userInfo.name}</Text>本人身份证</View>
         <View className="flex-space_center upload-box">
           <View className="flex_dir_center img_box" onClick={this.handleUpload.bind(this, 'front')}>
             {

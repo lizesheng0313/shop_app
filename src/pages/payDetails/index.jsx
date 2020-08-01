@@ -41,6 +41,7 @@ class Index extends Component {
 
 
   componentWillMount() {
+    console.log(this.$router.params.details)
     this.setState({
       orderDetails: { ...this.state.orderDetails, ...JSON.parse(this.$router.params.details) },
     }, () => {
@@ -180,8 +181,8 @@ class Index extends Component {
     
     await actionFundAuthOrderAppFreeze({
       orderTitle: this.state.orderDetails.goodsName,
-      // amount: this.state.orderDetails.yj_money,
-      amount: 0.07
+      amount: this.state.orderDetails.yj_money,
+      // amount: 0.07
     }).then(res => {
       that.state.orderDetails.order_id = res.data.outOrderNo;
       my.tradePay({

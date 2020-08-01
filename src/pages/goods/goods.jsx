@@ -78,10 +78,13 @@ class Goods extends Component {
         currentObj: res.data.itemList[0],
         currDay: res.data.itemList[0].dayItem.length - 1
       })
+      console.log('======================>',res)
       this.state.orderDetails.goodsName = res.data.name
       let content = res.data.content.replace(/\<img/gi, '<img style="width:100%" mode="widthFix"')
+      console.log(content)
       parse(content, (err, nodes) => {
         if (!err) {
+          console.log('===========>',nodes)
           this.setState({
             nodes
           });
@@ -123,7 +126,7 @@ class Goods extends Component {
     this.state.orderDetails.name = item.name;
     this.state.orderDetails.yj_money = item.yj_money;
     this.state.orderDetails.pic = item.pic;
-    this.state.orderDetails.day = this.state.currentObj.dayItem[0].day;
+    this.state.orderDetails.day = this.state.currentObj.dayItem[index].day;
     this.setState({
       currentPack: index,
       currentObj: item,
@@ -168,7 +171,7 @@ class Goods extends Component {
       this.state.orderDetails.goods_item_id = this.state.currentObj.id;
       this.state.orderDetails.name = this.state.currentObj.name;
       this.state.orderDetails.yj_money = this.state.currentObj.yj_money;
-      this.state.orderDetails.day = this.state.currentObj.dayItem[0].day;
+      this.state.orderDetails.day = this.state.currentObj.dayItem[this.state.currDay].day;
       this.state.orderDetails.pic = this.state.currentObj.pic
     }
     this.state.orderDetails.countPrice = (this.state.currentObj.dayItem[this.state.currDay].monery * this.state.currentObj.dayItem[this.state.currDay].day).toFixed(2)

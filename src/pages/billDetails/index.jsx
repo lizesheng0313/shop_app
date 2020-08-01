@@ -1,8 +1,12 @@
 import Taro, { Component } from '@tarojs/taro';
+import { connect } from '@tarojs/redux';
 import { View, Text, Image, Navigator, Radio } from '@tarojs/components';
 import { actionTradeCreate, actionUpdateBill } from '../../services/order';
 import './index.less';
 
+@connect(({ order, user }) => ({
+  user_id: user.user_id
+}))
 class Index extends Component {
 
   config = {
@@ -38,42 +42,56 @@ class Index extends Component {
     })
   }
 
-  handleToPay() {
+  async handleToPay() {
+    const { user_id } = this.props
+    let that = this;
     if (this.state.billId) {
       Taro.showLoading({
         title: "支付中"
       })
-      actionTradeCreate({
-        outTradeMo: this.state.orderInfo.id,
-        amount: this.state.orderInfo.countPrice,
-        subject: this.state.orderInfo.goodName,
-        buyerId: this.state.orderInfo.operation_id
-      }).then(res => {
-        if (res.success) {
-          actionUpdateBill({
-            id: this.state.billId
-          }).then(res => {
-            if (res.success) {
-              let data = this.state.orderInfo.list;
-              data[this.state.index].status = 1;
-              this.state.orderInfo.list = data;
-              this.setState({
-                orderInfo: this.state.orderInfo
-              })
-              Taro.hideLoading()
-            }
-          }).catch(err => {
-            Taro.hideLoading()
-          })
-        }
-      }).catch(err => {
+      try {
+        let res = await actionTradeCreate({
+          outTradeMo: this.state.orderInfo.id,
+          amount: this.state.orderInfo.list[this.state.index].money,
+          subject: this.state.orderInfo.goodName,
+          buyerId: user_id
+        })
         Taro.hideLoading()
-      })
+        if (res.code == '200') {
+          my.tradePay({
+            tradeNO: res.data.tradeNo,
+            success: (res) => {
+              if (res.resultCode === "9000") {
+                actionUpdateBill({
+                  id: that.state.billId
+                }).then(res => {
+                  if (res.code == '200') {
+                    let data = that.state.orderInfo.list;
+                    data[that.state.index].status = 1;
+                    that.state.orderInfo.list = data;
+                    that.setState({
+                      orderInfo: that.state.orderInfo
+                    })
+                  }
+                })
+              }
+            },
+            fail: (res) => {
+              my.alert({
+                content: JSON.stringify(res),
+              });
+            }
+          });
+        }
+      }
+      catch (err) {
+        Taro.hideLoading()
+      }
     }
   }
 
   handleSelectBill(item, index) {
-    if(item.status === 1) return 
+    if (item.status === 1) return
     let data = this.state.orderInfo.list;
     data[index].checked = !item.checked;
     if (data[index].checked) {
