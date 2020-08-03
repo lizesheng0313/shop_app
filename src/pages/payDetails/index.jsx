@@ -154,6 +154,7 @@ class Index extends Component {
     })
   }
 
+
   async handlePay() {
     let that = this;
     const { user_id, userInfo } = this.props;
@@ -182,7 +183,7 @@ class Index extends Component {
     await actionFundAuthOrderAppFreeze({
       orderTitle: this.state.orderDetails.goodsName,
       amount: this.state.orderDetails.yj_money,
-      // amount: 0.07
+      // amount: 1
     }).then(res => {
       that.state.orderDetails.order_id = res.data.outOrderNo;
       my.tradePay({
@@ -201,7 +202,7 @@ class Index extends Component {
           delete queryForm.yj_money;
           let resultData = await actionSubOrder(queryForm)
           Taro.redirectTo({
-            url: "/pages/ucenter/orderDetail/index?id=" + resultData.data
+            url: "/pages/ucenter/orderDetail/index?isPay=true&id=" + resultData.data
           })
 
         },

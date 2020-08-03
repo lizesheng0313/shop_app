@@ -4,11 +4,20 @@ import './index.less'
 
 export default class Customer extends Component {
     state = {
-
+        storePhoneInfo: {}
     }
 
     componentWillMount() {
 
+    }
+
+    componentDidShow() {
+        console.log(this.props)
+        this.setState({
+            storePhoneInfo: {
+                ...this.props.storePhoneInfo
+            }
+        })
     }
 
     makePhoneCall(number) {
@@ -20,6 +29,7 @@ export default class Customer extends Component {
     }
 
     render() {
+        const { storePhoneInfo } = this.state
         return (
             <View className="customer">
                 <View className="box">
@@ -31,19 +41,23 @@ export default class Customer extends Component {
                         <contact-button className="user_other_item btn" session-from='weapp' size='27' >
                         </contact-button>
                     </View>
-                    <View className='customer_flex'>
-                        <View>
-                            <View>商家客服：</View>
-                            <View className="phone">16642602726</View>
-                        </View>
-                        <View className="btn" onClick={this.makePhoneCall.bind(this, '16642602726')}>拨打</View>
-                    </View>
+                    {
+                        storePhoneInfo.isDp ?
+                            <View className='customer_flex'>
+                                <View>
+                                    <View>商家客服：</View>
+                                    <View className="phone">{storePhoneInfo.service_tel}</View>
+                                </View>
+                                <View className="btn" onClick={this.makePhoneCall.bind(this, storePhoneInfo.service_tel)}>拨打</View>
+                            </View>
+                            : ""
+                    }
                     <View className="customer_flex">
                         <View>
                             <View>平台客服：</View>
-                            <View className="phone">16642602726</View>
+                            <View className="phone">18001073147</View>
                         </View>
-                        <View className="btn" onClick={this.makePhoneCall.bind(this, '16642602726')}>拨打</View>
+                        <View className="btn" onClick={this.makePhoneCall.bind(this, '18001073147')}>拨打</View>
                     </View>
                 </View>
             </View>

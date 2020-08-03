@@ -4,15 +4,20 @@ import { connect } from '@tarojs/redux';
 import { AtInput, AtForm, AtButton } from 'taro-ui'
 import './index.less';
 import { actoinSendSub } from "../../../services/order"
-
+import { apiGetDP } from "../../../services/goods"
 class Index extends Component {
   state = {
     orderDetails: {},
     name: "请选择快递公司",
     queryObj: {
-      order_id:"",
+      order_id: "",
       express_name: "",
       express_code: "",
+    },
+    adress_info: {
+      gh_address: "",
+      gh_phone: "",
+      gh_name: ""
     },
     selector: [
       {
@@ -37,9 +42,25 @@ class Index extends Component {
   componentDidMount() {
     this.setState({
       orderDetails: JSON.parse(this.$router.params.orderDetails)
-    },()=>{
+    }, () => {
       this.state.queryObj.order_id = this.state.orderDetails.id;
-      console.log(this.state.orderDetails)
+      console.log(this.state.orderDetails);
+      this.getDp();
+    })
+  }
+
+  getDp() {
+    apiGetDP({
+      id: this.state.orderDetails.dId
+    }).then(res => {
+      const { gh_address, gh_phone, gh_name } = res.data;
+      this.setState({
+        adress_info: {
+          gh_address,
+          gh_phone,
+          gh_name
+        }
+      })
     })
   }
 
@@ -87,22 +108,22 @@ class Index extends Component {
   }
 
   render() {
-    const { queryObj, orderDetails, selector, name } = this.state
+    const { queryObj, orderDetails, selector, name, adress_info } = this.state
     return (
       <View className="refund">
         <View className="first_title">设备退还地址</View>
         <View className="adress_info">
           <View>
             <Text className="title">收件人：</Text>
-            <Text>梁青山</Text>
+            <Text>{adress_info.gh_name}</Text>
           </View>
           <View>
             <Text className="title">联系电话：</Text>
-            <Text>18610223553</Text>
+            <Text>{adress_info.gh_phone}</Text>
           </View>
           <View>
             <Text className="title">收货地址：</Text>
-            <Text>北京市昌平区关环岛西关科技孵化中心4层404</Text>
+            <Text>{adress_info.gh_address}</Text>
           </View>
         </View>
         <View className="first_title">设备信息</View>

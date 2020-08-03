@@ -108,15 +108,16 @@ class Index extends Component {
     e.stopPropagation();
     let orderDetails = {};
     orderDetails.order_id = item.id;
-    if(item.id.indexOf("XZ") > -1){
+    if (item.id.indexOf("XZ") > -1) {
       orderDetails.status = 5;
     }
-    else{
+    else {
       orderDetails.status = 1;
     }
     await actionFundAuthOrderAppFreeze({
       orderTitle: item.goodName,
       amount: item.yj_money,
+      oldOutOrderNo: item.id
       // amount: 0.07
     }).then(res => {
       my.tradePay({
@@ -247,8 +248,9 @@ class Index extends Component {
                 {
                   item.status === 41 ? <View className="btn" onClick={this.handleSubmitGoods.bind(this, item)}>确认收货</View> : ""
                 }
+
                 {
-                  item.status === 5 && new Date(item.end_date).getMonth() + 1 === new Date().getMonth()+1 && new Date(item.end_date).getFullYear() === new Date().getFullYear()? <View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> : ""
+                  item.status === 5 && new Date(item.end_date).getMonth() + 1 === new Date().getMonth() + 1 && new Date(item.end_date).getFullYear() === new Date().getFullYear() ? <View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> : ""
                 }
                 {
                   item.status === 5 ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""

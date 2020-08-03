@@ -15,3 +15,8 @@ export async function apiRandShop(payload) {
 export async function apiGetShop(payload) {
   return request("core_api/dianpuapi/getShop", payload);
 }
+
+//店铺信息
+export async function apiGetDP(payload) {
+  return request("core_api/dianpuapi/getDP", payload);
+}

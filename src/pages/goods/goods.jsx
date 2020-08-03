@@ -2,7 +2,7 @@ import Taro, { Component } from '@tarojs/taro';
 import { connect } from '@tarojs/redux';
 import { View, Swiper, SwiperItem, Button, Navigator, Text, Block, Input, Image, RichText } from '@tarojs/components';
 import { AtSegmentedControl } from 'taro-ui';
-import { getGoodsDetails, apiRandShop } from '../../services/goods';
+import { getGoodsDetails, apiRandShop, apiGetDP } from '../../services/goods';
 import Customer from '../../components/customer'
 import { apiRegisterUser } from "../../services/user"
 import parse from 'mini-html-parser2';
@@ -22,6 +22,10 @@ class Goods extends Component {
   }
 
   state = {
+    storePhoneInfo: {
+      service_tel: "",
+      isDp: true
+    },
     goods: {},
     isShowCustomer: false,
     openAttr: false,
@@ -65,6 +69,21 @@ class Goods extends Component {
     this.state.orderDetails.goods_id = this.$router.params.id
   }
 
+  getDp() {
+    apiGetDP({
+      id: this.state.goodsInfo.dId
+    }).then(res => {
+      const { service_tel } = res.data;
+      const { storePhoneInfo } = this.state;
+      this.setState({
+        storePhoneInfo: {
+          ...storePhoneInfo,
+          service_tel
+        }
+      })
+    })
+  }
+
   fetchGoodsInfo = () => {
     Taro.showLoading({
       title: "加载中"
@@ -77,14 +96,16 @@ class Goods extends Component {
         goodsInfo: res.data,
         currentObj: res.data.itemList[0],
         currDay: res.data.itemList[0].dayItem.length - 1
+      }, () => {
+        this.getDp();
       })
-      console.log('======================>',res)
+      console.log('======================>', res)
       this.state.orderDetails.goodsName = res.data.name
       let content = res.data.content.replace(/\<img/gi, '<img style="width:100%" mode="widthFix"')
-      console.log(content)
+      console.log(res.data.content)
       parse(content, (err, nodes) => {
         if (!err) {
-          console.log('===========>',nodes)
+          console.log('===========>', nodes)
           this.setState({
             nodes
           });
@@ -221,7 +242,7 @@ class Goods extends Component {
       url: "/pages/productList/index"
     });
   }
-  
+
   handleShowCustomer() {
     this.setState({
       isShowCustomer: true
@@ -230,12 +251,12 @@ class Goods extends Component {
 
   render() {
     const { userInfo } = this.props
-    const { current, nodes, currentObj, tagInfo, goodsInfo, openAttr, goods, orderObj, likeList, currDay,isShowCustomer } = this.state;
+    const { current, nodes, currentObj, storePhoneInfo, tagInfo, goodsInfo, openAttr, goods, orderObj, likeList, currDay, isShowCustomer } = this.state;
     return (
       <Block>
         <View className='container'>
           {
-            isShowCustomer ? <Customer handleCloseCumster={this.handleCloseCumster.bind(this)}></Customer> : ""
+            isShowCustomer ? <Customer storePhoneInfo={storePhoneInfo} handleCloseCumster={this.handleCloseCumster.bind(this)}></Customer> : ""
           }
           <Swiper className='goodsimgs' indicator-dots='true' autoplay='true' interval='5000' duration='1000'>
             {goodsInfo.title_pic.map(item => {

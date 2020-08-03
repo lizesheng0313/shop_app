@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro';
 import { View, Text, Image, Navigator } from '@tarojs/components';
-import { actionOrderDetails,actionDownloadContractDocument } from "../../../services/order"
+import { actionOrderDetails, actionDownloadContractDocument } from "../../../services/order"
 import { connect } from '@tarojs/redux';
 import './index.less';
 @connect(({ order, user }) => ({
@@ -14,12 +14,19 @@ class Index extends Component {
   }
 
   state = {
+    isPay: false,
     order_id: "",
     orderInfo: {}
   }
 
   componentDidShow() {
     const { userInfo } = this.props
+    const { isPay } = this.$router.params
+    if (isPay) {
+      this.setState({
+        isPay: true
+      })
+    }
     this.setState({
       order_id: this.$router.params.id
     }, () => {
@@ -45,16 +52,16 @@ class Index extends Component {
       url: "/pages/ucenter/auth/index"
     })
   }
- 
+
   handleCheck() {
     actionDownloadContractDocument({
-      flowId:this.state.orderInfo.flowid
-    }).then(res=>{
+      flowId: this.state.orderInfo.flowid
+    }).then(res => {
       Taro.showLoading({
         title: "加载中"
       })
       my.downloadFile({
-        url: 'https://app.zuyuanzhang01.com/ext_api'+res.data.contractDownloadUrl,
+        url: 'https://app.zuyuanzhang01.com/ext_api' + res.data.contractDownloadUrl,
         success({ apFilePath }) {
           Taro.hideLoading();
           my.openDocument({
@@ -67,6 +74,11 @@ class Index extends Component {
         }
       })
       console.log(res)
+    })
+  }
+  handleToOrdertList() {
+    Taro.redirectTo({
+      url: "/pages/ucenter/order/index"
     })
   }
 
@@ -97,10 +109,13 @@ class Index extends Component {
   }
 
   render() {
-    const { orderInfo } = this.state
+    const { orderInfo, isPay } = this.state
     const { userInfo } = this.props
     return (
       <View className='order-details'>
+        {isPay ? <View className="return_list">
+          <View className="footer_pay_btn" onClick={this.handleToOrdertList.bind(this)}>返回列表</View>
+        </View> : ""}
         <View className="goods_details">
           <View className="flex-start_center ">
             <Image className="image" mode="widthFix" src={'https://app.zuyuanzhang01.com/' + orderInfo.pic}></Image>
@@ -162,8 +177,8 @@ class Index extends Component {
               : ""
           }
         </View>
-        
-        {orderInfo.status !== 0  && orderInfo.status !== 1 && orderInfo.status !== 4 ?
+
+        {orderInfo.status !== 0 && orderInfo.status !== 1 && orderInfo.status !== 4 ?
           <View className="contract flex-space_center" onClick={this.handleCheck.bind(this)}>
             <View>租赁合同</View>
             <View className="look_contract">查看</View>

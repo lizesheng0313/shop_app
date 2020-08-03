@@ -3,6 +3,7 @@ import { View, Text, Navigator, Swiper, SwiperItem, Image, ScrollView, Block, In
 import { connect } from '@tarojs/redux';
 import { get as getGlobalData } from '../../global_data';
 import { apiGetType, apiGetShop } from '../../services/catalog';
+import { apiGetDP } from "../../services/goods"
 import Customer from '../../components/customer'
 
 
@@ -22,6 +23,10 @@ class Index extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      storePhoneInfo: {
+        service_tel: "",
+        isDp: true
+      },
       isShowCustomer: false,
       likeList: [],
       currentBrand: 0,
@@ -35,6 +40,7 @@ class Index extends PureComponent {
 
   componentDidShow() {
     this.getData();
+    this.getStoreInfo()
   }
 
   getData = () => {
@@ -56,6 +62,22 @@ class Index extends PureComponent {
     })
   }
 
+  getStoreInfo = () => {
+    apiGetDP({
+      id: this.$router.params.id
+    }).then(res => {
+      const { service_tel } = res.data;
+      const { storePhoneInfo } = this.state;
+      this.setState({
+        storePhoneInfo: {
+          ...storePhoneInfo,
+          service_tel
+        }
+      })
+
+    })
+  }
+
   handleCloseCumster() {
     this.setState({
       isShowCustomer: false
@@ -70,11 +92,11 @@ class Index extends PureComponent {
   }
 
   render() {
-    const { likeList, currentBrand, isShowCustomer } = this.state;
+    const { likeList, currentBrand, isShowCustomer, storePhoneInfo } = this.state;
     return (
       <View className='container'>
         {
-          isShowCustomer ? <Customer handleCloseCumster={this.handleCloseCumster.bind(this)}></Customer> : ""
+          isShowCustomer ? <Customer storePhoneInfo={storePhoneInfo} handleCloseCumster={this.handleCloseCumster.bind(this)}></Customer> : ""
         }
         <View className="header">
           <Image src={back} className="back" />
