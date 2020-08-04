@@ -3,6 +3,7 @@ import { View, Text, Image, Navigator } from '@tarojs/components';
 import { connect } from '@tarojs/redux';
 import nothing from "../../../assets/images/nothing1.jpg"
 import { actionOrderlist, actionCancelOrder, actionFundAuthOrderAppFreeze, actionUpdateOrder, actionReceiptSub } from "../../../services/order"
+import { apiGetDP } from "../../../services/goods"
 import './index.less';
 import Customer from '../../../components/customer'
 
@@ -16,6 +17,10 @@ class Index extends Component {
   }
 
   state = {
+    storePhoneInfo: {
+      service_tel: "",
+      isDp: true
+    },
     isShowCustomer: false,
     current: "",
     orderType: [
@@ -178,10 +183,26 @@ class Index extends Component {
     })
   }
 
-  handleShowCustomer(e) {
+  handleShowCustomer(item, e) {
     e.stopPropagation();
-    this.setState({
-      isShowCustomer: true
+    Taro.showLoading({
+      title: '加载中'
+    })
+    apiGetDP({
+      id: item.dId
+    }).then(res => {
+      Taro.hideLoading();
+      if (res.code == '200') {
+        const { service_tel } = res.data;
+        const { storePhoneInfo } = this.state;
+        this.setState({
+          storePhoneInfo: {
+            ...storePhoneInfo,
+            service_tel
+          },
+          isShowCustomer: true
+        })
+      }
     })
   }
 
@@ -209,11 +230,11 @@ class Index extends Component {
   }
 
   render() {
-    const { list, isShowCustomer } = this.state
+    const { list, isShowCustomer, storePhoneInfo } = this.state
     return (
       <View className='container'>
         {
-          isShowCustomer ? <Customer handleCloseCumster={this.handleCloseCumster.bind(this)}></Customer> : ""
+          isShowCustomer ? <Customer storePhoneInfo={storePhoneInfo} handleCloseCumster={this.handleCloseCumster.bind(this)}></Customer> : ""
         }
         <ScrollView scrollX scrollWithAnimation className="orders-switch">
           {
@@ -243,7 +264,7 @@ class Index extends Component {
                 <Text className='at-icon at-icon-chevron-right'></Text>
               </View>
               <View className="button_group">
-                <View className="btn" onClick={this.handleShowCustomer.bind(this)}>联系商家</View>
+                <View className="btn" onClick={this.handleShowCustomer.bind(this, item)}>联系商家</View>
                 {
                   item.status === 0 ? <View className="btn" onClick={this.handleToCancelOrder.bind(this, item.id)}>取消订单</View> : ""
                 }
@@ -261,7 +282,7 @@ class Index extends Component {
                   item.status === 5 && new Date(item.end_date).getMonth() + 1 === new Date().getMonth() + 1 && new Date(item.end_date).getFullYear() === new Date().getFullYear() ? <View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> : ""
                 }
                 {
-                  item.status === 5 ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""
+                  item.status === 5 && new Date(item.end_date).getMonth() + 1 === new Date().getMonth() + 1 && new Date(item.end_date).getFullYear() === new Date().getFullYear() ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""
                 }
               </View>
             </View >
