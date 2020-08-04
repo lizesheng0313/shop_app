@@ -33,6 +33,14 @@ class Index extends Component {
     list: []
   }
 
+  componentWillMount() {
+    const { isPay, id } = this.$router.params
+    if (isPay) {
+      Taro.navigateTo({
+        url: "/pages/ucenter/orderDetail/index?id=" + id
+      })
+    }
+  }
 
   componentDidShow() {
     let current;

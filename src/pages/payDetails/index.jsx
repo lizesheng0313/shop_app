@@ -202,7 +202,7 @@ class Index extends Component {
           delete queryForm.yj_money;
           let resultData = await actionSubOrder(queryForm)
           Taro.redirectTo({
-            url: "/pages/ucenter/orderDetail/index?isPay=true&id=" + resultData.data
+            url: "/pages/ucenter/order/index?isPay=true&id=" + resultData.data
           })
 
         },

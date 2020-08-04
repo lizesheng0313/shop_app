@@ -4,7 +4,6 @@ import './index.less'
 
 export default class Customer extends Component {
     state = {
-        storePhoneInfo: {}
     }
 
     componentWillMount() {
@@ -12,14 +11,8 @@ export default class Customer extends Component {
     }
 
     componentDidShow() {
-        console.log(this.props)
-        this.setState({
-            storePhoneInfo: {
-                ...this.props.storePhoneInfo
-            }
-        })
+      
     }
-
     makePhoneCall(number) {
         my.makePhoneCall({ number });
     }
@@ -29,7 +22,7 @@ export default class Customer extends Component {
     }
 
     render() {
-        const { storePhoneInfo } = this.state
+        const { storePhoneInfo } = this.props
         return (
             <View className="customer">
                 <View className="box">

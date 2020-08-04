@@ -166,15 +166,14 @@ class Index extends Component {
           </View>
           <View className="auth_input">
             <AtInput
-              name='email'
-              border={false}
-              editable={userInfo.card_num}
               title='邮箱'
               type='text'
-              onChange={this.handleChange.bind(this, 'email')}
+              className="email"
               placeholder='请输入邮箱'
-              placeholderClass="place_class"
+              disabled={userInfo.card_num}
               value={queryObj.email}
+              placeholderClass="place_class"
+              onChange={this.handleChange.bind(this, 'email')}
             />
           </View>
         </View>

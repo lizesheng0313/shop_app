@@ -26,7 +26,7 @@ class Index extends Component {
     orderInfo: {},
   }
 
-  componentDidShow() {
+  componentDidMount() {
     let hasAlso = 0;
     let data = JSON.parse(this.$router.params.info)
     data.list.forEach((item, index) => {

@@ -14,19 +14,12 @@ class Index extends Component {
   }
 
   state = {
-    isPay: false,
     order_id: "",
     orderInfo: {}
   }
 
   componentDidShow() {
     const { userInfo } = this.props
-    const { isPay } = this.$router.params
-    if (isPay) {
-      this.setState({
-        isPay: true
-      })
-    }
     this.setState({
       order_id: this.$router.params.id
     }, () => {
@@ -109,13 +102,10 @@ class Index extends Component {
   }
 
   render() {
-    const { orderInfo, isPay } = this.state
+    const { orderInfo } = this.state
     const { userInfo } = this.props
     return (
       <View className='order-details'>
-        {isPay ? <View className="return_list">
-          <View className="footer_pay_btn" onClick={this.handleToOrdertList.bind(this)}>返回列表</View>
-        </View> : ""}
         <View className="goods_details">
           <View className="flex-start_center ">
             <Image className="image" mode="widthFix" src={'https://app.zuyuanzhang01.com/' + orderInfo.pic}></Image>
