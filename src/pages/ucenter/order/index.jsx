@@ -221,6 +221,7 @@ class Index extends Component {
       url: '/pages/ucenter/refund/index?orderDetails=' + JSON.stringify(item)
     })
   }
+
   handleToLogistics(item, e) {
     console.log(e, item)
     e.stopPropagation();
@@ -228,6 +229,20 @@ class Index extends Component {
       url: '/pages/ucenter/logistics/index?id=' + item.id
     })
   }
+
+  isEqual = (time) => {
+    console.log(time)
+    const timeMonth = time.substr(5, 2)
+    console.log(timeMonth)
+    const timeYear = time.substr(0, 4)
+    console.log(timeYear)
+    if (new Date().getFullYear().toString() == timeYear && (timeMonth == new Date().getMonth() + 1 || timeMonth == "0" + new Date().getMonth() + 1)) {
+      return true
+    }
+    return false
+  }
+
+
 
   render() {
     const { list, isShowCustomer, storePhoneInfo } = this.state
@@ -277,12 +292,11 @@ class Index extends Component {
                 {
                   item.status === 41 ? <View className="btn" onClick={this.handleSubmitGoods.bind(this, item)}>确认收货</View> : ""
                 }
-
                 {
-                  item.status === 5 && new Date(item.end_date).getMonth() + 1 === new Date().getMonth() + 1 && new Date(item.end_date).getFullYear() === new Date().getFullYear() ? <View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> : ""
+                  item.status === 5 && this.isEqual(item.end_date) ? < View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> : ""
                 }
                 {
-                  item.status === 5 && new Date(item.end_date).getMonth() + 1 === new Date().getMonth() + 1 && new Date(item.end_date).getFullYear() === new Date().getFullYear() ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""
+                  item.status === 5 && this.isEqual(item.end_date) ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""
                 }
               </View>
             </View >
