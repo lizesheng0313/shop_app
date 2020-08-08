@@ -92,35 +92,35 @@ class App extends Component {
     "debug": true,
   }
 
-  componentWillMount() {
-    this.update();
-  }
+  // componentWillMount() {
+  //   this.update();
+  // }
 
-  update = () => {
-    if (process.env.TARO_ENV === 'weapp') {
-      const updateManager = Taro.getUpdateManager();
-      Taro.getUpdateManager().onUpdateReady(function () {
-        Taro.showModal({
-          title: '更新提示',
-          content: '新版本已经准备好，是否重启应用？',
-          success: function (res) {
-            if (res.confirm) {
-              // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
-              updateManager.applyUpdate()
-            }
-          }
-        })
-      })
-    }
-  }
+  // update = () => {
+  //   if (process.env.TARO_ENV === 'weapp') {
+  //     const updateManager = Taro.getUpdateManager();
+  //     Taro.getUpdateManager().onUpdateReady(function () {
+  //       Taro.showModal({
+  //         title: '更新提示',
+  //         content: '新版本已经准备好，是否重启应用？',
+  //         success: function (res) {
+  //           if (res.confirm) {
+  //             // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+  //             updateManager.applyUpdate()
+  //           }
+  //         }
+  //       })
+  //     })
+  //   }
+  // }
 
-  componentDidShow() {
-    user.checkLogin().then(res => {
-      setGlobalData('hasLogin', true);
-    }).catch(() => {
-      setGlobalData('hasLogin', false);
-    });
-  }
+  // componentDidShow() {
+  //   user.checkLogin().then(res => {
+  //     setGlobalData('hasLogin', true);
+  //   }).catch(() => {
+  //     setGlobalData('hasLogin', false);
+  //   });
+  // }
 
   componentDidHide() { }
 
