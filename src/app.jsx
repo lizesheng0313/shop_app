@@ -92,9 +92,7 @@ class App extends Component {
     "debug": true,
   }
 
-  // componentWillMount() {
-  //   this.update();
-  // }
+
 
   // update = () => {
   //   if (process.env.TARO_ENV === 'weapp') {
@@ -114,13 +112,6 @@ class App extends Component {
   //   }
   // }
 
-  // componentDidShow() {
-  //   user.checkLogin().then(res => {
-  //     setGlobalData('hasLogin', true);
-  //   }).catch(() => {
-  //     setGlobalData('hasLogin', false);
-  //   });
-  // }
 
   componentDidHide() { }
 

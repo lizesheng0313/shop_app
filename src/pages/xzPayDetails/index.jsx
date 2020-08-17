@@ -208,9 +208,9 @@ class Index extends Component {
            queryForm.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amount || 0
            queryForm.fund_amount = data.alipay_fund_auth_order_app_freeze_response.fund_amount || 1
           }
-          let resultData = await actionxzSubOrder(queryForm)
+          await actionxzSubOrder(queryForm)
           Taro.redirectTo({
-            url: "/pages/ucenter/orderDetail/index?id=" + resultData.data
+            url: "/pages/ucenter/orderDetail/index?id=" + queryForm.new_order_id
           })
 
         },
