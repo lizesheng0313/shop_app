@@ -1,7 +1,11 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import './index.less'
+import { connect } from '@tarojs/redux';
 
+@connect(({ user }) => ({
+    user_id: user.user_id
+}))
 export default class Customer extends Component {
     state = {
     }
@@ -11,7 +15,7 @@ export default class Customer extends Component {
     }
 
     componentDidShow() {
-      
+
     }
     makePhoneCall(number) {
         my.makePhoneCall({ number });
@@ -22,7 +26,7 @@ export default class Customer extends Component {
     }
 
     render() {
-        const { storePhoneInfo } = this.props
+        const { storePhoneInfo,user_id } = this.props
         return (
             <View className="customer">
                 <View className="box">
@@ -31,7 +35,7 @@ export default class Customer extends Component {
                     <View className="time">(9:00-18:00)</View>
                     <View className='customer_flex'>
                         <View>在线客服：</View>
-                        <contact-button className="user_other_item btn" session-from='weapp' size='27' >
+                        <contact-button className="user_other_item btn" alipay-card-no={user_id} session-from='weapp' size='27' tnt-inst-id="KBGXLUZI" scene="SCE00039823" >
                         </contact-button>
                     </View>
                     {
