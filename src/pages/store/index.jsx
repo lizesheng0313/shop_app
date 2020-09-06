@@ -23,6 +23,7 @@ class Index extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
+      backImage:"",
       storePhoneInfo: {
         service_tel: "",
         isDp: true
@@ -69,6 +70,7 @@ class Index extends PureComponent {
       const { service_tel } = res.data;
       const { storePhoneInfo } = this.state;
       this.setState({
+        backImage:res.data.log_img,
         storePhoneInfo: {
           ...storePhoneInfo,
           service_tel
@@ -92,14 +94,14 @@ class Index extends PureComponent {
   }
 
   render() {
-    const { likeList, currentBrand, isShowCustomer, storePhoneInfo } = this.state;
+    const { likeList, currentBrand, isShowCustomer, storePhoneInfo,backImage} = this.state;
     return (
       <View className='container'>
         {
           isShowCustomer ? <Customer storePhoneInfo={storePhoneInfo} handleCloseCumster={this.handleCloseCumster.bind(this)}></Customer> : ""
         }
         <View className="header">
-          <Image src={back} className="back" />
+          <Image src={'http://app.zuyuanzhang01.com/'+backImage} className="back" />
         </View>
         <Image src={service} className="service" onClick={this.handleShowCustomer.bind(this)}></Image>
         <View className="like">

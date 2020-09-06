@@ -56,6 +56,8 @@ class App extends Component {
       'pages/ucenter/order/index',
       'pages/ucenter/coupons/index',
       'pages/ucenter/feedback/index',
+      'pages/ucenter/platformCoupons/index'
+
     ],
     window: {
       backgroundTextStyle: 'light',

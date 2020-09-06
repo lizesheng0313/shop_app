@@ -101,6 +101,13 @@ class Index extends PureComponent {
     })
   }
 
+  handleGoCou() {
+    console.log(123)
+    Taro.navigateTo({
+      url: "/pages/ucenter/platformCoupons/index"
+    });
+  }
+
   render() {
     const { menuList, banner, list, likeList, value, currentBrand } = this.state;
     return (
@@ -148,7 +155,7 @@ class Index extends PureComponent {
           }
         </ScrollView>
 
-        <View>
+        <View onClick={this.handleGoCou.bind(this)}>
           <Image src="http://app.zuyuanzhang01.com/shop_app/home/coupons.png" className="coupons" />
         </View>
         <View className="like">

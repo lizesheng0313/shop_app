@@ -50,3 +50,17 @@ export async function actionUploadFile(payload) {
   return request("core_api/userapi/uploadFile", payload);
 }
 
+//获取优惠卷列表
+export async function actionCouponapiList(payload) {
+  return request("core_api/couponapi/list", payload);
+}
+
+//提交优惠
+export async function actionSetUserCoupon(payload) {
+  return request("core_api/couponapi/setUserCoupon", payload);
+}
+
+//获取会员的优惠卷
+export async function actionUserList(payload) {
+  return request("core_api/couponapi/user_list", payload);
+}

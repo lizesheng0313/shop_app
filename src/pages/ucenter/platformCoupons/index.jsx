@@ -1,11 +1,12 @@
 import Taro, { Component } from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
-import { connect } from '@tarojs/redux';
+
 import icon from "../../../assets/images/coupons/icon.png"
 import first from "../../../assets/images/coupons/first.png"
 import second from "../../../assets/images/coupons/second.png"
 import nothing from "../../../assets/images/nothing.jpg"
-import { actionUserList } from "../../../services/user"
+import { connect } from '@tarojs/redux';
+import { actionCouponapiList, actionSetUserCoupon } from "../../../services/user"
 
 import './index.less';
 
@@ -13,10 +14,11 @@ import './index.less';
   userInfo: user.userInfo
 }))
 
+
 class Index extends Component {
 
   config = {
-    "navigationBarTitleText": "我的优惠券"
+    "navigationBarTitleText": "平台优惠券"
   }
 
   state = {
@@ -24,49 +26,30 @@ class Index extends Component {
   }
 
   componentDidMount() {
-
-    let { userInfo } = this.props
-    actionUserList({
-      user_id: userInfo.user_id
-    }).then(res => {
+    actionCouponapiList().then(res => {
       this.setState({
         couponList: res.data
       })
     })
   }
 
-  selected(item) {
-    const { dispatch } = this.props;
-    const param = this.$router
-    console.log(param)
-    if (param.params.fr) {
-      if (Number(param.params.countPrice) >= item.full_money) {
-        dispatch({
-          type: 'user/saveConpons', payload: {
-            id: item.id,
-            sub_money: item.sub_money
-          }
-        })
-        Taro.navigateBack({
-          delta: 1
-        })
-      }
-      else {
-        Taro.showToast({
-          title: '满' + item.full_money + '可用'
-        })
-        return 
-      }
-    }
+  getCoupon(item) {
+    let { userInfo } = this.props
+    actionSetUserCoupon({
+      user_id: userInfo.user_id,
+      coupon_id: item.id
+    }).then(res => {
+      console.log(res)
+    })
   }
 
   render() {
     return (
       <View className='container coupons'>
-        <View className="coupons_list" >
+        <View className="coupons_list">
           {
             this.state.couponList.length > 0 ? this.state.couponList.map((item, index) => {
-              return <View className="coupon_list_item" onClick={this.selected.bind(this, item)}>
+              return <View className="coupon_list_item" onClick={this.getCoupon.bind(this, item)}>
                 {
                   index % 2 === 0 ? <Image src={first} className="back"></Image> : <Image src={second} className="back"></Image>
                 }
@@ -91,9 +74,6 @@ class Index extends Component {
               </View>
           }
         </View>
-        {/* {
-          this.state.couponList.length > 0 ? <View className="btn_submit">兑换优惠券</View> : ""
-        } */}
       </View>
     );
   }
