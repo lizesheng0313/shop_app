@@ -15,17 +15,6 @@ function request(url, data = {}) {
         if (res.statusCode == 200) {
           if (res.data.code == 200) {
             resolve(res.data);
-            // 清除登录相关内容
-            // try {
-            //   Taro.removeStorageSync('userInfo');
-            //   Taro.removeStorageSync('token');
-            // } catch (e) {
-            //   // Do something when catch error
-            // }
-            // 切换到登录页面
-            // Taro.navigateTo({
-            //   url: '/pages/auth/login/login'
-            // });
           } else if (res.data.data !== 200) {
             showErrorToast(res.data.msg);
             reject(res.data);
