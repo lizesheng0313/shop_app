@@ -9,7 +9,9 @@ import './index.less';
 @connect(({ order, user }) => ({
   addressInfo: order.addressInfo,
   userInfo: user.userInfo,
-  user_id: user.user_id
+  user_id: user.user_id,
+  conponsId: user.conponsId,
+  conponsMoney: user.conponsMoney
 }))
 
 class Index extends Component {
@@ -19,8 +21,10 @@ class Index extends Component {
   }
 
   state = {
+    coupons: '请选择优惠卷',
     num: 1,
     orderDetails: {
+      yhj_id: 0,
       order_id: "",
       operation_id: "",
       descption: "",
@@ -40,30 +44,65 @@ class Index extends Component {
 
 
 
-  componentWillMount() {
+  async componentWillMount() {
     console.log(this.$router.params.details)
+    const { dispatch } = this.props;
     this.setState({
       orderDetails: { ...this.state.orderDetails, ...JSON.parse(this.$router.params.details) },
     }, () => {
-      actionGetOneBill({
-        countPrice: this.state.orderDetails.countPrice,
-        day: this.state.orderDetails.day
-      }).then(res => {
-        this.setState({
-          bill: res.data
-        })
-      })
+      this.actionGetBill()
+    })
+    await dispatch({
+      type: 'user/saveConpons', payload: {
+        id: "",
+        sub_money: '请选择优惠卷'
+      }
     })
   }
 
   componentDidShow() {
-    const { addressInfo } = this.props;
+    const { addressInfo, conponsId, conponsMoney } = this.props;
+    console.log(conponsId, conponsMoney)
+    const { bill_money, orderDetails } = this.state
     if (addressInfo.id) {
       this.setState({
         isAddress: true
       })
       this.state.orderDetails.address_id = addressInfo.id;
     }
+    if (conponsId) {
+      orderDetails.yhj_id = conponsId
+      orderDetails.countPrice = orderDetails.countPrice - Number(conponsMoney)
+      this.setState({
+        orderDetails,
+        coupons: conponsMoney
+      },()=>{
+         this.actionGetBill()
+      })
+    }
+    else {
+      orderDetails.yhj_id = 0
+      this.setState({
+        orderDetails
+      })
+    }
+  }
+
+  actionGetBill = () => {
+    Taro.showLoading({
+      title:'加载中',
+      mask:true
+    })
+    actionGetOneBill({
+      countPrice: this.state.orderDetails.countPrice,
+      day: this.state.orderDetails.day
+    }).then(res => {
+      Taro.hideLoading()
+      this.setState({
+        bill: res.data,
+        bill_money: res.data.bill_money
+      })
+    })
   }
 
   handleToAddress(flag) {
@@ -88,7 +127,7 @@ class Index extends Component {
 
   handleToConpons() {
     Taro.navigateTo({
-      url: "/pages/ucenter/coupons/index"
+      url: "/pages/ucenter/coupons/index?fr=pay&countPrice=" + this.state.orderDetails.countPrice
     })
   }
 
@@ -179,7 +218,7 @@ class Index extends Component {
       })
       return;
     }
-    
+
     await actionFundAuthOrderAppFreeze({
       orderTitle: this.state.orderDetails.goodsName,
       amount: this.state.orderDetails.yj_money,
@@ -214,7 +253,7 @@ class Index extends Component {
   }
 
   render() {
-    const { num, isAddress, orderDetails, bill, checkboxOption, checkedList } = this.state
+    const { bill_money, num, isAddress, orderDetails, bill, checkboxOption, checkedList } = this.state
     const { addressInfo, userInfo } = this.props
     return (
       <View className='order-details'>
@@ -283,7 +322,7 @@ class Index extends Component {
           <View className="flex-space_center title">
             <View>优惠券</View>
             <View className="select_con" onClick={this.handleToConpons.bind(this)}>
-              请选择优惠卷
+              {coupons}
               <View className='at-icon  at-icon-chevron-right'></View>
             </View>
           </View>
@@ -317,7 +356,7 @@ class Index extends Component {
         <View className="footer_btn flex-space_center">
           <View>
             <View>
-              <View className="total_box">预计：<Text className="symbol">￥</Text><Text className="total">{bill.bill_money}</Text></View>
+              <View className="total_box">预计：<Text className="symbol">￥</Text><Text className="total">{bill_money}</Text></View>
               <View>
                 <AtCheckbox
                   size="5"

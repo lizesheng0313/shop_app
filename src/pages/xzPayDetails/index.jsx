@@ -251,13 +251,13 @@ class Index extends Component {
           </View>
         </View>
         <View className="coupons">
-          <View className="flex-space_center title">
+          {/* <View className="flex-space_center title">
             <View>优惠券</View>
             <View className="select_con" onClick={this.handleToConpons.bind(this)}>
               请选择优惠卷
               <View className='at-icon  at-icon-chevron-right'></View>
             </View>
-          </View>
+          </View> */}
           <View className="flex-space_center">
             <View>第1期租金</View>
             <View className="bold">￥{bill.bill_money}</View>

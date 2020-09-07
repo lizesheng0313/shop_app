@@ -215,17 +215,24 @@ class Goods extends Component {
           Taro.showLoading({
             title: "加载中"
           })
-          await apiRegisterUser({
-            user_id,
-            avatar: user_info.avatar,
-            nickName: user_info.nickName
-          })
-          await dispatch({ type: 'user/apiFindUserByUserId', payload: user_id }).then(res => {
-            Taro.hideLoading()
-            that.setState({
-              openAttr: true
+          if (user_id) {
+            await apiRegisterUser({
+              user_id,
+              avatar: user_info.avatar,
+              nickName: user_info.nickName
             })
-          })
+            await dispatch({ type: 'user/apiFindUserByUserId', payload: user_id }).then(res => {
+              Taro.hideLoading()
+              that.setState({
+                openAttr: true
+              })
+            })
+          }
+          else{
+            Taro.showToast({
+              title:"请您稍后在试，小程序没有拿到您的信息"
+            })
+          }
         }
       }
     })
@@ -308,14 +315,14 @@ class Goods extends Component {
 
 
 
-          <View className='section-nav section-attr' onClick={this.handleToCoupons.bind(this)}>
+          {/* <View className='section-nav section-attr' onClick={this.handleToCoupons.bind(this)}>
             <View className='t'>
               {
                 orderObj.coupons ? <View className="coupons">{orderObj.coupons}</View> : <Text className="tips">请选择优惠券</Text>
               }
             </View>
             <Text className='at-icon at-icon-chevron-right'></Text>
-          </View>
+          </View> */}
 
 
           <View className="recommend_list">
