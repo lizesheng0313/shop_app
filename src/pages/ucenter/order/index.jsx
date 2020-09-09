@@ -296,7 +296,7 @@ class Index extends Component {
                   item.status === 5 && this.isEqual(item.end_date) ? < View className="btn" onClick={this.handleRenewal.bind(this, item)}>续租</View> : ""
                 }
                 {
-                  item.status === 5 && this.isEqual(item.end_date) ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""
+                  (item.status === 5  || item.statusName =='逾期未归还') && this.isEqual(item.end_date) ? <View className="btn" onClick={this.handleToRefund.bind(this, item)}>退还</View> : ""
                 }
               </View>
             </View >
