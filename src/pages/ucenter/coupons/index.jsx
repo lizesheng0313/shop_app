@@ -39,6 +39,12 @@ class Index extends Component {
     const { dispatch } = this.props;
     const param = this.$router
     console.log(param)
+    if(Number(param.params.conponsId) == item.id){
+      Taro.showToast({
+        title: '已选中该优惠卷'
+      })
+      return
+    }
     if (param.params.fr) {
       if (Number(param.params.countPrice) >= item.full_money) {
         dispatch({
@@ -55,7 +61,7 @@ class Index extends Component {
         Taro.showToast({
           title: '满' + item.full_money + '可用'
         })
-        return 
+        return
       }
     }
   }

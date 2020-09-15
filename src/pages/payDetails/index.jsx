@@ -126,8 +126,9 @@ class Index extends Component {
   }
 
   handleToConpons() {
+    const { conponsId } = this.props;
     Taro.navigateTo({
-      url: "/pages/ucenter/coupons/index?fr=pay&countPrice=" + this.state.orderDetails.countPrice
+      url: "/pages/ucenter/coupons/index?fr=pay&countPrice=" + this.state.orderDetails.countPrice +'&conponsId='+conponsId
     })
   }
 

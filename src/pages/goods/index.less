@@ -828,6 +828,7 @@
 .spec-con .value {
   padding: 0 45px;
   display:flex;
+  box-sizing:border-box;
   align-items:center;
   justify-content:center;
   height:50px;
@@ -838,6 +839,9 @@
   border-radius:25px;
   margin-bottom:15px;
   color: #666;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .spec-con .value.selected {
@@ -901,7 +905,7 @@
   }
   .txt {
     text-align: center;
-    width:250px;  
+    width:250px;
     font-size: 26px;
     color: #333;
   }
