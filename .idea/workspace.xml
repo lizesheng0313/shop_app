@@ -35,9 +35,7 @@
       <change beforePath="$PROJECT_DIR$/src/components/taro-region-picker" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/taro-region-picker" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/taro-region-picker/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/taro-region-picker/index.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/taro-region-picker/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/taro-region-picker/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/goods/index.less" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/goods/index.less" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/payDetails/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/payDetails/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/ucenter/coupons/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ucenter/coupons/index.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,11 +44,6 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="ProjectFrameBounds" fullScreen="true">
-    <option name="x" value="1440" />
-    <option name="width" value="1920" />
-    <option name="height" value="1080" />
   </component>
   <component name="ProjectId" id="1hWgFiSclLSdqR01z3MSSbg3r2A" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -90,7 +83,8 @@
       <workItem from="1598921378847" duration="339000" />
       <workItem from="1599440012155" duration="819000" />
       <workItem from="1600132162300" duration="573000" />
-      <workItem from="1600132771961" duration="657000" />
+      <workItem from="1600132771961" duration="914000" />
+      <workItem from="1600218141888" duration="868000" />
     </task>
     <servers />
   </component>

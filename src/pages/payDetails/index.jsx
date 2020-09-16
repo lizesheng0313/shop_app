@@ -21,6 +21,7 @@ class Index extends Component {
   }
 
   state = {
+    countPrice:"",
     coupons: '请选择优惠卷',
     num: 1,
     orderDetails: {
@@ -50,6 +51,9 @@ class Index extends Component {
     this.setState({
       orderDetails: { ...this.state.orderDetails, ...JSON.parse(this.$router.params.details) },
     }, () => {
+      this.setState({
+        countPrice:this.state.orderDetails.countPrice
+      })
       this.actionGetBill()
     })
     await dispatch({
@@ -71,14 +75,16 @@ class Index extends Component {
       this.state.orderDetails.address_id = addressInfo.id;
     }
     if (conponsId) {
+      orderDetails.countPrice = this.state.countPrice
       orderDetails.yhj_id = conponsId
       orderDetails.countPrice = orderDetails.countPrice - Number(conponsMoney)
       this.setState({
         orderDetails,
         coupons: conponsMoney
       },()=>{
-         this.actionGetBill()
+        this.actionGetBill()
       })
+
     }
     else {
       orderDetails.yhj_id = 0
