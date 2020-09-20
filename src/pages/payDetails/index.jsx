@@ -77,7 +77,7 @@ class Index extends Component {
     if (conponsId) {
       orderDetails.countPrice = this.state.countPrice
       orderDetails.yhj_id = conponsId
-      orderDetails.countPrice = orderDetails.countPrice - Number(conponsMoney)
+      orderDetails.countPrice = (orderDetails.countPrice - Number(conponsMoney)).toFixed(2)
       this.setState({
         orderDetails,
         coupons: conponsMoney

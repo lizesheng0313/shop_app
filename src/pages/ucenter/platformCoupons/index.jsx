@@ -39,6 +39,12 @@ class Index extends Component {
       user_id: userInfo.user_id,
       coupon_id: item.id
     }).then(res => {
+
+      if(res.code === 200) {
+        Taro.showToast({
+          title:'领取成功'
+        })
+      }
       console.log(res)
     })
   }
