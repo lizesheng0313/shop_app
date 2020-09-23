@@ -242,7 +242,7 @@ class Index extends Component {
             that.state.orderDetails.order_id = data.alipay_fund_auth_order_app_freeze_response.out_order_no
             that.state.orderDetails.operation_id = data.alipay_fund_auth_order_app_freeze_response.auth_no
             that.state.orderDetails.credit_amout = data.alipay_fund_auth_order_app_freeze_response.credit_amount || 0
-            that.state.orderDetails.fund_amount = data.alipay_fund_auth_order_app_freeze_response.fund_amount || 1
+            that.state.orderDetails.fund_amount = data.alipay_fund_auth_order_app_freeze_response.fund_amount || this.state.orderDetails.yj_money
           }
           let queryForm = { ...that.state.orderDetails };
           delete queryForm.yj_money;

@@ -37,7 +37,6 @@
       <change beforePath="$PROJECT_DIR$/src/components/taro-region-picker/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/taro-region-picker/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/payDetails/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/payDetails/index.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/ucenter/orderDetail/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ucenter/orderDetail/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/ucenter/platformCoupons/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ucenter/platformCoupons/index.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,7 +93,9 @@
       <workItem from="1600219368236" duration="12000" />
       <workItem from="1600243499998" duration="41000" />
       <workItem from="1600243555444" duration="4000" />
-      <workItem from="1600602253286" duration="1185000" />
+      <workItem from="1600602253286" duration="1519000" />
+      <workItem from="1600604807433" duration="408000" />
+      <workItem from="1600823035235" duration="197000" />
     </task>
     <servers />
   </component>
@@ -112,5 +113,15 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="1824" y="190" key="DiffContextDialog" timestamp="1600823124473">
+      <screen x="1440" y="23" width="1920" height="1057" />
+    </state>
+    <state x="1824" y="190" key="DiffContextDialog/0.23.1440.877/1440.23.1920.1057@1440.23.1920.1057" timestamp="1600823124473" />
+    <state x="2189" y="261" key="RollbackChangesDialog" timestamp="1600823126063">
+      <screen x="1440" y="23" width="1920" height="1057" />
+    </state>
+    <state x="2189" y="261" key="RollbackChangesDialog/0.23.1440.877/1440.23.1920.1057@1440.23.1920.1057" timestamp="1600823126063" />
   </component>
 </project>

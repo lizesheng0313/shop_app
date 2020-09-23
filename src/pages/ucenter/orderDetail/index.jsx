@@ -127,7 +127,7 @@ class Index extends Component {
           </View>
           <View className="flex-space_center">
             <View>第1期租金</View>
-            <View>￥{orderInfo.fast_pay_money}</View>
+            <View>￥{orderInfo.fastOneMonery}</View>
           </View>
           <View className="flex-space_center">
             <View>运费</View>
