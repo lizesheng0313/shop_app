@@ -29,7 +29,7 @@ class Index extends Component {
 
   componentDidMount() {
     const { userInfo } = this.props;
-    if (userInfo.card_num) {
+    if (userInfo && userInfo.card_num) {
       const { card_num, name, email } = userInfo
       let data = Object.assign({}, this.state.queryObj, { certName: name, certNo: card_num, email })
       this.setState({
@@ -178,7 +178,7 @@ class Index extends Component {
           </View>
         </View>
         {
-          userInfo.card_num ? "" :
+          userInfo && userInfo.card_num ? "" :
             <View>
               <AtButton formType='submit' className="btn_submit">提交</AtButton>
             </View>
