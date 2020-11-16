@@ -143,11 +143,12 @@ class Goods extends Component {
 
 
   clickSkuValue = (item, index) => {
+    console.log(item,index)
     this.state.orderDetails.goods_item_id = item.id;
     this.state.orderDetails.name = item.name;
     this.state.orderDetails.yj_money = item.yj_money;
     this.state.orderDetails.pic = item.pic;
-    this.state.orderDetails.day = this.state.currentObj.dayItem[index].day;
+    this.state.orderDetails.day = this.state.currentObj.dayItem[0].day;
     this.setState({
       currentPack: index,
       currentObj: item,
